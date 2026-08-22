@@ -1,0 +1,67 @@
+{
+  "info": {
+    "_postman_id": "6d3095dc-a21a-4ca7-bb28-e24b85e332ec",
+    "name": "Microservicio Pedidos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54023857",
+    "_collection_link": "https://go.postman.co/collection/54023857-6d3095dc-a21a-4ca7-bb28-e24b85e332ec?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Iniciar estado REGISTRADO",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombreEstudiante\": \"Miguel Alarcon\",\r\n  \"correo\": \"miguel@gmail.com\",\r\n  \"telefono\": \"999999999\",\r\n  \"cursoId\": 1,\r\n  \"nombreCurso\": \"Desarrollo Web Integrado\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/pedidos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "pedidos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Cambiar estado PENDIENTE PAGO",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"estado\": \"PENDIENTE_PAGO\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/pedidos/1/estado",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "pedidos",
+            "1",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
