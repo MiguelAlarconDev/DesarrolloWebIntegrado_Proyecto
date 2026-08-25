@@ -1,6 +1,5 @@
 package com.curso.pedidos.service;
 
-import com.curso.pedidos.dto.CambiarEstadoRequest;
 import com.curso.pedidos.dto.CrearPedidoRequest;
 import com.curso.pedidos.dto.PagarPedidoRequest;
 import com.curso.pedidos.entity.*;
@@ -11,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
