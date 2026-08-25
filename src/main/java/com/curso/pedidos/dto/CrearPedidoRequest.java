@@ -1,35 +1,18 @@
 package com.curso.pedidos.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 
 public class CrearPedidoRequest {
 
-    @NotBlank
-    private String nombreEstudiante;
+    @NotNull(message = "El ID del estudiante es obligatorio")
+    private UUID estudianteId;
 
-    @NotBlank
-    @Email
-    private String correo;
+    @NotNull(message = "El ID del curso es obligatorio")
+    private UUID cursoId;
 
-    @NotBlank
-    private String telefono;
-
-    @NotNull
-    private Long cursoId;
-
-    @NotBlank
-    private String nombreCurso;
-
-    public String getNombreEstudiante() { return nombreEstudiante; }
-    public void setNombreEstudiante(String nombreEstudiante) { this.nombreEstudiante = nombreEstudiante; }
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
-    public Long getCursoId() { return cursoId; }
-    public void setCursoId(Long cursoId) { this.cursoId = cursoId; }
-    public String getNombreCurso() { return nombreCurso; }
-    public void setNombreCurso(String nombreCurso) { this.nombreCurso = nombreCurso; }
+    public UUID getEstudianteId() { return estudianteId; }
+    public void setEstudianteId(UUID estudianteId) { this.estudianteId = estudianteId; }
+    public UUID getCursoId() { return cursoId; }
+    public void setCursoId(UUID cursoId) { this.cursoId = cursoId; }
 }

@@ -1,39 +1,49 @@
 package com.curso.pedidos.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "pedidos")
 public class Pedido {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
-    @Column(nullable = false, length = 120)
-    private String nombreEstudiante;
+    @Column(name = "codigo_orden", nullable = false, unique = true, length = 30)
+    private String codigoOrden;
 
-    @Column(nullable = false, length = 150)
-    private String correo;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "estudiante_id", nullable = false)
+    private Usuario estudiante;
 
-    @Column(nullable = false, length = 20)
-    private String telefono;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "curso_id", nullable = false)
+    private Curso curso;
 
-    @Column(nullable = false)
-    private Long cursoId;
-
-    @Column(nullable = false, length = 150)
-    private String nombreCurso;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal monto;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private EstadoPedido estado;
+    private EstadoPedido estado = EstadoPedido.REGISTRADO;
 
-    @Column(nullable = false)
+    @Column(name = "mp_preference_id", length = 100)
+    private String mpPreferenceId;
+
+    @Column(name = "mp_payment_id", length = 100)
+    private String mpPaymentId;
+
+    @Column(name = "reserva_expira_en")
+    private LocalDateTime reservaExpiraEn;
+
+    @Column(name = "fecha_registro", nullable = false)
     private LocalDateTime fechaRegistro;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_actualizacion", nullable = false)
     private LocalDateTime fechaActualizacion;
 
     @PrePersist
@@ -41,6 +51,12 @@ public class Pedido {
         LocalDateTime ahora = LocalDateTime.now();
         fechaRegistro = ahora;
         fechaActualizacion = ahora;
+        if (estado == null) {
+            estado = EstadoPedido.REGISTRADO;
+        }
+        if (codigoOrden == null) {
+            codigoOrden = "ORD-" + System.currentTimeMillis();
+        }
     }
 
     @PreUpdate
@@ -48,20 +64,24 @@ public class Pedido {
         fechaActualizacion = LocalDateTime.now();
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getNombreEstudiante() { return nombreEstudiante; }
-    public void setNombreEstudiante(String nombreEstudiante) { this.nombreEstudiante = nombreEstudiante; }
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
-    public Long getCursoId() { return cursoId; }
-    public void setCursoId(Long cursoId) { this.cursoId = cursoId; }
-    public String getNombreCurso() { return nombreCurso; }
-    public void setNombreCurso(String nombreCurso) { this.nombreCurso = nombreCurso; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+    public String getCodigoOrden() { return codigoOrden; }
+    public void setCodigoOrden(String codigoOrden) { this.codigoOrden = codigoOrden; }
+    public Usuario getEstudiante() { return estudiante; }
+    public void setEstudiante(Usuario estudiante) { this.estudiante = estudiante; }
+    public Curso getCurso() { return curso; }
+    public void setCurso(Curso curso) { this.curso = curso; }
+    public BigDecimal getMonto() { return monto; }
+    public void setMonto(BigDecimal monto) { this.monto = monto; }
     public EstadoPedido getEstado() { return estado; }
     public void setEstado(EstadoPedido estado) { this.estado = estado; }
+    public String getMpPreferenceId() { return mpPreferenceId; }
+    public void setMpPreferenceId(String mpPreferenceId) { this.mpPreferenceId = mpPreferenceId; }
+    public String getMpPaymentId() { return mpPaymentId; }
+    public void setMpPaymentId(String mpPaymentId) { this.mpPaymentId = mpPaymentId; }
+    public LocalDateTime getReservaExpiraEn() { return reservaExpiraEn; }
+    public void setReservaExpiraEn(LocalDateTime reservaExpiraEn) { this.reservaExpiraEn = reservaExpiraEn; }
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }
     public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
     public LocalDateTime getFechaActualizacion() { return fechaActualizacion; }
