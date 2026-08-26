@@ -1,0 +1,221 @@
+package com.curso.pedidos.service;
+
+import com.curso.pedidos.client.AuthClient;
+import com.curso.pedidos.client.CursoClient;
+import com.curso.pedidos.dto.CrearPedidoRequest;
+import com.curso.pedidos.dto.CursoDto;
+import com.curso.pedidos.dto.PagarPedidoRequest;
+import com.curso.pedidos.dto.UsuarioDto;
+import com.curso.pedidos.entity.*;
+import com.curso.pedidos.repository.ComprobanteRepository;
+import com.curso.pedidos.repository.NotificacionRepository;
+import com.curso.pedidos.repository.PedidoRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class PedidoService {
+
+    private final PedidoRepository pedidoRepository;
+    private final ComprobanteRepository comprobanteRepository;
+    private final NotificacionRepository notificacionRepository;
+    private final AuthClient authClient;
+    private final CursoClient cursoClient;
+
+    public PedidoService(PedidoRepository pedidoRepository,
+                         ComprobanteRepository comprobanteRepository,
+                         NotificacionRepository notificacionRepository,
+                         AuthClient authClient,
+                         CursoClient cursoClient) {
+        this.pedidoRepository = pedidoRepository;
+        this.comprobanteRepository = comprobanteRepository;
+        this.notificacionRepository = notificacionRepository;
+        this.authClient = authClient;
+        this.cursoClient = cursoClient;
+    }
+
+    @Transactional
+    public Pedido crear(CrearPedidoRequest request) {
+        // 1. Validar existencia del estudiante en auth-service
+        UsuarioDto estudiante = authClient.obtenerUsuario(request.getEstudianteId());
+
+        // 2. Validar curso y reservar vacante vía HTTP en cursos-service
+        CursoDto cursoActualizado = cursoClient.descontarAforo(request.getCursoId());
+
+        // 3. Crear orden de pedido / matrícula
+        Pedido pedido = new Pedido();
+        pedido.setCodigoOrden("ORD-" + System.currentTimeMillis());
+        pedido.setEstudianteId(estudiante.getId());
+        pedido.setCursoId(cursoActualizado.getId());
+        pedido.setMonto(cursoActualizado.getPrecio());
+        pedido.setEstado(EstadoPedido.REGISTRADO);
+        pedido.setReservaExpiraEn(LocalDateTime.now().plusMinutes(15));
+        pedido.setMpPreferenceId("PREF-MP-" + UUID.randomUUID().toString().substring(0, 8));
+
+        Pedido guardado = pedidoRepository.save(pedido);
+
+        // Enriquecer datos para la respuesta
+        guardado.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
+        guardado.setCursoTitulo(cursoActualizado.getTitulo());
+        guardado.setHorario(cursoActualizado.getHorario());
+        guardado.setEnlaceClase(cursoActualizado.getEnlaceClase());
+
+        System.out.printf("[PEDIDOS-SERVICE] Pedido %s creado para el estudiante %s. Vacante reservada.%n",
+                guardado.getCodigoOrden(), estudiante.getNombres());
+
+        return guardado;
+    }
+
+    @Transactional
+    public Pedido pagar(UUID pedidoId, PagarPedidoRequest request) {
+        Pedido pedido = buscarPorId(pedidoId);
+
+        if (pedido.getEstado() == EstadoPedido.PAGADO || pedido.getEstado() == EstadoPedido.CONFIRMADO) {
+            throw new IllegalStateException("Este pedido ya fue pagado anteriormente");
+        }
+
+        if (pedido.getEstado() == EstadoPedido.CANCELADO) {
+            throw new IllegalStateException("No se puede pagar un pedido que fue cancelado");
+        }
+
+        pedido.setEstado(EstadoPedido.PAGADO);
+        pedido.setMpPaymentId(request != null && request.getMpPaymentId() != null
+                ? request.getMpPaymentId()
+                : "PAY-" + System.currentTimeMillis());
+
+        Pedido pedidoActualizado = pedidoRepository.save(pedido);
+
+        // Obtener datos del estudiante y curso para comprobante y notificación
+        UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+        CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
+
+        // Generar comprobante electrónico
+        generarComprobante(pedidoActualizado, estudiante, request != null ? request.getTipoComprobante() : TipoComprobante.BOLETA);
+
+        // Despachar notificación de WhatsApp
+        enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
+
+        enriquecerPedido(pedidoActualizado, estudiante, curso);
+        return pedidoActualizado;
+    }
+
+    @Transactional
+    public Pedido cancelar(UUID pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+
+        if (pedido.getEstado() == EstadoPedido.PAGADO || pedido.getEstado() == EstadoPedido.CONFIRMADO) {
+            throw new IllegalStateException("No se puede cancelar un pedido que ya está PAGADO");
+        }
+
+        if (pedido.getEstado() == EstadoPedido.CANCELADO) {
+            return pedido;
+        }
+
+        pedido.setEstado(EstadoPedido.CANCELADO);
+        Pedido pedidoCancelado = pedidoRepository.save(pedido);
+
+        // Liberar la vacante en cursos-service
+        cursoClient.liberarAforo(pedido.getCursoId());
+
+        System.out.printf("[PEDIDOS-SERVICE] Pedido %s cancelado. Vacante liberada.%n", pedido.getCodigoOrden());
+        return pedidoCancelado;
+    }
+
+    public List<Pedido> listar() {
+        List<Pedido> pedidos = pedidoRepository.findAll();
+        pedidos.forEach(this::enriquecerSilenciosamente);
+        return pedidos;
+    }
+
+    public Pedido buscarPorId(UUID id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado con ID: " + id));
+        enriquecerSilenciosamente(pedido);
+        return pedido;
+    }
+
+    public List<Pedido> listarPorEstudiante(UUID estudianteId) {
+        List<Pedido> pedidos = pedidoRepository.findByEstudianteId(estudianteId);
+        pedidos.forEach(this::enriquecerSilenciosamente);
+        return pedidos;
+    }
+
+    public List<Pedido> listarParticipantesPorCurso(UUID cursoId) {
+        List<Pedido> pedidos = pedidoRepository.findByCursoIdAndEstado(cursoId, EstadoPedido.PAGADO);
+        pedidos.forEach(this::enriquecerSilenciosamente);
+        return pedidos;
+    }
+
+    private void enriquecerSilenciosamente(Pedido pedido) {
+        try {
+            UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+            CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
+            enriquecerPedido(pedido, estudiante, curso);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void enriquecerPedido(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
+        if (estudiante != null) {
+            pedido.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
+        }
+        if (curso != null) {
+            pedido.setCursoTitulo(curso.getTitulo());
+            pedido.setHorario(curso.getHorario());
+            pedido.setEnlaceClase(curso.getEnlaceClase());
+        }
+    }
+
+    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, TipoComprobante tipo) {
+        if (comprobanteRepository.findByPedidoId(pedido.getId()).isPresent()) {
+            return;
+        }
+
+        BigDecimal montoTotal = pedido.getMonto();
+        BigDecimal montoSubtotal = montoTotal.divide(BigDecimal.valueOf(1.18), 2, RoundingMode.HALF_UP);
+        BigDecimal montoIgv = montoTotal.subtract(montoSubtotal);
+
+        Comprobante comprobante = new Comprobante();
+        comprobante.setPedidoId(pedido.getId());
+        comprobante.setSerie(tipo == TipoComprobante.FACTURA ? "F001" : "B001");
+        comprobante.setNumeroCorrelativo((int) (System.currentTimeMillis() % 100000));
+        comprobante.setTipoComprobante(tipo != null ? tipo : TipoComprobante.BOLETA);
+        comprobante.setMontoSubtotal(montoSubtotal);
+        comprobante.setMontoIgv(montoIgv);
+        comprobante.setMontoTotal(montoTotal);
+        comprobante.setPdfUrl("/api/comprobantes/descargar/" + pedido.getId());
+        comprobante.setEstadoEmail("ENVIADO");
+
+        comprobanteRepository.save(comprobante);
+
+        System.out.printf("[FACTURACION] Comprobante %s-%06d generado para la orden %s. Total: S/ %.2f. Enviado al correo %s%n",
+                comprobante.getSerie(), comprobante.getNumeroCorrelativo(), pedido.getCodigoOrden(),
+                montoTotal, estudiante.getCorreo());
+    }
+
+    private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
+        String enlace = curso.getEnlaceClase() != null ? curso.getEnlaceClase() : "Se publicará pronto";
+        String mensaje = String.format("¡Hola %s! Tu matrícula en el curso '%s' ha sido confirmada con éxito. Horario: %s. Enlace de clase: %s",
+                estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), enlace);
+
+        Notificacion notificacion = new Notificacion();
+        notificacion.setPedidoId(pedido.getId());
+        notificacion.setCanal("WHATSAPP");
+        notificacion.setDestinatario(estudiante.getWhatsapp());
+        notificacion.setTipo("BIENVENIDA");
+        notificacion.setMensaje(mensaje);
+        notificacion.setEstado("ENVIADO");
+        notificacion.setIntentos(1);
+
+        notificacionRepository.save(notificacion);
+
+        System.out.printf("[WHATSAPP NOTIFICACION] Mensaje enviado a %s (%s): %s%n",
+                estudiante.getNombres(), estudiante.getWhatsapp(), mensaje);
+    }
+}

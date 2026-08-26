@@ -1,35 +1,19 @@
-# Sistema de Gestión y Venta de Cursos Virtuales - POC
+# Sistema de Gestión y Venta de Cursos Virtuales - Arquitectura de Microservicios
 
-Prueba de Concepto (POC) funcional desarrollada en **Spring Boot 3** y **PostgreSQL** para la plataforma de gestión y venta de cursos 100% virtuales.
-
----
-
-## 🚀 Módulos y Funcionalidades
-
-1. **Módulo de Seguridad (Auth & 2FA)**:
-   - Registro de usuarios con DNI, WhatsApp, Nombres y Correo.
-   - Roles de usuario: `ADMIN`, `DOCENTE`, `ESTUDIANTE`.
-   - Doble Factor de Autenticación (2FA OTP) para roles `ADMIN` y `DOCENTE`.
-2. **Módulo de Cursos Virtuales y Catálogo**:
-   - Catálogo público de cursos disponibles, aforos, precios y horarios.
-   - Enlaces directos a clases virtuales (Zoom / Google Meet).
-   - Gestión de cursos por el Administrador y actualización de enlaces por el Docente.
-3. **Módulo de Matrícula y Ventas**:
-   - **Checkout**: Creación de orden de compra y reserva automática de vacante temporal.
-   - **Confirmación de Pago**: Cambio de estado a `PAGADO`, emisión automática de **Comprobante fiscal en PDF** y despacho de **Notificación de WhatsApp** con el enlace de la clase.
-   - **Cancelación**: Liberación inmediata de vacante (`+1` al aforo disponible).
-4. **Portales por Rol**:
-   - **Panel Estudiante**: Lista de cursos activos con acceso directo a los enlaces de clase.
-   - **Panel Docente**: Lista en tiempo real de estudiantes matriculados y pagados.
-   - **Panel Administrador**: Monitoreo general de todas las órdenes y aforos.
+Arquitectura de **Microservicios** desarrollada en **Spring Boot 3**, **Spring Cloud Gateway** y **PostgreSQL** para la plataforma de gestión y venta de cursos virtuales.
 
 ---
 
-## 📋 Requisitos
+## 🏗️ Arquitectura de Microservicios
 
-- **Java 17** o superior
-- **PostgreSQL 14+** (corriendo en `localhost:5432` con la base de datos `cursos_db`)
-- **Postman** (para pruebas de API)
+El sistema está dividido en módulos independientes bajo una estructura **Maven Multi-Módulo**:
+
+| Microservicio | Puerto | Descripción |
+| :--- | :---: | :--- |
+| **`gateway-service`** | `8080` | **API Gateway Centralizado**: Punto de entrada único que enruta las peticiones hacia los microservicios. |
+| **`auth-service`** | `8081` | **Autenticación y Seguridad**: Registro, Login, 2FA OTP para Admin/Docente y consulta de usuarios. |
+| **`cursos-service`** | `8082` | **Catálogo y Cursos**: Gestión de cursos, aforos, docentes y enlaces a clases virtuales (Zoom / Meet). |
+| **`pedidos-service`** | `8083` | **Matrículas y Pagos**: Checkout, reserva temporal de vacantes, confirmación de pago, comprobantes fiscales y notificaciones de WhatsApp. |
 
 ---
 
@@ -39,40 +23,61 @@ Prueba de Concepto (POC) funcional desarrollada en **Spring Boot 3** y **Postgre
 ```sql
 CREATE DATABASE cursos_db;
 ```
-2. *(Opcional)* Ejecutar el script [`database/schema_local.sql`](database/schema_local.sql) para cargar datos de prueba iniciales (Admin, Docente, Estudiante y Cursos).
+2. Ejecutar el script [`database/schema_local.sql`](database/schema_local.sql) para cargar la estructura y datos de prueba iniciales (Admin, Docente, Estudiante y Cursos).
 
-Credenciales por defecto en `src/main/resources/application.properties`:
+Credenciales por defecto en cada microservicio:
 - Usuario: `postgres`
 - Contraseña: `postgres`
 - Puerto: `5432`
 
 ---
 
-## ▶️ Ejecutar el Proyecto
+## ▶️ Cómo Ejecutar los Microservicios
 
-Desde tu IDE (IntelliJ IDEA, Eclipse o VS Code):
-- Abrir `src/main/java/com/curso/pedidos/PedidosApplication.java` y hacer clic en el botón verde **Play (▶️)**.
+### Opción 1: Desde tu IDE (IntelliJ IDEA, VS Code o Eclipse)
+Ejecutar la clase principal de cada servicio (puedes iniciar todos a la vez):
+1. `auth-service`: `com.curso.auth.AuthServiceApplication` (▶️)
+2. `cursos-service`: `com.curso.cursos.CursosServiceApplication` (▶️)
+3. `pedidos-service`: `com.curso.pedidos.PedidosServiceApplication` (▶️)
+4. `gateway-service`: `com.curso.gateway.GatewayServiceApplication` (▶️)
 
-O desde la terminal:
+### Opción 2: Desde la Terminal
+
+Compilar todo el proyecto:
 ```powershell
-.\mvnw.cmd spring-boot:run
+.\mvnw.cmd clean package -DskipTests
 ```
 
-Servidor corriendo en:
-`http://localhost:8081`
+Iniciar cada servicio en terminales separadas:
+```powershell
+# Terminal 1 - Auth Service (8081)
+.\mvnw.cmd spring-boot:run -pl auth-service
+
+# Terminal 2 - Cursos Service (8082)
+.\mvnw.cmd spring-boot:run -pl cursos-service
+
+# Terminal 3 - Pedidos Service (8083)
+.\mvnw.cmd spring-boot:run -pl pedidos-service
+
+# Terminal 4 - API Gateway (8080)
+.\mvnw.cmd spring-boot:run -pl gateway-service
+```
 
 ---
 
 ## 📮 Pruebas con Postman
 
 Importa la colección oficial en Postman:
-📂 [`postman/GestionCursos_Local.postman_collection.json`](postman/GestionCursos_Local.postman_collection.json)
+📂 [`postman/GestionCursos_Microservicios.postman_collection.json`](postman/GestionCursos_Microservicios.postman_collection.json)
+
+> [!TIP]
+> Puedes enviar todas las peticiones directamente a través del **Gateway** (`http://localhost:8080`) o apuntar a los puertos individuales (`8081`, `8082`, `8083`).
 
 ### Flujo de Prueba Rápido:
-1. **Ver Catálogo**: `GET http://localhost:8081/api/cursos`
-2. **Login Docente (2FA)**: `POST http://localhost:8081/api/auth/login` (ver código OTP en consola)
-3. **Verificar 2FA**: `POST http://localhost:8081/api/auth/verificar-2fa`
-4. **Checkout**: `POST http://localhost:8081/api/pedidos/checkout` (reserva vacante)
-5. **Pagar**: `PUT http://localhost:8081/api/pedidos/{pedidoId}/pagar` (genera boleta y envía WhatsApp)
-6. **Panel Estudiante**: `GET http://localhost:8081/api/pedidos/estudiante/{estudianteId}`
-7. **Panel Docente**: `GET http://localhost:8081/api/pedidos/docente/{docenteId}/participantes`
+1. **Ver Catálogo**: `GET http://localhost:8080/api/cursos`
+2. **Login Docente (2FA)**: `POST http://localhost:8080/api/auth/login` (ver código OTP generado en consola o respuesta)
+3. **Verificar 2FA**: `POST http://localhost:8080/api/auth/verificar-2fa`
+4. **Checkout (Matrícula)**: `POST http://localhost:8080/api/pedidos/checkout` (descuenta vacante en `cursos-service`)
+5. **Confirmar Pago**: `PUT http://localhost:8080/api/pedidos/{pedidoId}/pagar` (emite boleta y despacha WhatsApp)
+6. **Panel Estudiante**: `GET http://localhost:8080/api/pedidos/estudiante/{estudianteId}`
+7. **Panel Docente**: `GET http://localhost:8080/api/pedidos/curso/{cursoId}/participantes`
