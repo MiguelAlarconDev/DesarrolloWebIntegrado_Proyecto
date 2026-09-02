@@ -1,12 +1,15 @@
 package com.curso.cursos.service;
 
+import com.curso.cursos.dto.ActualizarDatosClaseRequest;
 import com.curso.cursos.dto.ActualizarEnlaceRequest;
 import com.curso.cursos.dto.CrearCursoRequest;
 import com.curso.cursos.entity.Curso;
 import com.curso.cursos.entity.EstadoCurso;
+import com.curso.cursos.entity.ModalidadCurso;
 import com.curso.cursos.repository.CursoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +42,9 @@ public class CursoService {
 
     @Transactional
     public Curso crear(CrearCursoRequest request) {
+        ModalidadCurso modalidad = request.getModalidad() != null ? request.getModalidad() : ModalidadCurso.VIRTUAL;
+        validarDatosClase(modalidad, request.getEnlaceClase(), request.getDireccionClase());
+
         Curso curso = new Curso();
         curso.setTitulo(request.getTitulo());
         curso.setDescripcion(request.getDescripcion());
@@ -46,10 +52,11 @@ public class CursoService {
         curso.setFechaInicio(request.getFechaInicio());
         curso.setFechaFin(request.getFechaFin());
         curso.setHorario(request.getHorario());
+        curso.setModalidad(modalidad);
         curso.setAforoMaximo(request.getAforoMaximo());
         curso.setAforoDisponible(request.getAforoMaximo());
         curso.setPrecio(request.getPrecio());
-        curso.setEnlaceClase(request.getEnlaceClase());
+        aplicarDatosClase(curso, modalidad, request.getEnlaceClase(), request.getDireccionClase(), request.getAula());
         curso.setEstado(EstadoCurso.PUBLICADO);
 
         return cursoRepository.save(curso);
@@ -58,7 +65,18 @@ public class CursoService {
     @Transactional
     public Curso actualizarEnlaceClase(UUID id, ActualizarEnlaceRequest request) {
         Curso curso = buscarPorId(id);
+        if (curso.getModalidad() == ModalidadCurso.PRESENCIAL) {
+            throw new IllegalStateException("No se puede asignar enlace a un curso presencial. Actualiza los datos de clase.");
+        }
         curso.setEnlaceClase(request.getEnlaceClase());
+        return cursoRepository.save(curso);
+    }
+
+    @Transactional
+    public Curso actualizarDatosClase(UUID id, ActualizarDatosClaseRequest request) {
+        Curso curso = buscarPorId(id);
+        validarDatosClase(request.getModalidad(), request.getEnlaceClase(), request.getDireccionClase());
+        aplicarDatosClase(curso, request.getModalidad(), request.getEnlaceClase(), request.getDireccionClase(), request.getAula());
         return cursoRepository.save(curso);
     }
 
@@ -88,10 +106,42 @@ public class CursoService {
     @Transactional
     public Curso liberarAforo(UUID id) {
         Curso curso = buscarPorId(id);
-        curso.setAforoDisponible(curso.getAforoDisponible() + 1);
+        if (curso.getAforoDisponible() < curso.getAforoMaximo()) {
+            curso.setAforoDisponible(curso.getAforoDisponible() + 1);
+        }
         Curso guardado = cursoRepository.save(curso);
         System.out.printf("[CURSOS-SERVICE] Vacante liberada para curso '%s'. Aforo restante: %d%n",
                 guardado.getTitulo(), guardado.getAforoDisponible());
         return guardado;
+    }
+
+    private void validarDatosClase(ModalidadCurso modalidad, String enlaceClase, String direccionClase) {
+        if (modalidad == null) {
+            throw new IllegalArgumentException("La modalidad del curso es obligatoria");
+        }
+        if (modalidad == ModalidadCurso.VIRTUAL && !StringUtils.hasText(enlaceClase)) {
+            throw new IllegalArgumentException("El enlace de clase es obligatorio para cursos virtuales");
+        }
+        if (modalidad == ModalidadCurso.PRESENCIAL && !StringUtils.hasText(direccionClase)) {
+            throw new IllegalArgumentException("La direccion de clase es obligatoria para cursos presenciales");
+        }
+    }
+
+    private void aplicarDatosClase(Curso curso,
+                                   ModalidadCurso modalidad,
+                                   String enlaceClase,
+                                   String direccionClase,
+                                   String aula) {
+        curso.setModalidad(modalidad);
+        if (modalidad == ModalidadCurso.VIRTUAL) {
+            curso.setEnlaceClase(enlaceClase);
+            curso.setDireccionClase(null);
+            curso.setAula(null);
+            return;
+        }
+
+        curso.setEnlaceClase(null);
+        curso.setDireccionClase(direccionClase);
+        curso.setAula(aula);
     }
 }

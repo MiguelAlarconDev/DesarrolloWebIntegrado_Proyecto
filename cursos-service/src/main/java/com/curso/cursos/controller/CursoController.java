@@ -1,5 +1,6 @@
 package com.curso.cursos.controller;
 
+import com.curso.cursos.dto.ActualizarDatosClaseRequest;
 import com.curso.cursos.dto.ActualizarEnlaceRequest;
 import com.curso.cursos.dto.CrearCursoRequest;
 import com.curso.cursos.entity.Curso;
@@ -52,6 +53,12 @@ public class CursoController {
     public Curso actualizarEnlace(@PathVariable UUID id,
                                   @Valid @RequestBody ActualizarEnlaceRequest request) {
         return cursoService.actualizarEnlaceClase(id, request);
+    }
+
+    @PutMapping("/{id}/datos-clase")
+    public Curso actualizarDatosClase(@PathVariable UUID id,
+                                      @Valid @RequestBody ActualizarDatosClaseRequest request) {
+        return cursoService.actualizarDatosClase(id, request);
     }
 
     @PutMapping("/{id}/estado")

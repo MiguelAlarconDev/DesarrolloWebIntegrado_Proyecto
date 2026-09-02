@@ -27,7 +27,7 @@ CREATE TABLE usuarios (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. TABLA: CURSOS (100% Virtuales con enlaces Zoom/Meet)
+-- 2. TABLA: CURSOS (Virtuales y presenciales)
 CREATE TABLE cursos (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     titulo VARCHAR(200) NOT NULL,
@@ -36,11 +36,19 @@ CREATE TABLE cursos (
     fecha_inicio TIMESTAMP WITH TIME ZONE NOT NULL,
     fecha_fin TIMESTAMP WITH TIME ZONE NOT NULL,
     horario VARCHAR(100) NOT NULL,
+    modalidad VARCHAR(20) NOT NULL DEFAULT 'VIRTUAL' CHECK (modalidad IN ('VIRTUAL', 'PRESENCIAL')),
     aforo_maximo INT NOT NULL CHECK (aforo_maximo > 0),
     aforo_disponible INT NOT NULL CHECK (aforo_disponible >= 0),
     precio NUMERIC(10, 2) NOT NULL CHECK (precio >= 0),
     enlace_clase VARCHAR(500),
+    direccion_clase VARCHAR(300),
+    aula VARCHAR(100),
     estado VARCHAR(20) DEFAULT 'PUBLICADO' CHECK (estado IN ('BORRADOR', 'PUBLICADO', 'FINALIZADO')),
+    CHECK (
+        (modalidad = 'VIRTUAL' AND enlace_clase IS NOT NULL AND direccion_clase IS NULL)
+        OR
+        (modalidad = 'PRESENCIAL' AND direccion_clase IS NOT NULL)
+    ),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -101,8 +109,9 @@ VALUES
 ('a0000000-0000-0000-0000-000000000002', '20000002', 'Roberto', 'Docente', 'docente@cursos.com', '+51999333444', '123456', 'DOCENTE', TRUE),
 ('a0000000-0000-0000-0000-000000000003', '30000003', 'Carlos', 'Estudiante', 'estudiante@cursos.com', '+51999555666', '123456', 'ESTUDIANTE', FALSE);
 
--- Cursos virtuales
-INSERT INTO cursos (id, titulo, descripcion, docente_id, fecha_inicio, fecha_fin, horario, aforo_maximo, aforo_disponible, precio, enlace_clase, estado)
+-- Cursos virtuales y presenciales
+INSERT INTO cursos (id, titulo, descripcion, docente_id, fecha_inicio, fecha_fin, horario, modalidad, aforo_maximo, aforo_disponible, precio, enlace_clase, direccion_clase, aula, estado)
 VALUES
-('b0000000-0000-0000-0000-000000000001', 'Desarrollo Web Integrado con Spring Boot', 'Aprende microservicios y arquitectura en Java.', 'a0000000-0000-0000-0000-000000000002', NOW() + INTERVAL '2 days', NOW() + INTERVAL '30 days', 'Lun y Mie 19:00 - 22:00', 30, 30, 150.00, 'https://meet.google.com/abc-defg-hij', 'PUBLICADO'),
-('b0000000-0000-0000-0000-000000000002', 'Arquitectura Cloud en Java', 'Fundamentos de servicios distribuidos.', 'a0000000-0000-0000-0000-000000000002', NOW() + INTERVAL '5 days', NOW() + INTERVAL '35 days', 'Mar y Jue 20:00 - 22:00', 25, 25, 180.00, 'https://zoom.us/j/9876543210', 'PUBLICADO');
+('b0000000-0000-0000-0000-000000000001', 'Desarrollo Web Integrado con Spring Boot', 'Aprende microservicios y arquitectura en Java.', 'a0000000-0000-0000-0000-000000000002', NOW() + INTERVAL '2 days', NOW() + INTERVAL '30 days', 'Lun y Mie 19:00 - 22:00', 'VIRTUAL', 30, 30, 150.00, 'https://meet.google.com/abc-defg-hij', NULL, NULL, 'PUBLICADO'),
+('b0000000-0000-0000-0000-000000000002', 'Arquitectura Cloud en Java', 'Fundamentos de servicios distribuidos.', 'a0000000-0000-0000-0000-000000000002', NOW() + INTERVAL '5 days', NOW() + INTERVAL '35 days', 'Mar y Jue 20:00 - 22:00', 'VIRTUAL', 25, 25, 180.00, 'https://zoom.us/j/9876543210', NULL, NULL, 'PUBLICADO'),
+('b0000000-0000-0000-0000-000000000003', 'Taller Presencial de Java y Microservicios', 'Practica en laboratorio con acompanamiento del docente.', 'a0000000-0000-0000-0000-000000000002', NOW() + INTERVAL '7 days', NOW() + INTERVAL '28 days', 'Sab 09:00 - 13:00', 'PRESENCIAL', 20, 20, 220.00, NULL, 'Av. Universitaria 1234, Lima', 'Laboratorio 204', 'PUBLICADO');

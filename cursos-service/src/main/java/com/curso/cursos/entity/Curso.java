@@ -31,6 +31,10 @@ public class Curso {
     @Column(nullable = false, length = 100)
     private String horario;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ModalidadCurso modalidad = ModalidadCurso.VIRTUAL;
+
     @Column(name = "aforo_maximo", nullable = false)
     private Integer aforoMaximo;
 
@@ -42,6 +46,12 @@ public class Curso {
 
     @Column(name = "enlace_clase", length = 500)
     private String enlaceClase;
+
+    @Column(name = "direccion_clase", length = 300)
+    private String direccionClase;
+
+    @Column(length = 100)
+    private String aula;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -106,6 +116,14 @@ public class Curso {
         this.horario = horario;
     }
 
+    public ModalidadCurso getModalidad() {
+        return modalidad;
+    }
+
+    public void setModalidad(ModalidadCurso modalidad) {
+        this.modalidad = modalidad;
+    }
+
     public Integer getAforoMaximo() {
         return aforoMaximo;
     }
@@ -136,6 +154,22 @@ public class Curso {
 
     public void setEnlaceClase(String enlaceClase) {
         this.enlaceClase = enlaceClase;
+    }
+
+    public String getDireccionClase() {
+        return direccionClase;
+    }
+
+    public void setDireccionClase(String direccionClase) {
+        this.direccionClase = direccionClase;
+    }
+
+    public String getAula() {
+        return aula;
+    }
+
+    public void setAula(String aula) {
+        this.aula = aula;
     }
 
     public EstadoCurso getEstado() {

@@ -1,0 +1,200 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------< com.curso:auth-service >-----------------------
+[INFO] Building auth-service 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.4.3:run (default-cli) > test-compile @ auth-service >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ auth-service ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ auth-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ auth-service ---
+[INFO] skip non existing resourceDirectory C:\Users\carlo\IdeaProjects\DesarrolloWebIntegrado_Proyecto\auth-service\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ auth-service ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.4.3:run (default-cli) < test-compile @ auth-service <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.4.3:run (default-cli) @ auth-service ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.3)
+
+2026-08-31T19:38:33.538-05:00  INFO 30600 --- [auth-service] [           main] com.curso.auth.AuthServiceApplication    : Starting AuthServiceApplication using Java 22.0.1 with PID 30600 (C:\Users\carlo\IdeaProjects\DesarrolloWebIntegrado_Proyecto\auth-service\target\classes started by carlo in C:\Users\carlo\IdeaProjects\DesarrolloWebIntegrado_Proyecto\auth-service)
+2026-08-31T19:38:33.543-05:00  INFO 30600 --- [auth-service] [           main] com.curso.auth.AuthServiceApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-08-31T19:38:35.632-05:00  INFO 30600 --- [auth-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-31T19:38:35.742-05:00  INFO 30600 --- [auth-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 94 ms. Found 1 JPA repository interface.
+2026-08-31T19:38:37.584-05:00  INFO 30600 --- [auth-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2026-08-31T19:38:37.621-05:00  INFO 30600 --- [auth-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-31T19:38:37.622-05:00  INFO 30600 --- [auth-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.36]
+2026-08-31T19:38:37.795-05:00  INFO 30600 --- [auth-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-08-31T19:38:37.799-05:00  INFO 30600 --- [auth-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4153 ms
+2026-08-31T19:38:38.207-05:00  INFO 30600 --- [auth-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-31T19:38:38.387-05:00  INFO 30600 --- [auth-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.8.Final
+2026-08-31T19:38:38.484-05:00  INFO 30600 --- [auth-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-08-31T19:38:39.364-05:00  INFO 30600 --- [auth-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-31T19:38:39.473-05:00  INFO 30600 --- [auth-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-31T19:38:39.868-05:00  INFO 30600 --- [auth-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@643f6179
+2026-08-31T19:38:39.871-05:00  INFO 30600 --- [auth-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-31T19:38:40.036-05:00  INFO 30600 --- [auth-service] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-31T19:38:41.817-05:00  INFO 30600 --- [auth-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-31T19:38:42.034-05:00  INFO 30600 --- [auth-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-31T19:38:43.315-05:00  INFO 30600 --- [auth-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2026-08-31T19:38:43.328-05:00  INFO 30600 --- [auth-service] [           main] com.curso.auth.AuthServiceApplication    : Started AuthServiceApplication in 10.754 seconds (process running for 11.72)
+2026-08-31T20:02:32.285-05:00  WARN 30600 --- [auth-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=21m21s530ms241µs200ns).
+2026-08-31T20:41:35.590-05:00  WARN 30600 --- [auth-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=27m2s838ms205µs500ns).
+2026-08-31T20:56:09.022-05:00  WARN 30600 --- [auth-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m2s474ms564µs600ns).
+2026-08-31T22:01:52.416-05:00  WARN 30600 --- [auth-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h5m43s412ms590µs700ns).
+2026-08-31T22:02:48.002-05:00  INFO 30600 --- [auth-service] [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-31T22:02:48.033-05:00  INFO 30600 --- [auth-service] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-31T22:02:48.205-05:00  INFO 30600 --- [auth-service] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 167 ms
+Hibernate: 
+    select
+        u1_0.id 
+    from
+        usuarios u1_0 
+    where
+        u1_0.correo=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id 
+    from
+        usuarios u1_0 
+    where
+        u1_0.correo=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id 
+    from
+        usuarios u1_0 
+    where
+        u1_0.dni=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id 
+    from
+        usuarios u1_0 
+    where
+        u1_0.whatsapp=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id 
+    from
+        usuarios u1_0 
+    where
+        u1_0.correo=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id 
+    from
+        usuarios u1_0 
+    where
+        u1_0.dni=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id 
+    from
+        usuarios u1_0 
+    where
+        u1_0.whatsapp=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        usuarios
+        (apellidos, codigo_2fa, correo, created_at, dni, is_2fa_enabled, is_active, nombres, password_hash, rol, whatsapp, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.apellidos,
+        u1_0.codigo_2fa,
+        u1_0.correo,
+        u1_0.created_at,
+        u1_0.dni,
+        u1_0.is_2fa_enabled,
+        u1_0.is_active,
+        u1_0.nombres,
+        u1_0.password_hash,
+        u1_0.rol,
+        u1_0.whatsapp 
+    from
+        usuarios u1_0 
+    where
+        u1_0.correo=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.apellidos,
+        u1_0.codigo_2fa,
+        u1_0.correo,
+        u1_0.created_at,
+        u1_0.dni,
+        u1_0.is_2fa_enabled,
+        u1_0.is_active,
+        u1_0.nombres,
+        u1_0.password_hash,
+        u1_0.rol,
+        u1_0.whatsapp 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.apellidos,
+        u1_0.codigo_2fa,
+        u1_0.correo,
+        u1_0.created_at,
+        u1_0.dni,
+        u1_0.is_2fa_enabled,
+        u1_0.is_active,
+        u1_0.nombres,
+        u1_0.password_hash,
+        u1_0.rol,
+        u1_0.whatsapp 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+2026-09-01T00:04:33.026-05:00  WARN 30600 --- [auth-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h51m40s328ms810µs300ns).
+2026-09-01T00:19:54.790-05:00  WARN 30600 --- [auth-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=13m21s479ms956µs700ns).
+2026-09-01T04:58:43.197-05:00  WARN 30600 --- [auth-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4h37m48s256ms60µs300ns).
+2026-09-01T16:32:50.747-05:00  WARN 30600 --- [auth-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=11h34m10s288ms765µs600ns).

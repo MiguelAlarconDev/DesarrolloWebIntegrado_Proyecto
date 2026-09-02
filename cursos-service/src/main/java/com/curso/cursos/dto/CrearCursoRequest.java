@@ -1,9 +1,11 @@
 package com.curso.cursos.dto;
 
+import com.curso.cursos.entity.ModalidadCurso;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,6 +30,8 @@ public class CrearCursoRequest {
     @NotBlank(message = "El horario es obligatorio")
     private String horario;
 
+    private ModalidadCurso modalidad = ModalidadCurso.VIRTUAL;
+
     @NotNull(message = "El aforo máximo es obligatorio")
     @Positive(message = "El aforo debe ser mayor a cero")
     private Integer aforoMaximo;
@@ -36,7 +40,12 @@ public class CrearCursoRequest {
     @PositiveOrZero(message = "El precio no puede ser negativo")
     private BigDecimal precio;
 
+    @URL(message = "Debe ser una URL valida")
     private String enlaceClase;
+
+    private String direccionClase;
+
+    private String aula;
 
     public String getTitulo() {
         return titulo;
@@ -86,6 +95,14 @@ public class CrearCursoRequest {
         this.horario = horario;
     }
 
+    public ModalidadCurso getModalidad() {
+        return modalidad;
+    }
+
+    public void setModalidad(ModalidadCurso modalidad) {
+        this.modalidad = modalidad;
+    }
+
     public Integer getAforoMaximo() {
         return aforoMaximo;
     }
@@ -108,5 +125,21 @@ public class CrearCursoRequest {
 
     public void setEnlaceClase(String enlaceClase) {
         this.enlaceClase = enlaceClase;
+    }
+
+    public String getDireccionClase() {
+        return direccionClase;
+    }
+
+    public void setDireccionClase(String direccionClase) {
+        this.direccionClase = direccionClase;
+    }
+
+    public String getAula() {
+        return aula;
+    }
+
+    public void setAula(String aula) {
+        this.aula = aula;
     }
 }

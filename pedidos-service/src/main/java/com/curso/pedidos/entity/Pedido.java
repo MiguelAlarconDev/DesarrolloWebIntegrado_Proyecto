@@ -57,6 +57,15 @@ public class Pedido {
     @Transient
     private String horario;
 
+    @Transient
+    private String modalidad;
+
+    @Transient
+    private String direccionClase;
+
+    @Transient
+    private String aula;
+
     @PreUpdate
     public void preUpdate() {
         this.fechaActualizacion = LocalDateTime.now();
@@ -180,5 +189,29 @@ public class Pedido {
 
     public void setHorario(String horario) {
         this.horario = horario;
+    }
+
+    public String getModalidad() {
+        return modalidad;
+    }
+
+    public void setModalidad(String modalidad) {
+        this.modalidad = modalidad;
+    }
+
+    public String getDireccionClase() {
+        return direccionClase;
+    }
+
+    public void setDireccionClase(String direccionClase) {
+        this.direccionClase = direccionClase;
+    }
+
+    public String getAula() {
+        return aula;
+    }
+
+    public void setAula(String aula) {
+        this.aula = aula;
     }
 }

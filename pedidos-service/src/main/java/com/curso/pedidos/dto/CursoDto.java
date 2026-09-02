@@ -12,10 +12,13 @@ public class CursoDto {
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaFin;
     private String horario;
+    private String modalidad;
     private Integer aforoMaximo;
     private Integer aforoDisponible;
     private BigDecimal precio;
     private String enlaceClase;
+    private String direccionClase;
+    private String aula;
     private String estado;
 
     public UUID getId() {
@@ -74,6 +77,14 @@ public class CursoDto {
         this.horario = horario;
     }
 
+    public String getModalidad() {
+        return modalidad;
+    }
+
+    public void setModalidad(String modalidad) {
+        this.modalidad = modalidad;
+    }
+
     public Integer getAforoMaximo() {
         return aforoMaximo;
     }
@@ -104,6 +115,22 @@ public class CursoDto {
 
     public void setEnlaceClase(String enlaceClase) {
         this.enlaceClase = enlaceClase;
+    }
+
+    public String getDireccionClase() {
+        return direccionClase;
+    }
+
+    public void setDireccionClase(String direccionClase) {
+        this.direccionClase = direccionClase;
+    }
+
+    public String getAula() {
+        return aula;
+    }
+
+    public void setAula(String aula) {
+        this.aula = aula;
     }
 
     public String getEstado() {

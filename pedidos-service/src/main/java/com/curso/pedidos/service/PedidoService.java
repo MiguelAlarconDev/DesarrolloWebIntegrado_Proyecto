@@ -64,7 +64,10 @@ public class PedidoService {
         guardado.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
         guardado.setCursoTitulo(cursoActualizado.getTitulo());
         guardado.setHorario(cursoActualizado.getHorario());
+        guardado.setModalidad(cursoActualizado.getModalidad());
         guardado.setEnlaceClase(cursoActualizado.getEnlaceClase());
+        guardado.setDireccionClase(cursoActualizado.getDireccionClase());
+        guardado.setAula(cursoActualizado.getAula());
 
         System.out.printf("[PEDIDOS-SERVICE] Pedido %s creado para el estudiante %s. Vacante reservada.%n",
                 guardado.getCodigoOrden(), estudiante.getNombres());
@@ -168,7 +171,10 @@ public class PedidoService {
         if (curso != null) {
             pedido.setCursoTitulo(curso.getTitulo());
             pedido.setHorario(curso.getHorario());
+            pedido.setModalidad(curso.getModalidad());
             pedido.setEnlaceClase(curso.getEnlaceClase());
+            pedido.setDireccionClase(curso.getDireccionClase());
+            pedido.setAula(curso.getAula());
         }
     }
 
@@ -200,9 +206,9 @@ public class PedidoService {
     }
 
     private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
-        String enlace = curso.getEnlaceClase() != null ? curso.getEnlaceClase() : "Se publicará pronto";
-        String mensaje = String.format("¡Hola %s! Tu matrícula en el curso '%s' ha sido confirmada con éxito. Horario: %s. Enlace de clase: %s",
-                estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), enlace);
+        String datosClase = obtenerDatosClase(curso);
+        String mensaje = String.format("Hola %s! Tu matricula en el curso '%s' ha sido confirmada con exito. Horario: %s. %s",
+                estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), datosClase);
 
         Notificacion notificacion = new Notificacion();
         notificacion.setPedidoId(pedido.getId());
@@ -217,5 +223,22 @@ public class PedidoService {
 
         System.out.printf("[WHATSAPP NOTIFICACION] Mensaje enviado a %s (%s): %s%n",
                 estudiante.getNombres(), estudiante.getWhatsapp(), mensaje);
+    }
+
+    private String obtenerDatosClase(CursoDto curso) {
+        if ("PRESENCIAL".equalsIgnoreCase(curso.getModalidad())) {
+            String direccion = curso.getDireccionClase() != null && !curso.getDireccionClase().isBlank()
+                    ? curso.getDireccionClase()
+                    : "Se publicara pronto";
+            String aula = curso.getAula() != null && !curso.getAula().isBlank()
+                    ? ". Aula: " + curso.getAula()
+                    : "";
+            return "Lugar de clase: " + direccion + aula;
+        }
+
+        String enlace = curso.getEnlaceClase() != null && !curso.getEnlaceClase().isBlank()
+                ? curso.getEnlaceClase()
+                : "Se publicara pronto";
+        return "Enlace de clase: " + enlace;
     }
 }
