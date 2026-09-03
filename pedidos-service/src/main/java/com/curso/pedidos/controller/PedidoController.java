@@ -6,9 +6,11 @@ import com.curso.pedidos.entity.Pedido;
 import com.curso.pedidos.service.PedidoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +21,44 @@ public class PedidoController {
 
     public PedidoController(PedidoService pedidoService) {
         this.pedidoService = pedidoService;
+    }
+
+    @PostMapping("/webhook")
+    public ResponseEntity<String> webhook(
+            @RequestParam(value = "type", required = false) String paramType,
+            @RequestParam(value = "topic", required = false) String topic,
+            @RequestParam(value = "data.id", required = false) String paramDataId,
+            @RequestParam(value = "id", required = false) String paramId,
+            @RequestBody(required = false) Map<String, Object> body) {
+
+        String paymentId = null;
+        String type = paramType != null ? paramType : topic;
+
+        if (body != null) {
+            if (body.get("type") != null) {
+                type = body.get("type").toString();
+            }
+            if (body.get("data") instanceof Map<?, ?> dataMap) {
+                Object idObj = dataMap.get("id");
+                if (idObj != null) {
+                    paymentId = idObj.toString();
+                }
+            }
+        }
+
+        if (paymentId == null) {
+            paymentId = paramDataId != null ? paramDataId : paramId;
+        }
+
+        if (paymentId != null && ("payment".equalsIgnoreCase(type) || type == null)) {
+            Pedido pedido = pedidoService.procesarPagoMercadoPago(paymentId);
+            if (pedido != null) {
+                return ResponseEntity.ok("Pago " + paymentId + " procesado exitosamente para el pedido " + pedido.getId());
+            }
+            return ResponseEntity.ok("Pago " + paymentId + " consultado pero aún no se encuentra aprobado.");
+        }
+
+        return ResponseEntity.ok("Evento ignorado (tipo: " + type + ")");
     }
 
     @PostMapping("/checkout")

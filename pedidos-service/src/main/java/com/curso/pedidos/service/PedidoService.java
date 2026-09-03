@@ -2,10 +2,8 @@ package com.curso.pedidos.service;
 
 import com.curso.pedidos.client.AuthClient;
 import com.curso.pedidos.client.CursoClient;
-import com.curso.pedidos.dto.CrearPedidoRequest;
-import com.curso.pedidos.dto.CursoDto;
-import com.curso.pedidos.dto.PagarPedidoRequest;
-import com.curso.pedidos.dto.UsuarioDto;
+import com.curso.pedidos.client.MercadoPagoClient;
+import com.curso.pedidos.dto.*;
 import com.curso.pedidos.entity.*;
 import com.curso.pedidos.repository.ComprobanteRepository;
 import com.curso.pedidos.repository.NotificacionRepository;
@@ -17,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -27,17 +26,20 @@ public class PedidoService {
     private final NotificacionRepository notificacionRepository;
     private final AuthClient authClient;
     private final CursoClient cursoClient;
+    private final MercadoPagoClient mercadoPagoClient;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ComprobanteRepository comprobanteRepository,
                          NotificacionRepository notificacionRepository,
                          AuthClient authClient,
-                         CursoClient cursoClient) {
+                         CursoClient cursoClient,
+                         MercadoPagoClient mercadoPagoClient) {
         this.pedidoRepository = pedidoRepository;
         this.comprobanteRepository = comprobanteRepository;
         this.notificacionRepository = notificacionRepository;
         this.authClient = authClient;
         this.cursoClient = cursoClient;
+        this.mercadoPagoClient = mercadoPagoClient;
     }
 
     @Transactional
@@ -56,9 +58,14 @@ public class PedidoService {
         pedido.setMonto(cursoActualizado.getPrecio());
         pedido.setEstado(EstadoPedido.REGISTRADO);
         pedido.setReservaExpiraEn(LocalDateTime.now().plusMinutes(15));
-        pedido.setMpPreferenceId("PREF-MP-" + UUID.randomUUID().toString().substring(0, 8));
 
         Pedido guardado = pedidoRepository.save(pedido);
+
+        // 4. Crear preferencia real en Mercado Pago Sandbox
+        PreferenciaResponse pref = mercadoPagoClient.crearPreferencia(guardado, estudiante, cursoActualizado);
+        guardado.setMpPreferenceId(pref.getId());
+        guardado = pedidoRepository.save(guardado);
+        guardado.setInitPoint(pref.getInitPoint());
 
         // Enriquecer datos para la respuesta
         guardado.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
@@ -69,10 +76,37 @@ public class PedidoService {
         guardado.setDireccionClase(cursoActualizado.getDireccionClase());
         guardado.setAula(cursoActualizado.getAula());
 
-        System.out.printf("[PEDIDOS-SERVICE] Pedido %s creado para el estudiante %s. Vacante reservada.%n",
-                guardado.getCodigoOrden(), estudiante.getNombres());
+        System.out.printf("[PEDIDOS-SERVICE] Pedido %s creado para el estudiante %s. Vacante reservada. MP Preference: %s%n",
+                guardado.getCodigoOrden(), estudiante.getNombres(), guardado.getMpPreferenceId());
 
         return guardado;
+    }
+
+    @Transactional
+    public Pedido procesarPagoMercadoPago(String paymentId) {
+        Map<String, Object> pago = mercadoPagoClient.consultarPago(paymentId);
+        if (pago == null) {
+            throw new IllegalArgumentException("No se pudo obtener informacion del pago " + paymentId + " desde Mercado Pago");
+        }
+
+        String status = (String) pago.get("status");
+        if (!"approved".equalsIgnoreCase(status)) {
+            System.out.printf("[MERCADO PAGO WEBHOOK] Pago %s recibido con estado '%s'. No es aprobado.%n", paymentId, status);
+            return null;
+        }
+
+        String externalRef = (String) pago.get("external_reference");
+        if (externalRef == null || externalRef.isBlank()) {
+            throw new IllegalArgumentException("El pago " + paymentId + " no contiene external_reference");
+        }
+
+        UUID pedidoId = UUID.fromString(externalRef);
+        PagarPedidoRequest pagarRequest = new PagarPedidoRequest();
+        pagarRequest.setMpPaymentId(paymentId);
+        pagarRequest.setTipoComprobante(TipoComprobante.BOLETA);
+
+        System.out.printf("[MERCADO PAGO WEBHOOK] Pago %s APROBADO para el pedido %s. Confirmando matricula...%n", paymentId, pedidoId);
+        return pagar(pedidoId, pagarRequest);
     }
 
     @Transactional
