@@ -9,6 +9,7 @@ import com.curso.auth.entity.Usuario;
 import com.curso.auth.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -78,13 +79,14 @@ public class AuthService {
         if (Boolean.TRUE.equals(usuario.getIs2faEnabled())) {
             String codigoOtp = String.format("%06d", new Random().nextInt(999999));
             usuario.setCodigo2fa(codigoOtp);
+            usuario.setCodigo2faExpiraEn(LocalDateTime.now().plusMinutes(5)); // Válido por 5 minutos
             usuarioRepository.save(usuario);
 
-            System.out.printf("[SEGURIDAD 2FA] Código OTP generado para %s: %s (Enviado al WhatsApp %s)%n",
+            System.out.printf("[SEGURIDAD 2FA] Código OTP generado para %s: %s (Vence en 5 min, Enviado al WhatsApp %s)%n",
                     usuario.getCorreo(), codigoOtp, usuario.getWhatsapp());
 
             AuthResponse response = new AuthResponse();
-            response.setMensaje("Se requiere verificación 2FA. Ingrese el código OTP generado.");
+            response.setMensaje("Se requiere verificación 2FA. Ingrese el código OTP generado (vigencia: 5 minutos).");
             response.setStatus("REQUIRES_2FA");
             response.setUsuarioId(usuario.getId());
             response.setNombres(usuario.getNombres() + " " + usuario.getApellidos());
@@ -110,10 +112,15 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + request.getCorreo()));
 
         if (usuario.getCodigo2fa() == null || !usuario.getCodigo2fa().equals(request.getCodigo2fa().trim())) {
-            throw new IllegalArgumentException("Código 2FA incorrecto o expirado");
+            throw new IllegalArgumentException("Código 2FA incorrecto");
+        }
+
+        if (usuario.getCodigo2faExpiraEn() == null || usuario.getCodigo2faExpiraEn().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("El código 2FA ha expirado. Por favor inicie sesión nuevamente para generar uno nuevo.");
         }
 
         usuario.setCodigo2fa(null);
+        usuario.setCodigo2faExpiraEn(null);
         usuarioRepository.save(usuario);
 
         return new AuthResponse(

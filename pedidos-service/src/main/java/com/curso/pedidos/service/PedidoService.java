@@ -133,7 +133,7 @@ public class PedidoService {
         CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
 
         // Generar comprobante electrónico
-        generarComprobante(pedidoActualizado, estudiante, request != null ? request.getTipoComprobante() : TipoComprobante.BOLETA);
+        generarComprobante(pedidoActualizado, estudiante, request);
 
         // Despachar notificación de WhatsApp
         enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
@@ -212,10 +212,14 @@ public class PedidoService {
         }
     }
 
-    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, TipoComprobante tipo) {
+    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, PagarPedidoRequest request) {
         if (comprobanteRepository.findByPedidoId(pedido.getId()).isPresent()) {
             return;
         }
+
+        TipoComprobante tipo = (request != null && request.getTipoComprobante() != null)
+                ? request.getTipoComprobante()
+                : TipoComprobante.BOLETA;
 
         BigDecimal montoTotal = pedido.getMonto();
         BigDecimal montoSubtotal = montoTotal.divide(BigDecimal.valueOf(1.18), 2, RoundingMode.HALF_UP);
@@ -225,18 +229,23 @@ public class PedidoService {
         comprobante.setPedidoId(pedido.getId());
         comprobante.setSerie(tipo == TipoComprobante.FACTURA ? "F001" : "B001");
         comprobante.setNumeroCorrelativo((int) (System.currentTimeMillis() % 100000));
-        comprobante.setTipoComprobante(tipo != null ? tipo : TipoComprobante.BOLETA);
+        comprobante.setTipoComprobante(tipo);
         comprobante.setMontoSubtotal(montoSubtotal);
         comprobante.setMontoIgv(montoIgv);
         comprobante.setMontoTotal(montoTotal);
         comprobante.setPdfUrl("/api/comprobantes/descargar/" + pedido.getId());
         comprobante.setEstadoEmail("ENVIADO");
 
+        if (tipo == TipoComprobante.FACTURA && request != null) {
+            comprobante.setRucCliente(request.getRucCliente());
+            comprobante.setRazonSocial(request.getRazonSocial());
+        }
+
         comprobanteRepository.save(comprobante);
 
-        System.out.printf("[FACTURACION] Comprobante %s-%06d generado para la orden %s. Total: S/ %.2f. Enviado al correo %s%n",
-                comprobante.getSerie(), comprobante.getNumeroCorrelativo(), pedido.getCodigoOrden(),
-                montoTotal, estudiante.getCorreo());
+        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. RUC: %s. Enviado al correo %s%n",
+                tipo, comprobante.getSerie(), comprobante.getNumeroCorrelativo(), pedido.getCodigoOrden(),
+                montoTotal, comprobante.getRucCliente() != null ? comprobante.getRucCliente() : "N/A", estudiante.getCorreo());
     }
 
     private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {

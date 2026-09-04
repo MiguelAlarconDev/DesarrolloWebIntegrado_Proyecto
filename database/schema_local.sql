@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS pedidos CASCADE;
 DROP TABLE IF EXISTS cursos CASCADE;
 DROP TABLE IF EXISTS usuarios CASCADE;
 
--- 1. TABLA: USUARIOS (Seguridad, Roles y 2FA)
+-- 1. TABLA: USUARIOS (auth-service - RF-01, RF-02, RF-03)
 CREATE TABLE usuarios (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     dni VARCHAR(15) UNIQUE NOT NULL,
@@ -23,6 +23,7 @@ CREATE TABLE usuarios (
     rol VARCHAR(20) NOT NULL CHECK (rol IN ('ADMIN', 'DOCENTE', 'ESTUDIANTE')),
     is_2fa_enabled BOOLEAN DEFAULT FALSE,
     codigo_2fa VARCHAR(10),
+    codigo_2fa_expira_en TIMESTAMP WITH TIME ZONE,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -68,7 +69,7 @@ CREATE TABLE pedidos (
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. TABLA: COMPROBANTES (Facturación)
+-- 4. TABLA: COMPROBANTES (pedidos-service / billing - RF-15)
 CREATE TABLE comprobantes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     pedido_id UUID UNIQUE NOT NULL REFERENCES pedidos(id) ON DELETE CASCADE,
@@ -78,6 +79,8 @@ CREATE TABLE comprobantes (
     monto_subtotal NUMERIC(10, 2) NOT NULL,
     monto_igv NUMERIC(10, 2) NOT NULL,
     monto_total NUMERIC(10, 2) NOT NULL,
+    ruc_cliente VARCHAR(11),
+    razon_social VARCHAR(200),
     pdf_url VARCHAR(500),
     estado_email VARCHAR(20) DEFAULT 'PENDIENTE' CHECK (estado_email IN ('PENDIENTE', 'ENVIADO', 'FALLIDO')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
