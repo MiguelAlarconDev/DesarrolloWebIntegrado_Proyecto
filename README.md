@@ -66,6 +66,90 @@ mvn spring-boot:run
 
 ---
 
+## Comprobantes Service
+
+`comprobantes-service` fue desarrollado con Python y FastAPI. Su responsabilidad es generar un comprobante en formato PDF y enviarlo al correo electrónico del estudiante.
+
+### Configuración
+
+Crear un archivo `.env` dentro de `comprobantes-service`:
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=correo_remitente@gmail.com
+SMTP_PASSWORD=contraseña_de_aplicacion
+SMTP_FROM=correo_remitente@gmail.com
+PDF_OUTPUT_DIR=generated
+```
+
+El archivo `.env` contiene información privada y no debe subirse a GitHub.
+
+### Instalación y ejecución
+
+```powershell
+cd comprobantes-service
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8084 --reload --env-file .env
+```
+
+Documentación interactiva de FastAPI:
+
+```text
+http://localhost:8084/docs
+```
+
+### Endpoints
+
+#### Verificar el servicio
+
+```http
+GET http://localhost:8084/health
+```
+
+#### Generar y enviar un comprobante
+
+```http
+POST http://localhost:8084/api/comprobantes/enviar
+Content-Type: application/json
+```
+
+Ejemplo del cuerpo:
+
+```json
+{
+  "pedidoId": "e2be3beb-b7b0-4797-84de-283d0c806996",
+  "codigoOrden": "ORD-PRUEBA-001",
+  "estudiante": "Carlos Estudiante",
+  "correo": "estudiante@cursos.com",
+  "curso": "Desarrollo Web Integrado con Spring Boot",
+  "monto": 150.00,
+  "tipoComprobante": "BOLETA"
+}
+```
+
+#### Descargar un comprobante
+
+```http
+GET http://localhost:8084/api/comprobantes/{pedidoId}/descargar
+```
+
+### Flujo probado
+
+1. El estudiante inicia sesión.
+2. Consulta los cursos publicados.
+3. Crea un pedido.
+4. Se genera una preferencia de pago en Mercado Pago.
+5. El pedido cambia al estado correspondiente.
+6. Se genera el comprobante PDF.
+7. El comprobante se envía por correo electrónico.
+
+Las peticiones pueden ejecutarse desde la colección compartida de Postman.
+
+---
+
 ## 📮 Pruebas con Postman
 
 Importa la colección oficial en Postman:
