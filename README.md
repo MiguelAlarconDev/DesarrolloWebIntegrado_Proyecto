@@ -4,64 +4,65 @@ Arquitectura de **Microservicios** desarrollada en **Spring Boot 3**, **Spring C
 
 ---
 
-## 🏗️ Arquitectura de Microservicios
+## Arquitectura de microservicios
 
-El sistema está dividido en módulos independientes bajo una estructura **Maven Multi-Módulo**:
+La POC está compuesta por servicios independientes que se comunican mediante API REST. Cada microservicio se ejecuta en un puerto diferente y posee una responsabilidad específica.
 
-| Microservicio | Puerto | Descripción |
-| :--- | :---: | :--- |
-| **`gateway-service`** | `8080` | **API Gateway Centralizado**: Punto de entrada único que enruta las peticiones hacia los microservicios. |
-| **`auth-service`** | `8081` | **Autenticación y Seguridad**: Registro, Login, 2FA OTP para Admin/Docente y consulta de usuarios. |
-| **`cursos-service`** | `8082` | **Catálogo y Cursos**: Gestión de cursos, aforos, docentes y enlaces a clases virtuales (Zoom / Meet). |
-| **`pedidos-service`** | `8083` | **Matrículas y Pagos**: Checkout, reserva temporal de vacantes, confirmación de pago, comprobantes fiscales y notificaciones de WhatsApp. |
+| Microservicio | Tecnología | Puerto | Responsabilidad |
+|---|---|---:|---|
+| gateway-service | Java y Spring Boot | 8080 | Punto de entrada de las solicitudes |
+| auth-service | Java y Spring Boot | 8081 | Autenticación y gestión de usuarios |
+| cursos-service | Java y Spring Boot | 8082 | Consulta y administración de cursos |
+| pedidos-service | Java y Spring Boot | 8083 | Pedidos, matrículas y pagos con Mercado Pago |
+| comprobantes-service | Python y FastAPI | 8084 | Generación de PDF y envío por correo |
 
----
+## Requisitos
 
-## 🗄️ Base de Datos
+Para ejecutar la POC se necesita:
 
-1. Crear la base de datos en PostgreSQL:
-```sql
-CREATE DATABASE cursos_db;
-```
-2. Ejecutar el script [`database/schema_local.sql`](database/schema_local.sql) para cargar la estructura y datos de prueba iniciales (Admin, Docente, Estudiante y Cursos).
+- Java 17 o superior.
+- Maven 3.9 o superior.
+- Python 3.11 o superior.
+- PostgreSQL o una instancia de Supabase.
+- Postman para las pruebas de los endpoints.
+- Una cuenta de Mercado Pago con credenciales de prueba.
+- Una cuenta SMTP para el envío de correos.
 
-Credenciales por defecto en cada microservicio:
-- Usuario: `postgres`
-- Contraseña: `postgres`
-- Puerto: `5432`
+## Base de datos
 
----
+Los microservicios Java utilizan PostgreSQL. Para las pruebas colaborativas se puede emplear una instancia compartida en Supabase.
 
-## ▶️ Cómo Ejecutar los Microservicios
+Las credenciales deben configurarse mediante variables de entorno:
 
-### Opción 1: Desde tu IDE (IntelliJ IDEA, VS Code o Eclipse)
-Ejecutar la clase principal de cada servicio (puedes iniciar todos a la vez):
-1. `auth-service`: `com.curso.auth.AuthServiceApplication` (▶️)
-2. `cursos-service`: `com.curso.cursos.CursosServiceApplication` (▶️)
-3. `pedidos-service`: `com.curso.pedidos.PedidosServiceApplication` (▶️)
-4. `gateway-service`: `com.curso.gateway.GatewayServiceApplication` (▶️)
+```env
+SPRING_DATASOURCE_URL=jdbc:postgresql://servidor:5432/postgres?sslmode=require
+SPRING_DATASOURCE_USERNAME=usuario
+SPRING_DATASOURCE_PASSWORD=contraseña
 
-### Opción 2: Desde la Terminal
+Las credenciales reales no deben almacenarse en el repositorio.
 
-Compilar todo el proyecto:
-```powershell
-.\mvnw.cmd clean package -DskipTests
-```
+## Ejecución de los servicios Java
 
-Iniciar cada servicio en terminales separadas:
-```powershell
-# Terminal 1 - Auth Service (8081)
-.\mvnw.cmd spring-boot:run -pl auth-service
+Cada microservicio debe iniciarse en una terminal independiente:
 
-# Terminal 2 - Cursos Service (8082)
-.\mvnw.cmd spring-boot:run -pl cursos-service
+powershell
+cd auth-service
+mvn spring-boot:run
 
-# Terminal 3 - Pedidos Service (8083)
-.\mvnw.cmd spring-boot:run -pl pedidos-service
 
-# Terminal 4 - API Gateway (8080)
-.\mvnw.cmd spring-boot:run -pl gateway-service
-```
+powershell
+cd cursos-service
+mvn spring-boot:run
+
+
+powershell
+cd pedidos-service
+mvn spring-boot:run
+
+
+powershell
+cd gateway-service
+mvn spring-boot:run
 
 ---
 
