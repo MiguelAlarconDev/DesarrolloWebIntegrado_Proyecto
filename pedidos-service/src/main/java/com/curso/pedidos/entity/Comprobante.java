@@ -35,6 +35,12 @@ public class Comprobante {
     @Column(name = "monto_total", nullable = false, precision = 10, scale = 2)
     private BigDecimal montoTotal;
 
+    @Column(name = "ruc_cliente", length = 11)
+    private String rucCliente;
+
+    @Column(name = "razon_social", length = 200)
+    private String razonSocial;
+
     @Column(name = "pdf_url", length = 500)
     private String pdfUrl;
 
@@ -106,6 +112,22 @@ public class Comprobante {
 
     public void setMontoTotal(BigDecimal montoTotal) {
         this.montoTotal = montoTotal;
+    }
+
+    public String getRucCliente() {
+        return rucCliente;
+    }
+
+    public void setRucCliente(String rucCliente) {
+        this.rucCliente = rucCliente;
+    }
+
+    public String getRazonSocial() {
+        return razonSocial;
+    }
+
+    public void setRazonSocial(String razonSocial) {
+        this.razonSocial = razonSocial;
     }
 
     public String getPdfUrl() {

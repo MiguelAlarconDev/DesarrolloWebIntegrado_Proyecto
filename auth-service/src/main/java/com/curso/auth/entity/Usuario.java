@@ -40,6 +40,9 @@ public class Usuario {
     @Column(name = "codigo_2fa", length = 10)
     private String codigo2fa;
 
+    @Column(name = "codigo_2fa_expira_en")
+    private LocalDateTime codigo2faExpiraEn;
+
     @Column(name = "is_active")
     private Boolean isActive = true;
 
@@ -124,6 +127,14 @@ public class Usuario {
 
     public void setCodigo2fa(String codigo2fa) {
         this.codigo2fa = codigo2fa;
+    }
+
+    public LocalDateTime getCodigo2faExpiraEn() {
+        return codigo2faExpiraEn;
+    }
+
+    public void setCodigo2faExpiraEn(LocalDateTime codigo2faExpiraEn) {
+        this.codigo2faExpiraEn = codigo2faExpiraEn;
     }
 
     public Boolean getIsActive() {

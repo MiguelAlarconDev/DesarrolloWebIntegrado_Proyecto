@@ -66,6 +66,9 @@ public class Pedido {
     @Transient
     private String aula;
 
+    @Transient
+    private String initPoint;
+
     @PreUpdate
     public void preUpdate() {
         this.fechaActualizacion = LocalDateTime.now();
@@ -213,5 +216,13 @@ public class Pedido {
 
     public void setAula(String aula) {
         this.aula = aula;
+    }
+
+    public String getInitPoint() {
+        return initPoint;
+    }
+
+    public void setInitPoint(String initPoint) {
+        this.initPoint = initPoint;
     }
 }
