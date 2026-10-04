@@ -28,7 +28,7 @@ start "4. Pedidos Service (8083)" cmd /k ".\mvnw.cmd spring-boot:run -pl pedidos
 timeout /t 2 /nobreak >nul
 
 echo [5/5] Levantando Comprobantes Service (Python FastAPI - Puerto 8084)...
-start "5. Comprobantes Service (8084)" cmd /k "cd comprobantes-service && python -m uvicorn app.main:app --port 8084 --reload"
+start "5. Comprobantes Service (8084)" cmd /k "cd comprobantes-service && python -m pip install -q -r requirements.txt && python -m uvicorn app.main:app --port 8084 --reload"
 
 echo.
 echo ========================================================
