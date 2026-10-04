@@ -123,6 +123,15 @@ import { Curso } from '../../models/curso.model';
                 <i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand-600 mb-3"></i>
                 <p class="text-xs text-slate-500">Cargando catálogo oficial desde el Gateway...</p>
               </div>
+            } @else if (errorMensaje) {
+              <div class="bg-white rounded-xl p-12 text-center border border-amber-200 bg-amber-50/30">
+                <i class="fa-solid fa-clock-rotate-left text-3xl text-amber-500 mb-3"></i>
+                <h4 class="font-bold text-sm text-slate-800 mb-1">Microservicios en inicialización</h4>
+                <p class="text-xs text-slate-600 max-w-md mx-auto mb-4 leading-relaxed">{{ errorMensaje }}</p>
+                <button (click)="cargarCursos()" class="px-4 py-2 bg-brand-900 text-white font-bold text-xs rounded-lg hover:bg-brand-800 shadow-sm transition">
+                  <i class="fa-solid fa-rotate-right mr-1.5"></i> Reintentar Conexión
+                </button>
+              </div>
             } @else if (cursosFiltrados.length === 0) {
               <div class="bg-white rounded-xl p-12 text-center border border-slate-200">
                 <i class="fa-solid fa-box-open text-4xl text-slate-300 mb-3"></i>
@@ -231,6 +240,7 @@ export class CatalogoComponent implements OnInit {
   cursos: Curso[] = [];
   cursosFiltrados: Curso[] = [];
   loading = true;
+  errorMensaje = '';
 
   filtroTexto = '';
   filtroModalidad = 'TODAS';
@@ -241,6 +251,7 @@ export class CatalogoComponent implements OnInit {
 
   cargarCursos(): void {
     this.loading = true;
+    this.errorMensaje = '';
     this.cursoService.listarPublicos().subscribe({
       next: (data) => {
         this.cursos = data;
@@ -250,6 +261,7 @@ export class CatalogoComponent implements OnInit {
       error: (err) => {
         console.error('Error cargando cursos', err);
         this.loading = false;
+        this.errorMensaje = 'No se pudo conectar con el microservicio de cursos. Si recién ejecutaste iniciar-todo.bat, los microservicios terminan de cargar en unos segundos. Haz clic abajo para reintentar.';
       }
     });
   }
