@@ -49,6 +49,17 @@ public class CursoController {
         return cursoService.crear(request);
     }
 
+    @PutMapping("/{id}")
+    public Curso actualizar(@PathVariable UUID id, @Valid @RequestBody CrearCursoRequest request) {
+        return cursoService.actualizar(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable UUID id) {
+        cursoService.eliminar(id);
+    }
+
     @PutMapping("/{id}/enlace")
     public Curso actualizarEnlace(@PathVariable UUID id,
                                   @Valid @RequestBody ActualizarEnlaceRequest request) {

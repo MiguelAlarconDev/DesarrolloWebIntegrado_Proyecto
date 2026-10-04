@@ -27,19 +27,22 @@ public class PedidoService {
     private final AuthClient authClient;
     private final CursoClient cursoClient;
     private final MercadoPagoClient mercadoPagoClient;
+    private final com.curso.pedidos.client.ComprobanteClient comprobanteClient;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ComprobanteRepository comprobanteRepository,
                          NotificacionRepository notificacionRepository,
                          AuthClient authClient,
                          CursoClient cursoClient,
-                         MercadoPagoClient mercadoPagoClient) {
+                         MercadoPagoClient mercadoPagoClient,
+                         com.curso.pedidos.client.ComprobanteClient comprobanteClient) {
         this.pedidoRepository = pedidoRepository;
         this.comprobanteRepository = comprobanteRepository;
         this.notificacionRepository = notificacionRepository;
         this.authClient = authClient;
         this.cursoClient = cursoClient;
         this.mercadoPagoClient = mercadoPagoClient;
+        this.comprobanteClient = comprobanteClient;
     }
 
     @Transactional
@@ -133,7 +136,7 @@ public class PedidoService {
         CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
 
         // Generar comprobante electrónico
-        generarComprobante(pedidoActualizado, estudiante, request);
+        generarComprobante(pedidoActualizado, estudiante, curso, request);
 
         // Despachar notificación de WhatsApp
         enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
@@ -212,7 +215,7 @@ public class PedidoService {
         }
     }
 
-    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, PagarPedidoRequest request) {
+    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, CursoDto curso, PagarPedidoRequest request) {
         if (comprobanteRepository.findByPedidoId(pedido.getId()).isPresent()) {
             return;
         }
@@ -233,7 +236,7 @@ public class PedidoService {
         comprobante.setMontoSubtotal(montoSubtotal);
         comprobante.setMontoIgv(montoIgv);
         comprobante.setMontoTotal(montoTotal);
-        comprobante.setPdfUrl("/api/comprobantes/descargar/" + pedido.getId());
+        comprobante.setPdfUrl("/api/comprobantes/" + pedido.getId() + "/descargar");
         comprobante.setEstadoEmail("ENVIADO");
 
         if (tipo == TipoComprobante.FACTURA && request != null) {
@@ -242,6 +245,16 @@ public class PedidoService {
         }
 
         comprobanteRepository.save(comprobante);
+
+        // Despachar PDF y correo electrónico mediante comprobantes-service (FastAPI)
+        comprobanteClient.emitirYEnviarComprobante(
+                pedido,
+                estudiante,
+                curso,
+                tipo,
+                comprobante.getRucCliente(),
+                comprobante.getRazonSocial()
+        );
 
         System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. RUC: %s. Enviado al correo %s%n",
                 tipo, comprobante.getSerie(), comprobante.getNumeroCorrelativo(), pedido.getCodigoOrden(),
