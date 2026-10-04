@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { PedidoService } from '../../services/pedido.service';
@@ -201,6 +201,7 @@ import { Pedido } from '../../models/pedido.model';
 export class EstudiantePanelComponent implements OnInit {
   private pedidoService = inject(PedidoService);
   private auth = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   user = this.auth.currentUser();
   pedidos: Pedido[] = [];
@@ -212,10 +213,12 @@ export class EstudiantePanelComponent implements OnInit {
       next: (data) => {
         this.pedidos = data;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(err);
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

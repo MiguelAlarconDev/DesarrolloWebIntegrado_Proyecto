@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -197,6 +197,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   correo = '';
   password = '';
@@ -215,6 +216,7 @@ export class LoginComponent {
 
     this.cargando = true;
     this.errorMensaje = '';
+    this.cdr.detectChanges();
 
     this.auth.login({ correo: this.correo, password: this.password }).subscribe({
       next: (res) => {
@@ -222,7 +224,8 @@ export class LoginComponent {
         if (res.status === 'REQUIRES_2FA') {
           this.requiere2fa = true;
           this.codigo2faGenerado = res.codigo2faGenerado || '';
-          this.codigoOtp = ''; // Limpio para que el usuario ingrese formalmente el código
+          this.codigoOtp = '';
+          this.cdr.detectChanges();
         } else {
           this.redirigirSegunRol(res.rol);
         }
@@ -230,6 +233,7 @@ export class LoginComponent {
       error: (err) => {
         this.cargando = false;
         this.errorMensaje = 'Error al iniciar sesión: ' + (err.error?.message || err.message);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -237,6 +241,7 @@ export class LoginComponent {
   verificarOtp(): void {
     this.cargando = true;
     this.errorMensaje = '';
+    this.cdr.detectChanges();
 
     this.auth.verificar2fa({ correo: this.correo, codigo2fa: this.codigoOtp }).subscribe({
       next: (res) => {
@@ -246,6 +251,7 @@ export class LoginComponent {
       error: (err) => {
         this.cargando = false;
         this.errorMensaje = 'Código incorrecto o expirado: ' + (err.error?.message || err.message);
+        this.cdr.detectChanges();
       }
     });
   }

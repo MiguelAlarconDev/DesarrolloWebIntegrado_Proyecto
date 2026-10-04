@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -236,6 +236,7 @@ import { Curso } from '../../models/curso.model';
 })
 export class CatalogoComponent implements OnInit {
   private cursoService = inject(CursoService);
+  private cdr = inject(ChangeDetectorRef);
 
   cursos: Curso[] = [];
   cursosFiltrados: Curso[] = [];
@@ -252,16 +253,22 @@ export class CatalogoComponent implements OnInit {
   cargarCursos(): void {
     this.loading = true;
     this.errorMensaje = '';
+    this.cdr.detectChanges();
+
+    console.log('[Catalogo] Solicitando cursos al backend...');
     this.cursoService.listarPublicos().subscribe({
       next: (data) => {
+        console.log('[Catalogo] Cursos recibidos del backend:', data);
         this.cursos = data;
         this.cursosFiltrados = data;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error cargando cursos', err);
+        console.error('[Catalogo] Error cargando cursos:', err);
         this.loading = false;
         this.errorMensaje = 'No se pudo conectar con el microservicio de cursos. Si recién ejecutaste iniciar-todo.bat, los microservicios terminan de cargar en unos segundos. Haz clic abajo para reintentar.';
+        this.cdr.detectChanges();
       }
     });
   }

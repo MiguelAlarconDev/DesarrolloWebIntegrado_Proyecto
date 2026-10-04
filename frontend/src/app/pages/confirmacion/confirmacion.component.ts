@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PedidoService } from '../../services/pedido.service';
@@ -180,6 +180,7 @@ import { Pedido } from '../../models/pedido.model';
 export class ConfirmacionComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private pedidoService = inject(PedidoService);
+  private cdr = inject(ChangeDetectorRef);
 
   pedido: Pedido | null = null;
   loading = true;
@@ -191,10 +192,12 @@ export class ConfirmacionComponent implements OnInit {
         next: (data) => {
           this.pedido = data;
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error(err);
           this.loading = false;
+          this.cdr.detectChanges();
         }
       });
     }

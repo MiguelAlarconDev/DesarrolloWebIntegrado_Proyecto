@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CursoService } from '../../services/curso.service';
@@ -242,6 +242,7 @@ export class DocentePanelComponent implements OnInit {
   private cursoService = inject(CursoService);
   private pedidoService = inject(PedidoService);
   private auth = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   cursos: Curso[] = [];
   cursoSeleccionado: Curso | null = null;
@@ -259,6 +260,7 @@ export class DocentePanelComponent implements OnInit {
         if (data.length > 0) {
           this.seleccionarCurso(data[0]);
         }
+        this.cdr.detectChanges();
       },
       error: (err) => console.error(err)
     });
@@ -269,6 +271,7 @@ export class DocentePanelComponent implements OnInit {
     this.pedidoService.listarParticipantesPorCurso(curso.id).subscribe({
       next: (data) => {
         this.participantes = data;
+        this.cdr.detectChanges();
       },
       error: (err) => console.error(err)
     });

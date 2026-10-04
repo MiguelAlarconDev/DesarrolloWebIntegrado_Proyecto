@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CursoService } from '../../services/curso.service';
@@ -222,6 +222,7 @@ import { Pedido } from '../../models/pedido.model';
 export class AdminPanelComponent implements OnInit {
   private cursoService = inject(CursoService);
   private pedidoService = inject(PedidoService);
+  private cdr = inject(ChangeDetectorRef);
 
   cursos: Curso[] = [];
   pedidos: Pedido[] = [];
@@ -247,7 +248,10 @@ export class AdminPanelComponent implements OnInit {
 
   cargarDatos(): void {
     this.cursoService.listarTodos().subscribe({
-      next: (data) => this.cursos = data,
+      next: (data) => {
+        this.cursos = data;
+        this.cdr.detectChanges();
+      },
       error: (err) => console.error(err)
     });
 
@@ -255,6 +259,7 @@ export class AdminPanelComponent implements OnInit {
       next: (data) => {
         this.pedidos = data;
         this.totalRecaudado = data.reduce((acc, p) => acc + (p.monto || 0), 0);
+        this.cdr.detectChanges();
       },
       error: (err) => console.error(err)
     });

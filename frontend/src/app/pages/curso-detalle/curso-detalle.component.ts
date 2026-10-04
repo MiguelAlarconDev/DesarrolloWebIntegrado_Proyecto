@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { CursoService } from '../../services/curso.service';
@@ -254,6 +254,7 @@ export class CursoDetalleComponent implements OnInit {
   private router = inject(Router);
   private cursoService = inject(CursoService);
   private auth = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   curso: Curso | null = null;
   loading = true;
@@ -265,10 +266,12 @@ export class CursoDetalleComponent implements OnInit {
         next: (data) => {
           this.curso = data;
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error(err);
           this.loading = false;
+          this.cdr.detectChanges();
         }
       });
     }
