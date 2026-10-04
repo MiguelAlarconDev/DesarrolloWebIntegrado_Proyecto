@@ -198,8 +198,8 @@ export class LoginComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
 
-  correo = 'docente@cursos.com';
-  password = 'password';
+  correo = '';
+  password = '';
   codigoOtp = '';
   codigo2faGenerado = '';
 
@@ -208,6 +208,11 @@ export class LoginComponent {
   errorMensaje = '';
 
   iniciarSesion(): void {
+    if (!this.correo || !this.password) {
+      this.errorMensaje = 'Por favor ingrese correo y contraseña.';
+      return;
+    }
+
     this.cargando = true;
     this.errorMensaje = '';
 
@@ -217,7 +222,7 @@ export class LoginComponent {
         if (res.status === 'REQUIRES_2FA') {
           this.requiere2fa = true;
           this.codigo2faGenerado = res.codigo2faGenerado || '';
-          this.codigoOtp = res.codigo2faGenerado || ''; // Autocompletar para prueba ágil
+          this.codigoOtp = ''; // Limpio para que el usuario ingrese formalmente el código
         } else {
           this.redirigirSegunRol(res.rol);
         }
