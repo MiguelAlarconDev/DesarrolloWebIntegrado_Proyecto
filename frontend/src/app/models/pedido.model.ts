@@ -18,6 +18,13 @@ export interface Pedido {
   enlaceClase?: string;
   direccionClase?: string;
   aula?: string;
+
+  // Comprobante fields
+  tipoComprobante?: 'BOLETA' | 'FACTURA';
+  serieComprobante?: string;
+  correlativoComprobante?: number;
+  rucCliente?: string;
+  razonSocial?: string;
 }
 
 export interface CrearPedidoRequest {

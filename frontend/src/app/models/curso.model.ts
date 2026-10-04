@@ -3,6 +3,7 @@ export interface Curso {
   titulo: string;
   descripcion?: string;
   docenteId: string;
+  docenteNombre?: string;
   fechaInicio: string;
   fechaFin: string;
   horario: string;
