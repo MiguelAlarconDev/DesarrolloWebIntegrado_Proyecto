@@ -77,7 +77,6 @@ public class MercadoPagoClient {
                             "failure", backUrlFailure,
                             "pending", backUrlPending
                     ),
-                    "auto_return", "approved",
                     "external_reference", pedido.getId().toString()
             );
 

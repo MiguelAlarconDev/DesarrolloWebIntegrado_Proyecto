@@ -12,7 +12,6 @@ public class AuthResponse {
     private String correo;
     private RolUsuario rol;
     private String token;
-    private String codigo2faGenerado;
 
     public AuthResponse() {
     }
@@ -83,11 +82,4 @@ public class AuthResponse {
         this.token = token;
     }
 
-    public String getCodigo2faGenerado() {
-        return codigo2faGenerado;
-    }
-
-    public void setCodigo2faGenerado(String codigo2faGenerado) {
-        this.codigo2faGenerado = codigo2faGenerado;
-    }
 }

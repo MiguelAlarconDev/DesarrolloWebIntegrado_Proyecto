@@ -3,8 +3,8 @@ package com.curso.auth.controller;
 import com.curso.auth.dto.AuthResponse;
 import com.curso.auth.dto.LoginRequest;
 import com.curso.auth.dto.RegistroUsuarioRequest;
+import com.curso.auth.dto.UsuarioResponse;
 import com.curso.auth.dto.Verificar2faRequest;
-import com.curso.auth.entity.Usuario;
 import com.curso.auth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -40,12 +40,12 @@ public class AuthController {
     }
 
     @GetMapping("/usuarios")
-    public List<Usuario> listarUsuarios() {
+    public List<UsuarioResponse> listarUsuarios() {
         return authService.listarUsuarios();
     }
 
     @GetMapping("/usuarios/{id}")
-    public Usuario buscarUsuario(@PathVariable UUID id) {
+    public UsuarioResponse buscarUsuario(@PathVariable UUID id) {
         return authService.buscarPorId(id);
     }
 }
