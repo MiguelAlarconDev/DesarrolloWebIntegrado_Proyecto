@@ -1,26 +1,43 @@
 package com.curso.auth.service;
 
+import com.curso.auth.client.WhatsappOtpClient;
 import com.curso.auth.dto.AuthResponse;
 import com.curso.auth.dto.LoginRequest;
 import com.curso.auth.dto.RegistroUsuarioRequest;
+import com.curso.auth.dto.UsuarioResponse;
 import com.curso.auth.dto.Verificar2faRequest;
 import com.curso.auth.entity.RolUsuario;
 import com.curso.auth.entity.Usuario;
+import com.curso.auth.exception.AuthenticationException;
 import com.curso.auth.repository.UsuarioRepository;
+import com.curso.auth.security.JwtService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 @Service
 public class AuthService {
 
-    private final UsuarioRepository usuarioRepository;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-    public AuthService(UsuarioRepository usuarioRepository) {
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final WhatsappOtpClient whatsappOtpClient;
+
+    public AuthService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            WhatsappOtpClient whatsappOtpClient) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.whatsappOtpClient = whatsappOtpClient;
     }
 
     public AuthResponse registrar(RegistroUsuarioRequest request) {
@@ -40,10 +57,9 @@ public class AuthService {
         usuario.setApellidos(request.getApellidos());
         usuario.setCorreo(request.getCorreo());
         usuario.setWhatsapp(request.getWhatsapp());
-        usuario.setPasswordHash(request.getPassword());
+        usuario.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         usuario.setRol(request.getRol() != null ? request.getRol() : RolUsuario.ESTUDIANTE);
 
-        // 2FA obligatorio para ADMIN y DOCENTE, opcional para ESTUDIANTE
         if (usuario.getRol() == RolUsuario.ADMIN || usuario.getRol() == RolUsuario.DOCENTE) {
             usuario.setIs2faEnabled(true);
         } else {
@@ -59,51 +75,47 @@ public class AuthService {
                 guardado.getNombres() + " " + guardado.getApellidos(),
                 guardado.getCorreo(),
                 guardado.getRol(),
-                "TOKEN-REGISTRO-" + guardado.getId()
+                jwtService.generateToken(guardado)
         );
     }
 
     public AuthResponse login(LoginRequest request) {
         Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo())
-                .orElseThrow(() -> new IllegalArgumentException("Credenciales inválidas (correo no encontrado)"));
+                .orElseThrow(() -> new AuthenticationException("Credenciales invalidas"));
 
-        if (!usuario.getPasswordHash().equals(request.getPassword())) {
-            throw new IllegalArgumentException("Credenciales inválidas (contraseña incorrecta)");
+        if (!passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash())) {
+            throw new AuthenticationException("Credenciales invalidas");
         }
 
         if (!Boolean.TRUE.equals(usuario.getIsActive())) {
-            throw new IllegalStateException("La cuenta de usuario está inactiva");
+            throw new IllegalStateException("La cuenta de usuario esta inactiva");
         }
 
-        // 2FA si está habilitado
         if (Boolean.TRUE.equals(usuario.getIs2faEnabled())) {
-            String codigoOtp = String.format("%06d", new Random().nextInt(999999));
+            String codigoOtp = generarOtp();
             usuario.setCodigo2fa(codigoOtp);
-            usuario.setCodigo2faExpiraEn(LocalDateTime.now().plusMinutes(5)); // Válido por 5 minutos
+            usuario.setCodigo2faExpiraEn(LocalDateTime.now().plusMinutes(5));
             usuarioRepository.save(usuario);
-
-            System.out.printf("[SEGURIDAD 2FA] Código OTP generado para %s: %s (Vence en 5 min, Enviado al WhatsApp %s)%n",
-                    usuario.getCorreo(), codigoOtp, usuario.getWhatsapp());
+            whatsappOtpClient.sendOtp(usuario.getWhatsapp(), codigoOtp);
 
             AuthResponse response = new AuthResponse();
-            response.setMensaje("Se requiere verificación 2FA. Ingrese el código OTP generado (vigencia: 5 minutos).");
+            response.setMensaje("Se requiere verificacion 2FA. Revise el codigo enviado por WhatsApp (vigencia: 5 minutos).");
             response.setStatus("REQUIRES_2FA");
             response.setUsuarioId(usuario.getId());
             response.setNombres(usuario.getNombres() + " " + usuario.getApellidos());
             response.setCorreo(usuario.getCorreo());
             response.setRol(usuario.getRol());
-            response.setCodigo2faGenerado(codigoOtp);
             return response;
         }
 
         return new AuthResponse(
-                "Inicio de sesión exitoso",
+                "Inicio de sesion exitoso",
                 "SUCCESS",
                 usuario.getId(),
                 usuario.getNombres() + " " + usuario.getApellidos(),
                 usuario.getCorreo(),
                 usuario.getRol(),
-                "BEARER-TOKEN-" + usuario.getRol() + "-" + usuario.getId()
+                jwtService.generateToken(usuario)
         );
     }
 
@@ -112,11 +124,14 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + request.getCorreo()));
 
         if (usuario.getCodigo2fa() == null || !usuario.getCodigo2fa().equals(request.getCodigo2fa().trim())) {
-            throw new IllegalArgumentException("Código 2FA incorrecto");
+            throw new AuthenticationException("Codigo 2FA incorrecto");
         }
 
         if (usuario.getCodigo2faExpiraEn() == null || usuario.getCodigo2faExpiraEn().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("El código 2FA ha expirado. Por favor inicie sesión nuevamente para generar uno nuevo.");
+            usuario.setCodigo2fa(null);
+            usuario.setCodigo2faExpiraEn(null);
+            usuarioRepository.save(usuario);
+            throw new AuthenticationException("El codigo 2FA ha expirado. Por favor inicie sesion nuevamente para generar uno nuevo.");
         }
 
         usuario.setCodigo2fa(null);
@@ -124,22 +139,29 @@ public class AuthService {
         usuarioRepository.save(usuario);
 
         return new AuthResponse(
-                "Autenticación 2FA exitosa. Acceso concedido.",
+                "Autenticacion 2FA exitosa. Acceso concedido.",
                 "SUCCESS",
                 usuario.getId(),
                 usuario.getNombres() + " " + usuario.getApellidos(),
                 usuario.getCorreo(),
                 usuario.getRol(),
-                "BEARER-TOKEN-2FA-" + usuario.getRol() + "-" + usuario.getId()
+                jwtService.generateToken(usuario)
         );
     }
 
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioResponse> listarUsuarios() {
+        return usuarioRepository.findAll().stream()
+                .map(UsuarioResponse::from)
+                .toList();
     }
 
-    public Usuario buscarPorId(UUID id) {
+    public UsuarioResponse buscarPorId(UUID id) {
         return usuarioRepository.findById(id)
+                .map(UsuarioResponse::from)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + id));
+    }
+
+    private String generarOtp() {
+        return String.format("%06d", SECURE_RANDOM.nextInt(1_000_000));
     }
 }
