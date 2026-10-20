@@ -1,0 +1,404 @@
+/* ==========================================================================
+   COMPONENTS.CSS - Tarjetas de Cursos, Aforo en Tiempo Real, Modalidades,
+   Simulador de WhatsApp y Comprobantes
+   ========================================================================== */
+
+/* ==========================================================================
+   FILTROS DE MODALIDAD
+   ========================================================================== */
+.filter-tabs-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 35px;
+  flex-wrap: wrap;
+}
+
+.filter-tab-btn {
+  background: #ffffff;
+  border: 1.5px solid var(--border-color);
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-dark);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.filter-tab-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.filter-tab-btn.active {
+  background: var(--primary-color);
+  color: #ffffff;
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 14px rgba(26, 45, 98, 0.2);
+}
+
+.filter-tab-btn .badge-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.filter-tab-btn:not(.active) .badge-count {
+  background: rgba(26, 45, 98, 0.08);
+  color: var(--primary-color);
+}
+
+/* ==========================================================================
+   TARJETA DE CURSO (COURSE CARD)
+   ========================================================================== */
+.course-card {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.course-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+  border-color: #cbd5e1;
+}
+
+.course-card-thumb {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  background-color: #1e293b;
+}
+
+.course-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.course-card:hover .course-card-thumb img {
+  transform: scale(1.06);
+}
+
+/* Insignias de Modalidad sobre la imagen */
+.modality-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.modality-badge.virtual {
+  background-color: var(--badge-virtual);
+  color: #ffffff;
+}
+
+.modality-badge.presencial {
+  background-color: var(--badge-presencial);
+  color: #ffffff;
+}
+
+.course-price-tag {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(26, 45, 98, 0.92);
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 16px;
+  backdrop-filter: blur(4px);
+}
+
+/* Cuerpo de la tarjeta */
+.course-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.course-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+
+.course-card-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.course-info-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12.5px;
+  color: #475569;
+  margin-bottom: 14px;
+}
+
+.course-info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.course-info-item i {
+  color: var(--secondary-color);
+}
+
+/* ==========================================================================
+   CONTROL DE AFORO EN TIEMPO REAL
+   ========================================================================== */
+.aforo-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-top: auto;
+  margin-bottom: 16px;
+}
+
+.aforo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.aforo-status-text {
+  color: var(--text-dark);
+}
+
+.aforo-status-text.few-spots {
+  color: var(--accent-color);
+  animation: pulseSpots 1.8s infinite;
+}
+
+@keyframes pulseSpots {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.aforo-status-text.sold-out {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.aforo-progress {
+  height: 7px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.aforo-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary-color), #22c55e);
+  transition: width 0.6s ease;
+}
+
+.aforo-bar.warning {
+  background: linear-gradient(90deg, #f59e0b, var(--accent-color));
+}
+
+.aforo-bar.danger {
+  background: #dc2626;
+}
+
+/* ==========================================================================
+   SIMULADOR DE WHATSAPP INTERACTIVO
+   ========================================================================== */
+.whatsapp-chat-card {
+  background: #0b141a;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  max-width: 480px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.whatsapp-chat-header {
+  background: #202c33;
+  color: #e9edef;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.whatsapp-avatar {
+  width: 42px;
+  height: 42px;
+  background: var(--secondary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 20px;
+}
+
+.whatsapp-header-info h5 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e9edef;
+}
+
+.whatsapp-header-info span {
+  font-size: 12px;
+  color: #8696a0;
+}
+
+.whatsapp-chat-body {
+  background-color: #0b141a;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 16px 16px;
+  padding: 18px 16px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.whatsapp-bubble {
+  background: #005c4b;
+  color: #e9edef;
+  padding: 12px 14px;
+  border-radius: 8px 8px 2px 8px;
+  max-width: 90%;
+  align-self: flex-start;
+  font-size: 13.5px;
+  line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.whatsapp-bubble strong {
+  color: #25d366;
+}
+
+.whatsapp-bubble .msg-time {
+  display: block;
+  text-align: right;
+  font-size: 10px;
+  color: #8696a0;
+  margin-top: 6px;
+}
+
+.whatsapp-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #25d366;
+  color: #111b21 !important;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-size: 12.5px;
+}
+
+/* ==========================================================================
+   COMPROBANTE ELECTRÓNICO (BOLETA / FACTURA SUNAT)
+   ========================================================================== */
+.invoice-receipt {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-md);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.invoice-receipt::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px dashed #e2e8f0;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+.invoice-company h4 {
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.invoice-company p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.invoice-box-sunat {
+  border: 2px solid var(--primary-color);
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-align: center;
+  min-width: 200px;
+}
+
+.invoice-box-sunat h6 {
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  color: var(--text-dark);
+}
+
+.invoice-box-sunat .serie-number {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary-color);
+}

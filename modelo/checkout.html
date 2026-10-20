@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<!-- Meta -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Finalizar Matrícula - - Gestión de Cursos</title>			
+	
+	<!-- Latest Bootstrap min CSS -->
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">		
+	<!-- Google Font Local -->
+	<link rel="stylesheet" href="assets/fonts/mulish.css">
+	<!-- Font Awesome CSS -->
+	<link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+	<link rel="stylesheet" href="assets/fonts/themify-icons.css">
+	<!--- owl carousel Css-->
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.carousel.css">
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.theme.css">				
+	<!--slicknav Css-->
+	<link rel="stylesheet" href="assets/css/slicknav.css">		
+	<!-- MAGNIFIC CSS -->
+	<link rel="stylesheet" href="assets/css/magnific-popup.css">	
+	<link rel="stylesheet" href="assets/css/niceselect.css" />	
+	<!-- animate CSS -->
+	<link rel="stylesheet" href="assets/css/animate.css">			
+	<!-- Style CSS de Gestión de Cursos -->					
+	<link rel="stylesheet" href="assets/css/shop.css" />				
+	<link rel="stylesheet" href="assets/css/style.css" />				
+	<link rel="stylesheet" href="css/custom.css" />
+</head>
+<body>
+	
+		<!-- START NAVBAR -->  
+	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="site-logo">
+						<a href="index.html" class="brand-logo-link">
+							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+							<span class="brand-text">Gestión de Cursos</span>
+						</a>          			        				
+					</div>
+				</div>
+				<div class="col-lg-5 col-md-5 col-sm-6">
+					<div class="header_right">
+						<nav id="main-menu" class="ms-auto">
+							<ul>
+								<li><a class="nav-link" href="index.html">Inicio</a></li>
+								<li><a class="nav-link" href="cursos.html">Cursos</a></li>
+								<li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
+								<li><a class="nav-link" href="mis-cursos.html">Mis Clases</a></li>
+							</ul>
+						</nav>
+						<div id="mobile_menu"></div>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-3 col-sm-12">
+					<div class="home_lc">
+						<a href="carrito.html" class="hlc" title="Ver Carrito de Matrícula">
+							<i class="ti-shopping-cart-full"></i>
+							<span class="gactive" id="cart-nav-counter">0</span>
+						</a>
+					</div>
+					<div class="call_to_action" id="auth-buttons-nav">
+						<a class="btn_one" href="login.html">Ingresar</a>
+						<a class="btn_two" href="registro.html">Registrarse</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> 	  
+	<!-- END NAVBAR -->
+
+	<!-- START SECTION TOP (PENN BANNER) -->
+	<section class="section-top">
+		<div class="container">
+			<div class="col-lg-10 offset-lg-1 text-center">
+				<div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+					<h1>Pasarela de Pago Seguro</h1>
+					<ul>
+						<li><a href="index.html">Inicio</a></li>
+						<li> / Checkout & Mercado Pago</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>	
+	<!-- END SECTION TOP -->
+	
+	<!-- Start Checkout (PLANTILLA PENN ORIGINAL) -->
+	<section class="shop checkout section">
+		<div class="container">
+			<div class="row"> 
+				<div class="col-lg-8 col-12">
+					<div class="checkout-form">
+						<h2>Datos de Matrícula y Facturación</h2>
+						<p>Ingresa tus datos personales para asegurar tu vacante y emitir tu comprobante electrónico</p>
+						<!-- Form -->
+						<form class="form" id="penn-checkout-form" onsubmit="ejecutarPago(event)">
+							<div class="row">
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Nombres<span>*</span></label>
+										<input type="text" id="chk-nombres" placeholder="Ej. Carlos" required="required">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>Apellidos<span>*</span></label>
+										<input type="text" id="chk-apellidos" placeholder="Ej. Alarcón Gómez" required="required">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>DNI / Documento de Identidad<span>*</span></label>
+										<input type="text" id="chk-dni" placeholder="8 dígitos" maxlength="12" required="required">
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<div class="form-group">
+										<label>WhatsApp (Para Envío de Accesos)<span>*</span></label>
+										<input type="tel" id="chk-whatsapp" placeholder="Ej. 999555666" required="required">
+									</div>
+								</div>
+								<div class="col-12">
+									<div class="form-group">
+										<label>Correo Electrónico (Boleta PDF)<span>*</span></label>
+										<input type="email" id="chk-correo" placeholder="correo@ejemplo.com" required="required">
+									</div>
+								</div>
+
+								<!-- Selección de Comprobante SUNAT -->
+								<div class="col-12">
+									<div class="form-group">
+										<label>Tipo de Comprobante SUNAT<span>*</span></label>
+										<div style="display: flex; gap: 25px; padding: 14px 20px; background: #F6F7FB; border-radius: 4px; margin-top: 5px;">
+											<label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #333;">
+												<input type="radio" name="tipoComp" id="comp-boleta" value="BOLETA" checked onchange="toggleFactura(false)" style="width: auto; height: auto;">
+												Boleta de Venta
+											</label>
+											<label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #333;">
+												<input type="radio" name="tipoComp" id="comp-factura" value="FACTURA" onchange="toggleFactura(true)" style="width: auto; height: auto;">
+												Factura Electrónica (con RUC)
+											</label>
+										</div>
+									</div>
+								</div>
+
+								<div id="box-factura" class="col-12 d-none" style="margin-bottom: 25px;">
+									<div class="row" style="background: #F6F7FB; padding: 15px 5px; margin: 0; border-radius: 4px;">
+										<div class="col-lg-6 col-12">
+											<div class="form-group" style="margin-bottom: 10px;">
+												<label>RUC (11 dígitos)<span>*</span></label>
+												<input type="text" id="chk-ruc" placeholder="20601234567" maxlength="11" style="background: #fff; border: 1px solid #e0e0e0;">
+											</div>
+										</div>
+										<div class="col-lg-6 col-12">
+											<div class="form-group" style="margin-bottom: 10px;">
+												<label>Razón Social<span>*</span></label>
+												<input type="text" id="chk-razon" placeholder="Ej. Empresa Soluciones S.A.C." style="background: #fff; border: 1px solid #e0e0e0;">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<div class="col-lg-4 col-12">
+					<div class="order-details">
+						<!-- Order Widget -->
+						<div class="single-widget">
+							<h2>RESUMEN DE MATRÍCULA</h2>
+							<div class="content">
+								<ul id="penn-order-items-list">
+									<!-- Cursos inyectados dinámicamente -->
+								</ul>
+								<ul style="border-top: 1px solid #ebebeb; padding-top: 12px; margin-top: 15px;">
+									<li>Sub Total<span id="side-subtotal">S/ 0.00</span></li>
+									<li>(+) I.G.V. (18%)<span id="side-igv">S/ 0.00</span></li>
+									<li class="last">Total a Pagar<span id="side-total" style="color: #2eca7f; font-weight: 700;">S/ 0.00</span></li>
+								</ul>
+							</div>
+						</div>
+						<!--/ End Order Widget -->
+
+						<!-- Payment Method Widget -->
+						<div class="single-widget">
+							<h2>MÉTODO DE PAGO</h2>
+							<div class="content">
+								<div class="checkbox" style="margin-top: 15px;">
+									<!-- Yape -->
+									<label class="checkbox-inline checked" id="lbl-metodo-yape" onclick="selectMetodoPago('YAPE')" style="color: #333; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+										<span>
+											<input name="metodoPagoRadio" id="radio-yape" type="radio" value="YAPE" checked>
+											<strong style="color: #742284;"><i class="fa fa-qrcode"></i> Yape</strong> (Mercado Pago)
+										</span>
+										<span class="badge" style="background: #742284; color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 2px;">RECOMENDADO</span>
+									</label>
+
+									<!-- Plin -->
+									<label class="checkbox-inline" id="lbl-metodo-plin" onclick="selectMetodoPago('PLIN')" style="color: #333; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+										<span>
+											<input name="metodoPagoRadio" id="radio-plin" type="radio" value="PLIN">
+											<strong style="color: #00A7D0;"><i class="fa fa-mobile"></i> Plin</strong> (Interoperable)
+										</span>
+										<span class="badge" style="background: #00A7D0; color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 2px;">INTEROPERABLE</span>
+									</label>
+
+									<!-- Tarjeta Débito / Crédito -->
+									<label class="checkbox-inline" id="lbl-metodo-card" onclick="selectMetodoPago('TARJETA')" style="color: #333; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+										<span>
+											<input name="metodoPagoRadio" id="radio-card" type="radio" value="TARJETA">
+											<strong style="color: #009ee3;"><i class="fa fa-credit-card"></i> Tarjeta Débito / Crédito</strong>
+										</span>
+										<span class="badge" style="background: #009ee3; color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 2px;">MERCADO PAGO</span>
+									</label>
+								</div>
+
+								<!-- Panel de Configuración de Pago Dinámico -->
+								<div style="padding: 0 30px;">
+									<!-- Panel Yape -->
+									<div id="panel-yape" style="background: #F6F7FB; border: 1px solid #e5e7eb; border-radius: 4px; padding: 14px; margin-top: 15px;">
+										<div style="display: flex; gap: 6px; margin-bottom: 12px;">
+											<button type="button" id="btn-tab-yape-code" onclick="switchYapeModo('CODE')" style="flex: 1; padding: 6px 8px; font-size: 11px; font-weight: 600; border-radius: 3px; border: none; background: #742284; color: #fff; cursor: pointer;">
+												<i class="fa fa-key"></i> Código de Aprobación
+											</button>
+											<button type="button" id="btn-tab-yape-qr" onclick="switchYapeModo('QR')" style="flex: 1; padding: 6px 8px; font-size: 11px; font-weight: 600; border-radius: 3px; border: 1px solid #d1d5db; background: #fff; color: #374151; cursor: pointer;">
+												<i class="fa fa-qrcode"></i> Escanear QR Yape
+											</button>
+										</div>
+
+										<div id="yape-modo-code">
+											<p style="font-size: 11px; color: #666; margin-bottom: 8px; line-height: 1.4;">
+												1. Abre tu app <strong>Yape</strong> y entra a <em>"Código de aprobación"</em> en el menú lateral.<br>
+												2. Ingresa tu celular y el código de 6 dígitos:
+											</p>
+											<div style="margin-bottom: 8px;">
+												<label style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px; display: block;">Número Celular Yape:</label>
+												<input type="tel" id="yape-celular" maxlength="9" placeholder="Ej. 999555666" style="width: 100%; height: 36px; border: 1px solid #ccc; border-radius: 3px; padding: 0 10px; font-size: 13px; background: #fff;">
+											</div>
+											<div>
+												<label style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px; display: block;">Código de Aprobación (6 dígitos):</label>
+												<input type="text" id="yape-otp" maxlength="6" placeholder="Ej. 482910" style="width: 100%; height: 36px; border: 1px solid #ccc; border-radius: 3px; padding: 0 10px; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-align: center; background: #fff;">
+											</div>
+										</div>
+
+										<div id="yape-modo-qr" class="d-none" style="text-align: center; padding: 8px 0;">
+											<p style="font-size: 11px; color: #555; margin-bottom: 6px;">
+												Escanea con la cámara de tu app <strong>Yape</strong>:
+											</p>
+											<div style="display: inline-block; padding: 10px; background: #fff; border-radius: 4px; border: 1px solid #e5e7eb; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+												<img id="yape-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=00020101021226480014pe.com.yape011299955566652044812530360454050.005802PE5913GESTION_CURSOS6004LIMA62070503***6304" alt="QR Yape" style="width: 130px; height: 130px; display: block; margin: 0 auto;">
+												<span style="display: block; margin-top: 4px; font-size: 11px; font-weight: 700; color: #742284;">Gestión de Cursos &bull; YAPE</span>
+												<span id="yape-qr-monto" style="display: block; font-size: 13px; font-weight: 800; color: #2eca7f;">S/ 0.00</span>
+											</div>
+										</div>
+									</div>
+
+									<!-- Panel Plin -->
+									<div id="panel-plin" class="d-none" style="background: #F6F7FB; border: 1px solid #e5e7eb; border-radius: 4px; padding: 14px; margin-top: 15px;">
+										<div style="display: flex; gap: 6px; margin-bottom: 12px;">
+											<button type="button" id="btn-tab-plin-code" onclick="switchPlinModo('CODE')" style="flex: 1; padding: 6px 8px; font-size: 11px; font-weight: 600; border-radius: 3px; border: none; background: #00A7D0; color: #fff; cursor: pointer;">
+												<i class="fa fa-mobile"></i> Transferencia Plin
+											</button>
+											<button type="button" id="btn-tab-plin-qr" onclick="switchPlinModo('QR')" style="flex: 1; padding: 6px 8px; font-size: 11px; font-weight: 600; border-radius: 3px; border: 1px solid #d1d5db; background: #fff; color: #374151; cursor: pointer;">
+												<i class="fa fa-qrcode"></i> Escanear QR Plin
+											</button>
+										</div>
+
+										<div id="plin-modo-code">
+											<p style="font-size: 11px; color: #666; margin-bottom: 8px; line-height: 1.4;">
+												Paga por <strong>Plin</strong> desde <em>Interbank, BBVA, Scotiabank o BanBif</em>:
+											</p>
+											<div style="margin-bottom: 8px;">
+												<label style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px; display: block;">Número Celular Plin:</label>
+												<input type="tel" id="plin-celular" maxlength="9" placeholder="Ej. 999555666" style="width: 100%; height: 36px; border: 1px solid #ccc; border-radius: 3px; padding: 0 10px; font-size: 13px; background: #fff;">
+											</div>
+											<div>
+												<label style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px; display: block;">Nro. Operación o Referencia Plin:</label>
+												<input type="text" id="plin-otp" maxlength="8" placeholder="Ej. 582910" style="width: 100%; height: 36px; border: 1px solid #ccc; border-radius: 3px; padding: 0 10px; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-align: center; background: #fff;">
+											</div>
+										</div>
+
+										<div id="plin-modo-qr" class="d-none" style="text-align: center; padding: 8px 0;">
+											<p style="font-size: 11px; color: #555; margin-bottom: 6px;">
+												Escanea con tu app bancaria Plin:
+											</p>
+											<div style="display: inline-block; padding: 10px; background: #fff; border-radius: 4px; border: 1px solid #e5e7eb; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+												<img id="plin-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=00020101021226480014pe.com.plin011299955566652044812530360454050.005802PE5913GESTION_CURSOS6004LIMA62070503***6304" alt="QR Plin" style="width: 130px; height: 130px; display: block; margin: 0 auto;">
+												<span style="display: block; margin-top: 4px; font-size: 11px; font-weight: 700; color: #00A7D0;">Gestión de Cursos &bull; PLIN</span>
+												<span id="plin-qr-monto" style="display: block; font-size: 13px; font-weight: 800; color: #2eca7f;">S/ 0.00</span>
+											</div>
+										</div>
+									</div>
+
+									<!-- Panel Tarjeta -->
+									<div id="panel-card" class="d-none" style="background: #F6F7FB; border: 1px solid #e5e7eb; border-radius: 4px; padding: 14px; margin-top: 15px;">
+										<p style="font-size: 11px; color: #666; margin-bottom: 8px; line-height: 1.4;">
+											<i class="fa fa-lock" style="color: #2eca7f;"></i> Pasarela bancaria protegida por <strong>Mercado Pago</strong>:
+										</p>
+										<div style="margin-bottom: 8px;">
+											<label style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px; display: block;">Número de Tarjeta:</label>
+											<input type="text" id="card-num" maxlength="19" placeholder="4242 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242" style="width: 100%; height: 36px; border: 1px solid #ccc; border-radius: 3px; padding: 0 10px; font-size: 13px; background: #fff;">
+										</div>
+										<div style="display: flex; gap: 8px;">
+											<div style="flex: 1;">
+												<label style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px; display: block;">Expiración:</label>
+												<input type="text" id="card-exp" maxlength="5" placeholder="MM/AA" style="width: 100%; height: 36px; border: 1px solid #ccc; border-radius: 3px; padding: 0 10px; font-size: 13px; text-align: center; background: #fff;">
+											</div>
+											<div style="flex: 1;">
+												<label style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 2px; display: block;">CVV:</label>
+												<input type="password" id="card-cvv" maxlength="4" placeholder="123" style="width: 100%; height: 36px; border: 1px solid #ccc; border-radius: 3px; padding: 0 10px; font-size: 13px; text-align: center; background: #fff;">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!--/ End Payment Method Widget -->
+
+						<!-- Payment Method Brands Widget -->
+						<div class="single-widget payement" style="margin-top: 0; padding-top: 0;">
+							<div class="content">
+								<div style="display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+									<span class="badge" style="background: #742284; color: #fff; font-size: 11px; padding: 4px 7px; font-weight: 700; border-radius: 2px;"><i class="fa fa-qrcode"></i> YAPE</span>
+									<span class="badge" style="background: #00A7D0; color: #fff; font-size: 11px; padding: 4px 7px; font-weight: 700; border-radius: 2px;"><i class="fa fa-mobile"></i> PLIN</span>
+									<span class="badge" style="background: #1a1f71; color: #fff; font-size: 11px; padding: 4px 7px; font-weight: 700; border-radius: 2px;">VISA</span>
+									<span class="badge" style="background: #eb001b; color: #fff; font-size: 11px; padding: 4px 7px; font-weight: 700; border-radius: 2px;">MASTERCARD</span>
+									<span class="badge" style="background: #009ee3; color: #fff; font-size: 11px; padding: 4px 7px; font-weight: 700; border-radius: 2px;"><i class="fa fa-handshake-o"></i> MERCADO PAGO</span>
+								</div>
+								<p style="font-size: 12px; color: #888; margin: 0;">
+									<i class="fa fa-lock" style="color: #2eca7f;"></i> Cifrado SSL 256-bit &bull; Reserva de vacante en tiempo real
+								</p>
+							</div>
+						</div>
+						<!--/ End Payment Method Brands Widget -->
+
+						<!-- Button Widget -->
+						<div class="single-widget get-button">
+							<div class="content">
+								<div class="button">
+									<button type="submit" form="penn-checkout-form" id="btn-pago-penn" class="btn" style="cursor: pointer; background: #742284; border: none; font-size: 14px; font-weight: 600; letter-spacing: 0.5px; width: 100%;">
+										<i class="fa fa-qrcode" style="margin-right: 6px;"></i> PAGAR CON YAPE
+									</button>
+								</div>
+							</div>
+						</div>
+						<!--/ End Button Widget -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!--/ End Checkout -->
+
+	<!-- START FOOTER (PENN) -->
+	<div class="footer section-padding">
+		<div class="container">
+			<div class="row fc">
+				<div class="col-lg-6 col-sm-6 col-xs-12">
+					<div class="footer_copyright">
+						<p>&copy; 2026 Gestión de Cursos. Todos los derechos reservados.</p>
+					</div>
+				</div>
+				<div class="col-lg-6 col-sm-6 col-xs-12">
+					<div class="footer_menu">
+						<ul>
+							<li><a href="index.html">Inicio</a></li>
+							<li><a href="cursos.html">Cursos</a></li>
+							<li><a href="carrito.html">Carrito</a></li>
+							<li><a href="mis-cursos.html">Mis Clases</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>				
+		</div>
+	</div>
+	<!-- END FOOTER -->			
+		
+	<!-- Scripts Gestión de Cursos -->
+	<script src="assets/js/jquery-1.12.4.min.js"></script>
+	<script src="assets/bootstrap/js/bootstrap.min.js"></script>			
+	<script src="assets/owlcarousel/js/owl.carousel.min.js"></script>	
+	<script src="assets/js/jquery.slicknav.js"></script>			
+	<script src="assets/js/jquery.magnific-popup.min.js"></script>		
+	<script src="assets/js/jquery.mixitup.js"></script>			
+	<script src="assets/js/scrolltopcontrol.js"></script>	
+	<script src="assets/js/purecounter_vanilla.js"></script>	
+	<script src="assets/js/wow.min.js"></script>				
+	<script src="assets/js/scripts.js"></script>
+
+	<!-- Lógica Modular -->
+	<script src="js/config.js"></script>
+	<script src="js/api.js"></script>
+	<script src="js/auth.service.js"></script>
+	<script src="js/cursos.service.js"></script>
+	<script src="js/cart.service.js"></script>
+	<script src="js/pedidos.service.js"></script>
+	<script src="js/notifications.js"></script>
+
+	<script>
+		let tipoComp = 'BOLETA';
+		let metodoPagoSeleccionado = 'YAPE';
+
+		function selectMetodoPago(metodo) {
+			metodoPagoSeleccionado = metodo;
+
+			const metodos = [
+				{ id: 'yape', key: 'YAPE' },
+				{ id: 'plin', key: 'PLIN' },
+				{ id: 'card', key: 'TARJETA' }
+			];
+
+			metodos.forEach(m => {
+				const lbl = document.getElementById('lbl-metodo-' + m.id);
+				const radio = document.getElementById('radio-' + m.id);
+				const panel = document.getElementById('panel-' + m.id);
+
+				if (m.key === metodo) {
+					if (lbl) lbl.classList.add('checked');
+					if (radio) radio.checked = true;
+					if (panel) panel.classList.remove('d-none');
+				} else {
+					if (lbl) lbl.classList.remove('checked');
+					if (radio) radio.checked = false;
+					if (panel) panel.classList.add('d-none');
+				}
+			});
+
+			actualizarBotonPago();
+		}
+
+		function switchYapeModo(modo) {
+			const btnCode = document.getElementById('btn-tab-yape-code');
+			const btnQr = document.getElementById('btn-tab-yape-qr');
+			const panelCode = document.getElementById('yape-modo-code');
+			const panelQr = document.getElementById('yape-modo-qr');
+
+			if (modo === 'CODE') {
+				btnCode.style.background = '#742284';
+				btnCode.style.color = '#fff';
+				btnCode.style.border = 'none';
+
+				btnQr.style.background = '#fff';
+				btnQr.style.color = '#374151';
+				btnQr.style.border = '1px solid #d1d5db';
+
+				panelCode.classList.remove('d-none');
+				panelQr.classList.add('d-none');
+			} else {
+				btnQr.style.background = '#742284';
+				btnQr.style.color = '#fff';
+				btnQr.style.border = 'none';
+
+				btnCode.style.background = '#fff';
+				btnCode.style.color = '#374151';
+				btnCode.style.border = '1px solid #d1d5db';
+
+				panelQr.classList.remove('d-none');
+				panelCode.classList.add('d-none');
+			}
+		}
+
+		function switchPlinModo(modo) {
+			const btnCode = document.getElementById('btn-tab-plin-code');
+			const btnQr = document.getElementById('btn-tab-plin-qr');
+			const panelCode = document.getElementById('plin-modo-code');
+			const panelQr = document.getElementById('plin-modo-qr');
+
+			if (modo === 'CODE') {
+				btnCode.style.background = '#00A7D0';
+				btnCode.style.color = '#fff';
+				btnCode.style.border = 'none';
+
+				btnQr.style.background = '#fff';
+				btnQr.style.color = '#374151';
+				btnQr.style.border = '1px solid #d1d5db';
+
+				panelCode.classList.remove('d-none');
+				panelQr.classList.add('d-none');
+			} else {
+				btnQr.style.background = '#00A7D0';
+				btnQr.style.color = '#fff';
+				btnQr.style.border = 'none';
+
+				btnCode.style.background = '#fff';
+				btnCode.style.color = '#374151';
+				btnCode.style.border = '1px solid #d1d5db';
+
+				panelQr.classList.remove('d-none');
+				panelCode.classList.add('d-none');
+			}
+		}
+
+		function actualizarBotonPago() {
+			const totals = CartService.getTotals();
+			const btn = document.getElementById('btn-pago-penn');
+			if (!btn) return;
+
+			// Actualizar montos en los QR
+			const elYapeMonto = document.getElementById('yape-qr-monto');
+			if (elYapeMonto) elYapeMonto.textContent = `S/ ${totals.total}`;
+
+			const elPlinMonto = document.getElementById('plin-qr-monto');
+			if (elPlinMonto) elPlinMonto.textContent = `S/ ${totals.total}`;
+
+			if (metodoPagoSeleccionado === 'YAPE') {
+				btn.innerHTML = `<i class="fa fa-qrcode" style="margin-right: 6px;"></i> PAGAR CON YAPE (S/ ${totals.total})`;
+				btn.style.background = '#742284';
+			} else if (metodoPagoSeleccionado === 'PLIN') {
+				btn.innerHTML = `<i class="fa fa-mobile" style="margin-right: 6px;"></i> PAGAR CON PLIN (S/ ${totals.total})`;
+				btn.style.background = '#00A7D0';
+			} else {
+				btn.innerHTML = `<i class="fa fa-credit-card" style="margin-right: 6px;"></i> PAGAR CON MERCADO PAGO (S/ ${totals.total})`;
+				btn.style.background = '#2eca7f';
+			}
+		}
+
+		function initPennCheckout() {
+			const cart = CartService.getCart();
+			if (cart.length === 0) {
+				Notifications.showToast('No tienes cursos en el carrito.', 'warning');
+				setTimeout(() => window.location.href = 'cursos.html', 800);
+				return;
+			}
+
+			// Prellenar si hay usuario logueado o sugerir datos válidos
+			const user = AuthService.getCurrentUser();
+			if (user) {
+				let nom = user.nombres || '';
+				let ape = user.apellidos || '';
+
+				if (!ape && nom && nom.includes(' ')) {
+					const partes = nom.trim().split(' ');
+					nom = partes[0];
+					ape = partes.slice(1).join(' ');
+				}
+
+				document.getElementById('chk-nombres').value = nom || 'Carlos';
+				document.getElementById('chk-apellidos').value = ape || 'Alarcón';
+				document.getElementById('chk-correo').value = user.correo || '';
+				document.getElementById('chk-whatsapp').value = user.whatsapp ? user.whatsapp.replace('+51', '') : '';
+				document.getElementById('chk-dni').value = user.dni || '30000003';
+			} else {
+				if (!document.getElementById('chk-nombres').value) document.getElementById('chk-nombres').value = 'Jose Elmer';
+				if (!document.getElementById('chk-apellidos').value) document.getElementById('chk-apellidos').value = 'Coronado Maldonado';
+				if (!document.getElementById('chk-dni').value) document.getElementById('chk-dni').value = '74859612';
+				if (!document.getElementById('chk-whatsapp').value) document.getElementById('chk-whatsapp').value = '935300159';
+				if (!document.getElementById('chk-correo').value) document.getElementById('chk-correo').value = 'carlokasike333@gmail.com';
+			}
+
+			// Sincronizar número de celular para Yape y Plin
+			const numWa = document.getElementById('chk-whatsapp').value || '999555666';
+			const yapeCel = document.getElementById('yape-celular');
+			if (yapeCel && !yapeCel.value) yapeCel.value = numWa;
+			const plinCel = document.getElementById('plin-celular');
+			if (plinCel && !plinCel.value) plinCel.value = numWa;
+
+			// Sincronizar al escribir en WhatsApp
+			document.getElementById('chk-whatsapp').addEventListener('input', (e) => {
+				const val = e.target.value.trim();
+				if (yapeCel) yapeCel.value = val;
+				if (plinCel) plinCel.value = val;
+			});
+
+			// Renderizar items y totales
+			const totals = CartService.getTotals();
+			document.getElementById('side-subtotal').textContent = `S/ ${totals.subtotal}`;
+			document.getElementById('side-igv').textContent = `S/ ${totals.igv}`;
+			document.getElementById('side-total').textContent = `S/ ${totals.total}`;
+
+			const list = document.getElementById('penn-order-items-list');
+			list.innerHTML = cart.map(c => `
+				<li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+					<div>
+						<div class="fw-bold text-dark small">${c.titulo}</div>
+						<small class="badge ${c.modalidad === 'VIRTUAL' ? 'bg-primary' : 'bg-success'}">${c.modalidad}</small>
+					</div>
+					<span class="fw-bold text-primary">S/ ${Number(c.precio).toFixed(2)}</span>
+				</li>
+			`).join('');
+
+			actualizarBotonPago();
+			if (window.location.search && window.location.search.includes('tab=plin')) {
+				selectMetodoPago('PLIN');
+			}
+			if (window.location.search && window.location.search.includes('qr=1')) {
+				switchYapeModo('QR');
+			}
+
+			// Navbar
+			document.getElementById('cart-nav-counter').textContent = CartService.getCartCount();
+			AuthService.updateNavbar();
+		}
+
+		function toggleFactura(isFactura) {
+			tipoComp = isFactura ? 'FACTURA' : 'BOLETA';
+			document.getElementById('box-factura').classList.toggle('d-none', !isFactura);
+			const ruc = document.getElementById('chk-ruc');
+			const razon = document.getElementById('chk-razon');
+			if (isFactura) {
+				ruc.setAttribute('required', 'true');
+				razon.setAttribute('required', 'true');
+				if (!ruc.value) ruc.value = '20601234567';
+				if (!razon.value) razon.value = 'TECH SOLUTIONS PERU S.A.C.';
+			} else {
+				ruc.removeAttribute('required');
+				razon.removeAttribute('required');
+			}
+		}
+
+		async function ejecutarPago(e) {
+			e.preventDefault();
+			const cart = CartService.getCart();
+			if (cart.length === 0) return;
+
+			const btn = document.getElementById('btn-pago-penn');
+			btn.disabled = true;
+
+			try {
+				let nombreMetodo = 'Yape (Mercado Pago)';
+				if (metodoPagoSeleccionado === 'PLIN') {
+					nombreMetodo = 'Plin (Mercado Pago)';
+					const plinCel = document.getElementById('plin-celular');
+					const plinOtp = document.getElementById('plin-otp');
+					if (plinOtp && !plinOtp.value) plinOtp.value = '582910';
+				} else if (metodoPagoSeleccionado === 'TARJETA') {
+					nombreMetodo = 'Tarjeta (Mercado Pago)';
+				} else {
+					const yapeCel = document.getElementById('yape-celular');
+					const yapeOtp = document.getElementById('yape-otp');
+					if (yapeOtp && !yapeOtp.value) yapeOtp.value = '482910';
+				}
+
+				btn.innerHTML = `<i class="fa fa-spinner fa-spin me-2"></i> Conectando con ${nombreMetodo}...`;
+				await new Promise(r => setTimeout(r, 600));
+
+				btn.innerHTML = `<i class="fa fa-spinner fa-spin me-2"></i> Verificando pago y asegurando vacante...`;
+				await new Promise(r => setTimeout(r, 600));
+
+				const nombres = document.getElementById('chk-nombres').value.trim();
+				const apellidos = document.getElementById('chk-apellidos').value.trim();
+				const dni = document.getElementById('chk-dni').value.trim();
+				const whatsapp = document.getElementById('chk-whatsapp').value.trim();
+				const correo = document.getElementById('chk-correo').value.trim();
+
+				const user = AuthService.getCurrentUser();
+				const estId = user ? user.id : '21b48018-8c1c-4f1d-8976-828361be0fbf';
+
+				// 1. Crear pedido y bloquear cupo en backend PostgreSQL
+				const pedido = await PedidosService.crearPedido(cart[0].id, estId);
+
+				// 2. Procesar pago en pasarela
+				const payInfo = {
+					metodoPago: nombreMetodo,
+					tipoComprobante: tipoComp,
+					clienteNombres: `${nombres} ${apellidos}`.trim(),
+					docIdentidad: tipoComp === 'FACTURA' ? (document.getElementById('chk-ruc').value || '20601234567') : dni,
+					whatsapp: whatsapp,
+					correo: correo
+				};
+
+				await PedidosService.procesarPagoMercadoPago(pedido, payInfo);
+
+				btn.innerHTML = `<i class="fa fa-check-circle me-2"></i> ¡Pago con ${metodoPagoSeleccionado} Aprobado!`;
+				Notifications.showToast(`¡Pago exitoso con ${nombreMetodo}!`, 'success');
+
+				setTimeout(() => {
+					window.location.href = 'confirmacion.html';
+				}, 700);
+
+			} catch (err) {
+				console.error('Error durante el pago:', err);
+				Notifications.showToast('Error en pasarela: ' + err.message, 'error');
+				btn.disabled = false;
+				actualizarBotonPago();
+			}
+		}
+
+		$(document).ready(initPennCheckout);
+	</script>
+</body>
+</html>

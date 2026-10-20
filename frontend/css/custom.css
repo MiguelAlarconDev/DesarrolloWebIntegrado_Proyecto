@@ -1,0 +1,686 @@
+/* ==========================================================================
+   ALINEACIÓN EXACTA, NIVELADA Y CUADRADA DEL NAVBAR
+   (LOGO, MENÚ DE NAVEGACIÓN, ÍCONO DEL CARRITO Y BOTONES DE AUTENTICACIÓN)
+   ========================================================================== */
+
+/* Barra de navegación principal fija */
+#navigation.site-navigation,
+#navigation.navbar-fixed,
+#navigation,
+.site-navigation {
+  background: #ffffff !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+  padding: 10px 0 !important;
+  min-height: 68px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+#navigation .container {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+#navigation .row,
+.site-navigation .row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Columna 1: Logo centrado verticalmente */
+.site-logo {
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 48px !important;
+}
+
+.site-logo a,
+.site-logo .brand-logo-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  text-decoration: none !important;
+  font-family: 'Mulish', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 20px !important;
+  color: #2eca7f !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.site-logo .brand-icon,
+.site-logo a span:first-child {
+  color: #2eca7f !important;
+  font-size: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  margin-right: 2px !important;
+}
+
+.site-logo .brand-text,
+.site-logo a span:last-child {
+  font-weight: 800 !important;
+  color: #2eca7f !important;
+  letter-spacing: -0.3px !important;
+  display: inline-block !important;
+  line-height: 1 !important;
+}
+
+/* Columna 2: Menú Principal centrado verticalmente */
+.header_right {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#main-menu {
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#main-menu ul {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 6px !important;
+}
+
+#main-menu ul li {
+  display: inline-flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#main-menu ul li a,
+#navigation #main-menu ul li a,
+#navigation.navbar-fixed #main-menu ul li a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 38px !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+  line-height: 38px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #1a2d62 !important;
+  text-decoration: none !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+}
+
+#main-menu ul li a:hover,
+#main-menu ul li a:focus,
+#main-menu ul li a.active {
+  color: #2eca7f !important;
+  background-color: rgba(46, 202, 127, 0.08) !important;
+}
+
+/* Columna 3: Carrito y Botones Auth perfectamente alineados y cuadrados */
+.site-navigation .col-lg-4,
+.site-navigation [class*="col-"]:last-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Contenedor del ícono del carrito */
+.home_lc {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 38px !important;
+  line-height: 1 !important;
+  position: relative !important;
+}
+
+/* Botón cuadrado del carrito */
+.hlc,
+.home_lc a.hlc {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  color: #1a2d62 !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  position: relative !important;
+  margin: 0 !important;
+  margin-right: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+}
+
+.hlc:hover,
+.home_lc a.hlc:hover {
+  background: #e2e8f0 !important;
+  color: #2eca7f !important;
+  border-color: #2eca7f !important;
+}
+
+.home_lc a i {
+  font-size: 18px !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #1a2d62 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Contador flotante de cursos en carrito */
+.home_lc a .gactive {
+  position: absolute !important;
+  top: -5px !important;
+  right: -5px !important;
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  background: #2eca7f !important;
+  color: #ffffff !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Reset de float y alineación para call_to_action */
+.call_to_action,
+#auth-buttons-nav {
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  height: 38px !important;
+}
+
+.call_to_action a,
+#auth-buttons-nav a {
+  margin: 0 !important;
+}
+
+/* Botones cuadrados y nivelados con altura exacta de 38px */
+.call_to_action .btn_one,
+.call_to_action .btn_two,
+#auth-buttons-nav .btn_one,
+#auth-buttons-nav .btn_two {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 16px !important;
+  margin: 0 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 38px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease !important;
+  vertical-align: middle !important;
+}
+
+/* Eliminar pseudo-elementos del template que desfiguran los bordes */
+.call_to_action .btn_one:before,
+#auth-buttons-nav .btn_one:before,
+.call_to_action .btn_two:before,
+#auth-buttons-nav .btn_two:before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Estilo Botón Primario (Login / Ingresar / Usuario) */
+.call_to_action .btn_one,
+#auth-buttons-nav .btn_one {
+  background-color: #2eca7f !important;
+  color: #ffffff !important;
+  border: 1px solid #2eca7f !important;
+}
+
+.call_to_action .btn_one:hover,
+#auth-buttons-nav .btn_one:hover {
+  background-color: #26b36f !important;
+  border-color: #26b36f !important;
+  color: #ffffff !important;
+}
+
+/* Estilo Botón Secundario (Sign Up / Registrarse / Salir) */
+.call_to_action .btn_two,
+#auth-buttons-nav .btn_two {
+  background-color: #ffffff !important;
+  color: #1a2d62 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.call_to_action .btn_two:hover,
+#auth-buttons-nav .btn_two:hover {
+  background-color: #f8fafc !important;
+  color: #2eca7f !important;
+  border-color: #2eca7f !important;
+}
+
+/* Estilos de usuario conectado */
+#auth-buttons-nav .btn-nav-user {
+  background-color: #2eca7f !important;
+  color: #ffffff !important;
+  border: 1px solid #2eca7f !important;
+}
+
+#auth-buttons-nav .btn-nav-logout {
+  background-color: #ffffff !important;
+  color: #e53e3e !important;
+  border: 1px solid #fed7d7 !important;
+}
+
+#auth-buttons-nav .btn-nav-logout:hover {
+  background-color: #fff5f5 !important;
+  color: #c53030 !important;
+  border-color: #feb2b2 !important;
+}
+
+/* Adaptabilidad Responsive */
+@media only screen and (max-width: 991px) {
+  #navigation {
+    padding: 8px 0 !important;
+  }
+  .site-navigation .row {
+    flex-wrap: nowrap !important;
+  }
+}
+
+
+/* ==========================================================================
+   CUSTOM.CSS - Extensiones Específicas del Negocio
+   Complementa style.css y shop.css de la plantilla Penn sin alterarlos
+   ========================================================================== */
+
+/* Prevenir que el preloader bloquee la pantalla con fondo blanco */
+#loader-wrapper {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+}
+
+/* Insignias de Modalidad sobre las tarjetas de cursos de Penn */
+.badge-mod-virtual {
+  background-color: #007bff !important;
+  color: #ffffff !important;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.badge-mod-presencial {
+  background-color: #2eca7f !important;
+  color: #ffffff !important;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Indicador de Aforo en Tiempo Real en la tarjeta Penn */
+.seats-live-badge {
+  display: inline-block;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f4f6f9;
+}
+
+.seats-live-badge.urgent {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  animation: pulseSeats 2s infinite;
+}
+
+.seats-live-badge.soldout {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@keyframes pulseSeats {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Temporizador de Reserva de 15 Minutos en Carrito */
+.penn-timer-box {
+  background: #fff8e1;
+  border: 2px dashed #ffb300;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #b78103;
+}
+
+.penn-timer-digits {
+  font-size: 22px;
+  font-weight: 800;
+  font-family: monospace;
+  background: #ffffff;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #ffca28;
+  color: #e65100;
+}
+
+
+
+/* Tarjetas de Confirmación Estilo Penn */
+.penn-confirm-box {
+  background: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 6px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  margin-bottom: 30px;
+  height: 100%;
+}
+
+.penn-confirm-box h3 {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1a2d62;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.penn-confirm-box h3::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40px;
+  height: 2px;
+  background: #2eca7f;
+}
+
+.penn-channel-card {
+  background: #F6F7FB;
+  border: 1px solid #ebebeb;
+  border-radius: 6px;
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.penn-channel-card:hover {
+  border-color: #2eca7f;
+  box-shadow: 0 5px 15px rgba(46, 202, 127, 0.08);
+}
+
+.penn-channel-card .channel-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+/* Comprobante Oficial SUNAT */
+.penn-sunat-receipt {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 25px;
+}
+
+.sunat-box {
+  border: 2px solid #1a2d62;
+  border-radius: 4px;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+/* Toast */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.penn-toast {
+  background: #ffffff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  border-left: 5px solid #2eca7f;
+}
+
+/* Modo Impresión / PDF */
+@media print {
+  #navigation,
+  .section-top,
+  .footer,
+  .penn-channel-card,
+  button,
+  .btn_one,
+  .btn_two,
+  #toast-container {
+    display: none !important;
+  }
+  .section-padding {
+    padding: 0 !important;
+  }
+  body {
+    background: #ffffff !important;
+  }
+  .penn-confirm-box {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    padding: 15px !important;
+  }
+}
+
+
+
+/* ==========================================================================
+   ALINEACIÓN Y ENCUADRE DE ACCIONES EN TARJETAS DE CURSO (CARD FOOTER)
+   Resuelve el desfase vertical entre 'Ver Temario' e 'Inscribirme'
+   ========================================================================== */
+
+/* Contenedor inferior de acciones de la tarjeta */
+.course-slide .border-top,
+.course-content .border-top,
+.course-content .d-flex.border-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  padding-top: 15px !important;
+  margin-top: auto !important;
+  border-top: 1px solid #eef2f6 !important;
+  width: 100% !important;
+}
+
+/* Botón 1: 'Ver Temario' (c_btn) */
+.c_btn,
+.course-slide .c_btn,
+.course-content .c_btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 16px !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 38px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+  background-color: #ffffff !important;
+  color: #1a2d62 !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  vertical-align: middle !important;
+}
+
+.c_btn:hover,
+.course-slide .c_btn:hover,
+.course-content .c_btn:hover {
+  background-color: #f8fafc !important;
+  color: #2eca7f !important;
+  border-color: #2eca7f !important;
+  text-decoration: none !important;
+}
+
+.c_btn i,
+.course-slide .c_btn i,
+.course-content .c_btn i {
+  margin-right: 6px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  display: inline-block !important;
+}
+
+/* Botón 2: 'Inscribirme' (btn-card-inscribir / btn_two dentro de tarjetas) */
+.btn-card-inscribir,
+.course-slide .btn_two,
+.course-content .btn_two {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 16px !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 38px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+  background-color: #2eca7f !important;
+  color: #ffffff !important;
+  border: 1px solid #2eca7f !important;
+  box-shadow: 0 2px 6px rgba(46, 202, 127, 0.2) !important;
+  cursor: pointer !important;
+  vertical-align: middle !important;
+}
+
+.btn-card-inscribir:before,
+.course-slide .btn_two:before,
+.course-content .btn_two:before {
+  display: none !important;
+  content: none !important;
+}
+
+.btn-card-inscribir:hover,
+.course-slide .btn_two:hover,
+.course-content .btn_two:hover {
+  background-color: #26b36f !important;
+  border-color: #26b36f !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(46, 202, 127, 0.3) !important;
+}
+
+.btn-card-inscribir i,
+.course-slide .btn_two i,
+.course-content .btn_two i {
+  margin-right: 6px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  display: inline-block !important;
+}
+
+/* Estado 'Sin Vacantes' en tarjetas */
+.course-slide .badge.bg-secondary,
+.course-content .badge.bg-secondary {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 38px !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
+  border: 1px solid #6c757d !important;
+}

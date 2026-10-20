@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Matrícula Confirmada - Gestión de Cursos</title>			
+	
+	<!-- Latest Bootstrap min CSS -->
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">		
+	<!-- Google Font Local -->
+	<link rel="stylesheet" href="assets/fonts/mulish.css">
+	<!-- Font Awesome CSS -->
+	<link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+	<link rel="stylesheet" href="assets/fonts/themify-icons.css">
+	<!--- owl carousel Css-->
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.carousel.css">
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.theme.css">				
+	<!--slicknav Css-->
+	<link rel="stylesheet" href="assets/css/slicknav.css">		
+	<!-- MAGNIFIC CSS -->
+	<link rel="stylesheet" href="assets/css/magnific-popup.css">	
+	<link rel="stylesheet" href="assets/css/niceselect.css" />	
+	<!-- animate CSS -->
+	<link rel="stylesheet" href="assets/css/animate.css">			
+	<!-- Style CSS de Gestión de Cursos -->					
+	<link rel="stylesheet" href="assets/css/shop.css" />				
+	<link rel="stylesheet" href="assets/css/style.css" />				
+	<link rel="stylesheet" href="css/custom.css" />
+</head>
+<body>
+	
+		<!-- START NAVBAR -->  
+	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="site-logo">
+						<a href="index.html" class="brand-logo-link">
+							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+							<span class="brand-text">Gestión de Cursos</span>
+						</a>          			        				
+					</div>
+				</div>
+				<div class="col-lg-5 col-md-5 col-sm-6">
+					<div class="header_right">
+						<nav id="main-menu" class="ms-auto">
+							<ul>
+								<li><a class="nav-link" href="index.html">Inicio</a></li>
+								<li><a class="nav-link" href="cursos.html">Cursos</a></li>
+								<li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
+								<li><a class="nav-link" href="mis-cursos.html">Mis Clases</a></li>
+							</ul>
+						</nav>
+						<div id="mobile_menu"></div>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-3 col-sm-12">
+					<div class="home_lc">
+						<a href="carrito.html" class="hlc" title="Ver Carrito de Matrícula">
+							<i class="ti-shopping-cart-full"></i>
+							<span class="gactive" id="cart-nav-counter">0</span>
+						</a>
+					</div>
+					<div class="call_to_action" id="auth-buttons-nav">
+						<a class="btn_one" href="login.html">Ingresar</a>
+						<a class="btn_two" href="registro.html">Registrarse</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> 	  
+	<!-- END NAVBAR -->
+
+	<!-- START SECTION TOP (PENN BANNER) -->
+	<section class="section-top">
+		<div class="container">
+			<div class="col-lg-10 offset-lg-1 text-center">
+				<div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s">
+					<h1>¡Matrícula Exitosa!</h1>
+					<ul>
+						<li><a href="index.html">Inicio</a></li>
+						<li> / Confirmación de Pago y Accesos</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>	
+	<!-- END SECTION TOP -->
+
+	<!-- Contenido de Confirmación -->
+	<div class="section-padding" style="padding-top: 50px; background: #fff;">
+		<div class="container">
+			<!-- Header de Éxito Estilo Gestión de Cursos -->
+			<div class="row">
+				<div class="col-12 text-center" style="margin-bottom: 35px;">
+					<div style="width: 65px; height: 65px; line-height: 65px; background: #2eca7f; color: #fff; border-radius: 50%; font-size: 30px; margin: 0 auto 15px; box-shadow: 0 4px 15px rgba(46, 202, 127, 0.35);">
+						<i class="fa fa-check"></i>
+					</div>
+					<div class="section-title text-center" style="margin-bottom: 12px;">
+						<h2>CONFIRMACIÓN DE MATRÍCULA</h2>
+						<p style="font-size: 32px; line-height: 38px; margin: 0 auto; width: 100%;">¡Tu vacante ha sido asegurada con éxito!</p>
+					</div>
+					<p style="color: #666; font-size: 14px; max-width: 650px; margin: 0 auto 15px;">
+						Hemos registrado tu inscripción en el sistema académico y emitido tu comprobante electrónico de pago en <strong>Gestión de Cursos</strong>.
+					</p>
+					<div style="display: inline-flex; align-items: center; gap: 15px; padding: 10px 22px; background: #F6F7FB; border: 1px solid #ebebeb; border-radius: 4px; flex-wrap: wrap; justify-content: center;">
+						<span><i class="fa fa-barcode" style="color: #2eca7f;"></i> Código: <strong id="code-order-display" style="color: #1a2d62;">ORD-000000</strong></span>
+						<span style="color: #ccc;">|</span>
+						<span><i class="fa fa-calendar" style="color: #2eca7f;"></i> Fecha: <strong id="order-date-display" style="color: #1a2d62;">05/10/2026</strong></span>
+						<span style="color: #ccc;">|</span>
+						<span class="badge" style="background: #2eca7f; color: #fff; padding: 5px 12px; font-weight: 700; border-radius: 2px;">PAGADO</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Grid Principal: Detalle de Clase + Comprobante Oficial -->
+			<div class="row">
+				<!-- Columna 1: DETALLES DEL PROGRAMA Y ACCESO -->
+				<div class="col-lg-6 col-12 mb-4">
+					<div class="penn-confirm-box">
+						<h3><i class="fa fa-graduation-cap" style="color: #2eca7f; margin-right: 8px;"></i> Detalles de tu Programa</h3>
+						
+						<h4 id="rec-curso-title" style="color: #1a2d62; font-weight: 700; font-size: 18px; margin-bottom: 8px; line-height: 1.3;">
+							Curso Profesional
+						</h4>
+
+						<div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
+							<span id="rec-curso-mod" class="badge bg-primary" style="font-size: 11px; padding: 5px 10px; font-weight: 700; border-radius: 3px;">VIRTUAL</span>
+							<span style="color: #666; font-size: 13px;"><i class="fa fa-clock-o" style="color: #2eca7f; margin-right: 4px;"></i> <strong id="rec-horario">Lun y Mie 19:00 - 22:00</strong></span>
+						</div>
+
+						<!-- Caja Destacada de Acceso al Aula -->
+						<div id="box-acceso-aula" style="background: #F6F7FB; border: 1px solid #e0e0e0; border-radius: 4px; padding: 18px; margin: 18px 0;">
+							<h5 style="font-size: 14px; font-weight: 700; color: #1a2d62; margin-bottom: 6px;">
+								<i class="fa fa-video-camera" style="color: #2eca7f; margin-right: 6px;"></i> Sala de Clases en Vivo (Google Meet / Zoom)
+							</h5>
+							<p style="font-size: 12px; color: #666; margin-bottom: 12px;">
+								El enlace para unirte a tus sesiones en tiempo real ya se encuentra disponible:
+							</p>
+							<a id="btn-link-clase" href="#" target="_blank" class="btn_one" style="display: inline-block; padding: 9px 20px; font-size: 13px; text-decoration: none; border-radius: 3px;">
+								<i class="fa fa-external-link" style="margin-right: 6px;"></i> Entrar a la Sala Virtual
+							</a>
+						</div>
+
+						<!-- Datos del Estudiante Matriculado -->
+						<h5 style="font-size: 13px; font-weight: 700; color: #555; text-transform: uppercase; margin-bottom: 10px; border-top: 1px solid #ebebeb; padding-top: 15px;">
+							Datos del Estudiante Matriculado
+						</h5>
+						<div class="row g-2" style="font-size: 13px; color: #444;">
+							<div class="col-sm-6 col-12"><strong>Alumno:</strong> <span id="rec-cliente">Carlos Alarcón</span></div>
+							<div class="col-sm-6 col-12"><strong>Documento:</strong> <span id="rec-doc">74859612</span></div>
+							<div class="col-sm-6 col-12"><strong>WhatsApp:</strong> <span id="rec-telefono">999555666</span></div>
+							<div class="col-sm-6 col-12"><strong>Correo:</strong> <span id="rec-correo">alumno@cursos.com</span></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Columna 2: COMPROBANTE OFICIAL SUNAT -->
+				<div class="col-lg-6 col-12 mb-4">
+					<div class="penn-confirm-box">
+						<h3><i class="fa fa-file-text-o" style="color: #2eca7f; margin-right: 8px;"></i> Comprobante Electrónico SUNAT</h3>
+
+						<!-- Header de Facturación -->
+						<div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #ebebeb; padding-bottom: 12px; margin-bottom: 15px;">
+							<div>
+								<h5 style="font-weight: 700; color: #1a2d62; margin-bottom: 2px; font-size: 15px;">Gestión de Cursos S.A.C.</h5>
+								<p style="color: #777; font-size: 11px; margin-bottom: 0;">RUC: 20609876543 &bull; Av. Universitaria 1234, Lima</p>
+								<p style="color: #777; font-size: 11px; margin-bottom: 0;">Servicios Educativos y Capacitación Integral</p>
+							</div>
+							<div class="sunat-box" style="border: 2px solid #1a2d62; padding: 6px 12px; text-align: center; border-radius: 4px;">
+								<span style="font-size: 10px; color: #777; display: block; font-weight: 600;">R.U.C. 20609876543</span>
+								<strong id="sunat-tipo-title" style="font-size: 11px; color: #1a2d62; display: block; text-transform: uppercase;">BOLETA DE VENTA ELECTRÓNICA</strong>
+								<span id="sunat-serie-display" style="font-size: 13px; font-weight: 800; color: #e53935; display: block;">B001-00001001</span>
+							</div>
+						</div>
+
+						<!-- Tabla de Ítems del Comprobante -->
+						<table class="table table-bordered align-middle" style="font-size: 12px; margin-bottom: 12px;">
+							<thead style="background: #F6F7FB;">
+								<tr>
+									<th>Descripción del Programa</th>
+									<th class="text-center" style="width: 90px;">Modalidad</th>
+									<th class="text-end" style="width: 90px;">Importe</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td id="rec-table-desc">Curso Profesional</td>
+									<td class="text-center"><span class="badge bg-secondary" id="rec-table-mod">VIRTUAL</span></td>
+									<td class="text-end" id="rec-table-total">S/ 0.00</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<!-- Totales y Medio de Pago -->
+						<div style="background: #F6F7FB; padding: 12px 16px; border-radius: 4px; font-size: 13px;">
+							<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+								<span>Subtotal:</span>
+								<strong id="rec-subtotal-val">S/ 0.00</strong>
+							</div>
+							<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+								<span>I.G.V. (18%):</span>
+								<strong id="rec-igv-val">S/ 0.00</strong>
+							</div>
+							<div style="display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 6px; font-size: 15px; color: #1a2d62;">
+								<strong>Total Pagado:</strong>
+								<strong id="rec-total-val" style="color: #2eca7f; font-size: 17px;">S/ 0.00</strong>
+							</div>
+							<div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #ccc; margin-top: 8px; padding-top: 8px;">
+								<span style="font-size: 12px; color: #555;">Forma de Pago:</span>
+								<span id="rec-metodo" class="badge" style="background: #742284; color: #fff; font-size: 11px; padding: 4px 8px;">Yape (Mercado Pago)</span>
+							</div>
+						</div>
+
+						<button onclick="window.print()" class="btn_two" style="width: 100%; margin-top: 14px; padding: 10px; font-size: 13px; cursor: pointer; text-align: center; border-radius: 3px;">
+							<i class="fa fa-print" style="margin-right: 6px;"></i> Imprimir / Guardar Comprobante PDF
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- NOTIFICACIONES Y ENVÍOS AUTOMÁTICOS -->
+			<div class="row" style="margin-top: 15px;">
+				<div class="col-12 text-center" style="margin-bottom: 25px;">
+					<h3 style="font-size: 20px; font-weight: 800; color: #1a2d62; margin-bottom: 6px;">
+						<i class="fa fa-paper-plane" style="color: #2eca7f; margin-right: 6px;"></i> Notificaciones Enviadas Automáticamente
+					</h3>
+					<p style="color: #666; font-size: 14px; margin-bottom: 0;">
+						Hemos enviado automáticamente los accesos a tu curso y la Boleta Electrónica a tus canales de contacto registrados:
+					</p>
+				</div>
+
+				<!-- Canal 1: CORREO ELECTRÓNICO (AUTOMÁTICO) -->
+				<div class="col-lg-6 col-12 mb-3">
+					<div class="penn-channel-card">
+						<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+							<div style="display: flex; align-items: center; gap: 12px;">
+								<div class="channel-icon" style="background: #1a2d62; color: #fff; margin-bottom: 0;">
+									<i class="fa fa-envelope"></i>
+								</div>
+								<div>
+									<h4 style="font-size: 16px; font-weight: 700; color: #1a2d62; margin: 0;">Correo Electrónico</h4>
+									<small style="color: #666;">Bandeja de entrada oficial</small>
+								</div>
+							</div>
+							<span class="badge" style="background: #2eca7f; color: #fff; font-size: 11px; padding: 5px 9px; font-weight: 700; border-radius: 3px;">
+								<i class="fa fa-check"></i> ENVIADO AUTOMÁTICO
+							</span>
+						</div>
+
+						<div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 4px; padding: 12px; margin-bottom: 12px;">
+							<span style="font-size: 11px; color: #888; display: block; text-transform: uppercase; font-weight: 600;">Destinatario Registrado:</span>
+							<strong id="auto-correo-dest" style="color: #1a2d62; font-size: 14px; word-break: break-all;">alumno@cursos.com</strong>
+							<p style="font-size: 12px; color: #555; margin-top: 6px; margin-bottom: 0; line-height: 1.4;">
+								<i class="fa fa-file-pdf-o" style="color: #e53935; margin-right: 4px;"></i> Se adjuntó tu <strong>Boleta Electrónica SUNAT (PDF/XML)</strong> y las credenciales de ingreso a clase.
+							</p>
+						</div>
+
+						<div style="display: flex; gap: 8px; flex-wrap: wrap;">
+							<button type="button" onclick="abrirClienteCorreo()" class="btn_one" style="flex: 1; padding: 9px 12px; font-size: 12px; text-align: center; border-radius: 3px; text-decoration: none;">
+								<i class="fa fa-external-link" style="margin-right: 4px;"></i> Abrir en mi Correo
+							</button>
+							<button type="button" id="btn-reenviar-email" onclick="reenviarCorreoAuto()" class="btn_two" style="padding: 9px 15px; font-size: 12px; cursor: pointer; border-radius: 3px;">
+								<i class="fa fa-refresh" style="margin-right: 4px;"></i> Reenviar
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Canal 2: WHATSAPP (AUTOMÁTICO) -->
+				<div class="col-lg-6 col-12 mb-3">
+					<div class="penn-channel-card">
+						<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+							<div style="display: flex; align-items: center; gap: 12px;">
+								<div class="channel-icon" style="background: #25D366; color: #fff; margin-bottom: 0;">
+									<i class="fa fa-whatsapp"></i>
+								</div>
+								<div>
+									<h4 style="font-size: 16px; font-weight: 700; color: #1a2d62; margin: 0;">WhatsApp Oficial</h4>
+									<small style="color: #666;">Notificaciones instantáneas</small>
+								</div>
+							</div>
+							<span class="badge" style="background: #25D366; color: #fff; font-size: 11px; padding: 5px 9px; font-weight: 700; border-radius: 3px;">
+								<i class="fa fa-check"></i> NOTIFICADO AUTOMÁTICO
+							</span>
+						</div>
+
+						<div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 4px; padding: 12px; margin-bottom: 12px;">
+							<span style="font-size: 11px; color: #888; display: block; text-transform: uppercase; font-weight: 600;">Número de WhatsApp:</span>
+							<strong id="auto-wa-dest" style="color: #1a2d62; font-size: 14px;">+51 999 555 666</strong>
+							<p style="font-size: 12px; color: #555; margin-top: 6px; margin-bottom: 0; line-height: 1.4;">
+								<i class="fa fa-video-camera" style="color: #2eca7f; margin-right: 4px;"></i> Se envió el mensaje con el <strong>código de orden</strong>, horario y enlace directo a Zoom/Meet.
+							</p>
+						</div>
+
+						<div style="display: flex; gap: 8px; flex-wrap: wrap;">
+							<button type="button" onclick="abrirChatWhatsApp()" class="btn" style="flex: 1; background: #25D366; color: #fff; font-weight: 700; border: none; padding: 9px 12px; font-size: 12px; cursor: pointer; border-radius: 3px;">
+								<i class="fa fa-whatsapp" style="margin-right: 4px; font-size: 15px;"></i> Ver Mensaje en WhatsApp Web
+							</button>
+							<button type="button" onclick="contactarSoporte()" class="btn_two" style="padding: 9px 15px; font-size: 12px; cursor: pointer; border-radius: 3px;">
+								<i class="fa fa-comments-o" style="margin-right: 4px;"></i> Soporte
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Botones de Navegación Finales -->
+			<div class="row" style="margin-top: 25px;">
+				<div class="col-12 text-center">
+					<a href="mis-cursos.html" class="btn_one" style="display: inline-block; padding: 12px 28px; margin-right: 12px; text-decoration: none; border-radius: 4px;">
+						<i class="fa fa-book" style="margin-right: 6px;"></i> Ir a Mis Clases
+					</a>
+					<a href="index.html" class="btn_two" style="display: inline-block; padding: 12px 28px; text-decoration: none; border-radius: 4px;">
+						<i class="fa fa-home" style="margin-right: 6px;"></i> Volver al Inicio
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- START FOOTER (PENN) -->
+	<div class="footer section-padding">
+		<div class="container">
+			<div class="row fc">
+				<div class="col-lg-6 col-sm-6 col-xs-12">
+					<div class="footer_copyright">
+						<p>&copy; 2026 Gestión de Cursos. Todos los derechos reservados.</p>
+					</div>
+				</div>
+				<div class="col-lg-6 col-sm-6 col-xs-12">
+					<div class="footer_menu">
+						<ul>
+							<li><a href="index.html">Inicio</a></li>
+							<li><a href="cursos.html">Cursos</a></li>
+							<li><a href="mis-cursos.html">Mis Clases</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>				
+		</div>
+	</div>
+	<!-- END FOOTER -->			
+		
+	<!-- Scripts Gestión de Cursos -->
+	<script src="assets/js/jquery-1.12.4.min.js"></script>
+	<script src="assets/bootstrap/js/bootstrap.min.js"></script>			
+	<script src="assets/owlcarousel/js/owl.carousel.min.js"></script>	
+	<script src="assets/js/jquery.slicknav.js"></script>			
+	<script src="assets/js/jquery.magnific-popup.min.js"></script>		
+	<script src="assets/js/jquery.mixitup.js"></script>			
+	<script src="assets/js/scrolltopcontrol.js"></script>	
+	<script src="assets/js/purecounter_vanilla.js"></script>	
+	<script src="assets/js/wow.min.js"></script>				
+	<script src="assets/js/scripts.js"></script>
+
+	<!-- Lógica Modular -->
+	<script src="js/config.js"></script>
+	<script src="js/api.js"></script>
+	<script src="js/auth.service.js"></script>
+	<script src="js/cursos.service.js"></script>
+	<script src="js/cart.service.js"></script>
+	<script src="js/pedidos.service.js"></script>
+	<script src="js/notifications.js"></script>
+
+	<!-- Logica de la pagina: Confirmación -->
+	<script src="js/pages/confirmacion.js"></script>
+</body>
+</html>

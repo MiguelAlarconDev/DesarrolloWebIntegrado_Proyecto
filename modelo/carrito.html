@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<!-- Meta -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Carrito de Compras - - Gestión de Cursos</title>			
+	
+	<!-- Latest Bootstrap min CSS -->
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">		
+	<!-- Google Font Local -->
+	<link rel="stylesheet" href="assets/fonts/mulish.css">
+	<!-- Font Awesome CSS -->
+	<link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+	<link rel="stylesheet" href="assets/fonts/themify-icons.css">
+	<!--- owl carousel Css-->
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.carousel.css">
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.theme.css">				
+	<!--slicknav Css-->
+	<link rel="stylesheet" href="assets/css/slicknav.css">		
+	<!-- MAGNIFIC CSS -->
+	<link rel="stylesheet" href="assets/css/magnific-popup.css">	
+	<link rel="stylesheet" href="assets/css/niceselect.css" />	
+	<!-- animate CSS -->
+	<link rel="stylesheet" href="assets/css/animate.css">			
+	<!-- Style CSS de Gestión de Cursos -->					
+	<link rel="stylesheet" href="assets/css/shop.css" />				
+	<link rel="stylesheet" href="assets/css/style.css" />				
+	<link rel="stylesheet" href="css/custom.css" />
+</head>
+<body>
+	
+		<!-- START NAVBAR -->  
+	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="site-logo">
+						<a href="index.html" class="brand-logo-link">
+							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+							<span class="brand-text">Gestión de Cursos</span>
+						</a>          			        				
+					</div>
+				</div>
+				<div class="col-lg-5 col-md-5 col-sm-6">
+					<div class="header_right">
+						<nav id="main-menu" class="ms-auto">
+							<ul>
+								<li><a class="nav-link" href="index.html">Inicio</a></li>
+								<li><a class="nav-link" href="cursos.html">Cursos</a></li>
+								<li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
+								<li><a class="nav-link" href="mis-cursos.html">Mis Clases</a></li>
+							</ul>
+						</nav>
+						<div id="mobile_menu"></div>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-3 col-sm-12">
+					<div class="home_lc">
+						<a href="carrito.html" class="hlc" title="Ver Carrito de Matrícula">
+							<i class="ti-shopping-cart-full"></i>
+							<span class="gactive" id="cart-nav-counter">0</span>
+						</a>
+					</div>
+					<div class="call_to_action" id="auth-buttons-nav">
+						<a class="btn_one" href="login.html">Ingresar</a>
+						<a class="btn_two" href="registro.html">Registrarse</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> 	  
+	<!-- END NAVBAR -->
+
+	<!-- START SECTION TOP (PENN BANNER) -->
+	<section class="section-top">
+		<div class="container">
+			<div class="col-lg-10 offset-lg-1 text-center">
+				<div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+					<h1>Carrito de Inscripción</h1>
+					<ul>
+						<li><a href="index.html">Inicio</a></li>
+						<li> / Carrito de Matrícula</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>	
+	<!-- END SECTION TOP -->
+	
+	<!-- Shopping Cart (PLANTILLA PENN) -->
+	<div class="shopping-cart section">
+		<div class="container">
+			
+			<!-- Temporizador de Reserva de Vacante en Tiempo Real -->
+			<div class="penn-timer-box d-none" id="cart-timer-box">
+				<div class="d-flex align-items-center gap-3">
+					<i class="fa fa-clock-o fs-2 text-warning"></i>
+					<div>
+						<h5 class="mb-0 fw-bold">¡Tu Vacante está Reservada en Tiempo Real!</h5>
+						<small class="text-muted">El sistema bloquea temporalmente tu cupo para que nadie te lo gane mientras completas el pago.</small>
+					</div>
+				</div>
+				<div class="text-end">
+					<small class="d-block text-muted">Tiempo restante:</small>
+					<span class="penn-timer-digits" id="timer-text">15:00</span>
+				</div>
+			</div>
+
+			<div id="cart-dynamic-area">
+				<!-- Inyectado con la tabla Gestión de Cursos -->
+			</div>
+		</div>
+	</div>
+	<!--/ End Shopping Cart -->
+
+	<!-- START FOOTER (PENN) -->
+	<div class="footer section-padding">
+		<div class="container">
+			<div class="row fc">
+				<div class="col-lg-6 col-sm-6 col-xs-12">
+					<div class="footer_copyright">
+						<p>&copy; 2026 Gestión de Cursos. Todos los derechos reservados.</p>
+					</div>
+				</div>
+				<div class="col-lg-6 col-sm-6 col-xs-12">
+					<div class="footer_menu">
+						<ul>
+							<li><a href="index.html">Inicio</a></li>
+							<li><a href="index.html#cursos-section">Cursos</a></li>
+							<li><a href="mis-cursos.html">Mis Clases</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>				
+		</div>
+	</div>
+	<!-- END FOOTER -->			
+		
+	<!-- Scripts Gestión de Cursos -->
+	<script src="assets/js/jquery-1.12.4.min.js"></script>
+	<script src="assets/bootstrap/js/bootstrap.min.js"></script>			
+	<script src="assets/owlcarousel/js/owl.carousel.min.js"></script>	
+	<script src="assets/js/jquery.slicknav.js"></script>			
+	<script src="assets/js/jquery.magnific-popup.min.js"></script>		
+	<script src="assets/js/jquery.mixitup.js"></script>			
+	<script src="assets/js/scrolltopcontrol.js"></script>	
+	<script src="assets/js/purecounter_vanilla.js"></script>	
+	<script src="assets/js/wow.min.js"></script>				
+	<script src="assets/js/scripts.js"></script>
+
+	<!-- Lógica Modular -->
+	<script src="js/config.js"></script>
+	<script src="js/api.js"></script>
+	<script src="js/auth.service.js"></script>
+	<script src="js/cursos.service.js"></script>
+	<script src="js/cart.service.js"></script>
+	<script src="js/pedidos.service.js"></script>
+	<script src="js/notifications.js"></script>
+
+	<script>
+		let intervalTimer = null;
+
+		function initPennCart() {
+			renderCart();
+			actualizarNavbar();
+		}
+
+		function actualizarNavbar() {
+			document.getElementById('cart-nav-counter').textContent = CartService.getCartCount();
+			AuthService.updateNavbar();
+		}
+
+		function renderCart() {
+			const cart = CartService.getCart();
+			const area = document.getElementById('cart-dynamic-area');
+			const timerBox = document.getElementById('cart-timer-box');
+
+			if (cart.length === 0) {
+				timerBox.classList.add('d-none');
+				if (intervalTimer) clearInterval(intervalTimer);
+
+				area.innerHTML = `
+					<div class="row">
+						<div class="col-12 text-center py-5">
+							<i class="ti-shopping-cart text-muted" style="font-size: 72px;"></i>
+							<h3 class="mt-3">Tu carrito de matrícula está vacío</h3>
+							<p class="text-muted">No tienes ningún curso reservado en este momento.</p>
+							<a href="cursos.html" class="btn_one mt-3">Ver Catálogo de Cursos</a>
+						</div>
+					</div>
+				`;
+				return;
+			}
+
+			timerBox.classList.remove('d-none');
+			activarTimer();
+
+			const totals = CartService.getTotals();
+
+			const rowsHtml = cart.map(item => {
+				const isVirtual = item.modalidad === 'VIRTUAL';
+				const badge = isVirtual
+					? `<span class="badge-mod-virtual"><i class="fa fa-video-camera"></i> Virtual Zoom</span>`
+					: `<span class="badge-mod-presencial"><i class="fa fa-building"></i> Presencial Sede</span>`;
+
+				return `
+					<tr>
+						<td class="image" data-title="Curso"><img src="${item.imagen}" alt="#"></td>
+						<td class="product-des" data-title="Descripción">
+							<p class="product-name"><a href="curso-detalle.html?id=${item.id}">${item.titulo}</a></p>
+							<p class="product-des mb-1">${badge} &bull; Horario: ${item.horario}</p>
+							<small class="text-muted"><i class="fa fa-user"></i> ${item.docente || 'Docente asignado'}</small>
+						</td>
+						<td class="price text-center" data-title="Precio"><span>S/ ${Number(item.precio).toFixed(2)}</span></td>
+						<td class="qty text-center" data-title="Vacante">
+							<span class="badge bg-light text-dark p-2 border">1 Vacante</span>
+						</td>
+						<td class="total-amount text-center" data-title="Total"><span>S/ ${Number(item.precio).toFixed(2)}</span></td>
+						<td class="action text-center" data-title="Quitar">
+							<a href="#" onclick="quitar('${item.id}'); return false;"><i class="ti-trash remove-icon"></i></a>
+						</td>
+					</tr>
+				`;
+			}).join('');
+
+			area.innerHTML = `
+				<div class="row">
+					<div class="col-12">
+						<!-- Tabla Shopping Summery Oficial de Gestión de Cursos -->
+						<table class="table shopping-summery">
+							<thead>
+								<tr class="main-hading">
+									<th>CURSO</th>
+									<th>DETALLE Y MODALIDAD</th>
+									<th class="text-center">PRECIO</th>
+									<th class="text-center">RESERVA</th>
+									<th class="text-center">SUBTOTAL</th> 
+									<th class="text-center"><i class="ti-trash remove-icon"></i></th>
+								</tr>
+							</thead>
+							<tbody>
+								${rowsHtml}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-12">
+						<!-- Bloque Total Amount Oficial de Gestión de Cursos -->
+						<div class="total-amount">
+							<div class="row">
+								<div class="col-lg-8 col-md-5 col-12">
+									<div class="left">
+										<div class="alert alert-info border-0 rounded-3 mb-0">
+											<i class="fa fa-shield text-primary me-2"></i>
+											<strong>Garantía de Pago:</strong> Tu pago está protegido con cifrado de 256 bits mediante la pasarela de <strong>Mercado Pago</strong>. Recibirás tu Boleta o Factura al instante.
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-4 col-md-7 col-12">
+									<div class="right">
+										<ul>
+											<li>Subtotal (sin IGV)<span>S/ ${totals.subtotal}</span></li>
+											<li>I.G.V. (18%)<span>S/ ${totals.igv}</span></li>
+											<li class="last">Total a Pagar<span>S/ ${totals.total}</span></li>
+										</ul>
+										<div class="button5">
+											<a href="checkout.html" class="btn">Continuar al Pago</a>
+											<a href="index.html#cursos-section" class="btn">Seguir Comprando</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+		}
+
+		function activarTimer() {
+			if (intervalTimer) clearInterval(intervalTimer);
+
+			function tick() {
+				const time = CartService.getRemainingTime();
+				if (!time || time.expired) {
+					clearInterval(intervalTimer);
+					CartService.clearCart();
+					Notifications.showToast('Tiempo de reserva finalizado. Vacante liberada.', 'warning');
+					renderCart();
+					return;
+				}
+				document.getElementById('timer-text').textContent = time.formatted;
+			}
+
+			tick();
+			intervalTimer = setInterval(tick, 1000);
+		}
+
+		function quitar(id) {
+			CartService.removeFromCart(id);
+			Notifications.showToast('Curso eliminado del carrito.', 'info');
+			actualizarNavbar();
+			renderCart();
+		}
+
+		$(document).ready(initPennCart);
+	</script>
+</body>
+</html>

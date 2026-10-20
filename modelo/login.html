@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Iniciar Sesión - - Gestión de Cursos</title>			
+	
+	<!-- Latest Bootstrap min CSS -->
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">		
+	<!-- Google Font Local -->
+	<link rel="stylesheet" href="assets/fonts/mulish.css">
+	<!-- Font Awesome CSS -->
+	<link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+	<link rel="stylesheet" href="assets/fonts/themify-icons.css">
+	<!--- owl carousel Css-->
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.carousel.css">
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.theme.css">				
+	<!--slicknav Css-->
+	<link rel="stylesheet" href="assets/css/slicknav.css">		
+	<!-- MAGNIFIC CSS -->
+	<link rel="stylesheet" href="assets/css/magnific-popup.css">	
+	<link rel="stylesheet" href="assets/css/niceselect.css" />	
+	<!-- animate CSS -->
+	<link rel="stylesheet" href="assets/css/animate.css">			
+	<!-- Style CSS de Gestión de Cursos -->					
+	<link rel="stylesheet" href="assets/css/shop.css" />				
+	<link rel="stylesheet" href="assets/css/style.css" />				
+	<link rel="stylesheet" href="css/custom.css" />
+</head>
+<body>
+	
+		<!-- START NAVBAR -->  
+	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="site-logo">
+						<a href="index.html" class="brand-logo-link">
+							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+							<span class="brand-text">Gestión de Cursos</span>
+						</a>          			        				
+					</div>
+				</div>
+				<div class="col-lg-5 col-md-5 col-sm-6">
+					<div class="header_right">
+						<nav id="main-menu" class="ms-auto">
+							<ul>
+								<li><a class="nav-link" href="index.html">Inicio</a></li>
+								<li><a class="nav-link" href="cursos.html">Cursos</a></li>
+								<li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
+								<li><a class="nav-link" href="mis-cursos.html">Mis Clases</a></li>
+							</ul>
+						</nav>
+						<div id="mobile_menu"></div>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-3 col-sm-12">
+					<div class="home_lc">
+						<a href="carrito.html" class="hlc" title="Ver Carrito de Matrícula">
+							<i class="ti-shopping-cart-full"></i>
+							<span class="gactive" id="cart-nav-counter">0</span>
+						</a>
+					</div>
+					<div class="call_to_action" id="auth-buttons-nav">
+						<a class="btn_one" href="login.html">Ingresar</a>
+						<a class="btn_two" href="registro.html">Registrarse</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> 	  
+	<!-- END NAVBAR -->
+
+	<!-- START SECTION TOP (PENN BANNER) -->
+	<section class="section-top">
+		<div class="container">
+			<div class="col-lg-10 offset-lg-1 text-center">
+				<div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s">
+					<h1>Ingreso de Alumnos</h1>
+					<ul>
+						<li><a href="index.html">Inicio</a></li>
+						<li> / Iniciar Sesión</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>	
+	<!-- END SECTION TOP -->
+
+	<!-- START LOGIN (PLANTILLA PENN) -->
+	<section class="login_register section-padding">
+		<div class="container">
+			<div class="row">				
+				<div class="col-lg-6 offset-lg-3 col-xs-12">
+					<div class="login">
+						<h4 class="login_register_title">Ingresa a tu cuenta de estudiante:</h4>
+
+						<form id="penn-login-form" onsubmit="hacerLogin(event)">
+							<div class="form-group mb-3">
+								<label for="login-email">Correo Electrónico *</label>
+								<input type="email" id="login-email" class="form-control requiredField input-label" required placeholder="tu@correo.com">
+							</div>
+							<div class="form-group mb-3">
+								<label for="login-pwd">Contraseña *</label>
+								<input type="password" id="login-pwd" class="form-control requiredField input-label" required placeholder="Tu contraseña">
+							</div>
+							<div class="form-group col-lg-12">
+								<button class="btn_one w-100" type="submit" id="btn-login-penn">Iniciar Sesión</button>
+							</div>
+						</form>
+
+						<p class="mt-4 text-center">¿No tienes cuenta? <a href="registro.html" class="fw-bold text-success">Regístrate aquí</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- END LOGIN -->
+
+	<!-- START FOOTER (PENN) -->
+	<div class="footer section-padding">
+		<div class="container">
+			<div class="row fc">
+				<div class="col-lg-6 col-sm-6 col-xs-12">
+					<div class="footer_copyright">
+						<p>&copy; 2026 Gestión de Cursos. Todos los derechos reservados.</p>
+					</div>
+				</div>
+				<div class="col-lg-6 col-sm-6 col-xs-12">
+					<div class="footer_menu">
+						<ul>
+							<li><a href="index.html">Inicio</a></li>
+							<li><a href="carrito.html">Carrito</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>				
+		</div>
+	</div>
+	<!-- END FOOTER -->			
+		
+	<!-- Scripts Gestión de Cursos -->
+	<script src="assets/js/jquery-1.12.4.min.js"></script>
+	<script src="assets/bootstrap/js/bootstrap.min.js"></script>			
+	<script src="assets/owlcarousel/js/owl.carousel.min.js"></script>	
+	<script src="assets/js/jquery.slicknav.js"></script>			
+	<script src="assets/js/jquery.magnific-popup.min.js"></script>		
+	<script src="assets/js/jquery.mixitup.js"></script>			
+	<script src="assets/js/scrolltopcontrol.js"></script>	
+	<script src="assets/js/purecounter_vanilla.js"></script>	
+	<script src="assets/js/wow.min.js"></script>				
+	<script src="assets/js/scripts.js"></script>
+
+	<!-- Lógica Modular -->
+	<script src="js/config.js"></script>
+	<script src="js/api.js"></script>
+	<script src="js/auth.service.js"></script>
+	<script src="js/cursos.service.js"></script>
+	<script src="js/cart.service.js"></script>
+	<script src="js/notifications.js"></script>
+
+	<script>
+		async function hacerLogin(e) {
+			e.preventDefault();
+			const email = document.getElementById('login-email').value.trim();
+			const pwd = document.getElementById('login-pwd').value.trim();
+			const btn = document.getElementById('btn-login-penn');
+			btn.disabled = true;
+			btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Iniciando Sesión...`;
+
+			try {
+				const res = await AuthService.login(email, pwd);
+				Notifications.showToast(`¡Bienvenido, ${res.user.nombres}!`, 'success');
+				AuthService.updateNavbar();
+				setTimeout(() => {
+					window.location.href = 'index.html';
+				}, 400);
+			} catch (err) {
+				Notifications.showToast(err.message, 'error');
+				btn.disabled = false;
+				btn.innerHTML = `Iniciar Sesión`;
+			}
+		}
+
+		$(document).ready(() => {
+			AuthService.updateNavbar();
+			document.getElementById('cart-nav-counter').textContent = CartService.getCartCount();
+		});
+	</script>
+</body>
+</html>
