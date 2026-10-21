@@ -684,3 +684,436 @@
   vertical-align: middle !important;
   border: 1px solid #6c757d !important;
 }
+
+
+/* ==========================================================================
+   CHECKOUT (prefijo ck-) — Diseño unificado de la página de pago
+   Misma paleta y tipografía del sitio: verde #2eca7f, azul #1a2d62, Mulish
+   ========================================================================== */
+.ck-page {
+  padding: 56px 0 80px;
+  background: #f6f8fb;
+  font-family: 'Mulish', sans-serif;
+  color: #334155;
+}
+
+/* --- Stepper --- */
+.ck-steps {
+  display: flex;
+  max-width: 560px;
+  margin: 0 auto 36px;
+  padding: 0;
+}
+.ck-steps li {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  font-size: 13px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+.ck-steps li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: calc(50% + 24px);
+  right: calc(-50% + 24px);
+  height: 2px;
+  background: #e2e8f0;
+}
+.ck-steps li.is-done:not(:last-child)::after { background: #2eca7f; }
+.ck-steps li.is-done,
+.ck-steps li.is-active { color: #1a2d62; }
+.ck-step-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #94a3b8;
+  position: relative;
+  z-index: 1;
+}
+.ck-steps li.is-done .ck-step-dot { background: #2eca7f; border-color: #2eca7f; color: #fff; }
+.ck-steps li.is-active .ck-step-dot { border-color: #2eca7f; color: #2eca7f; box-shadow: 0 0 0 4px rgba(46, 202, 127, 0.15); }
+
+/* --- Tarjetas --- */
+.ck-card {
+  background: #fff;
+  border: 1px solid #e6ebf1;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+.ck-card-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+.ck-card-num {
+  flex: 0 0 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #eafaf2;
+  color: #1f9e62;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ck-card-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1a2d62;
+  line-height: 1.3;
+  text-transform: none;
+  margin: 0;
+}
+.ck-card-sub { font-size: 13px; color: #64748b; line-height: 1.45; margin: 2px 0 0; }
+
+/* --- Formulario --- */
+.ck-label { display: block; font-size: 13px; font-weight: 700; color: #334155; line-height: 1.4; margin-bottom: 6px; }
+.ck-label span { color: #ef4444; }
+.ck-input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #d7dee8;
+  border-radius: 10px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.ck-input::placeholder { color: #a0aec0; font-weight: 500; }
+.ck-input:focus { outline: none; border-color: #2eca7f; box-shadow: 0 0 0 4px rgba(46, 202, 127, 0.15); }
+.ck-input-otp { text-align: center; letter-spacing: 6px; font-size: 16px; font-weight: 800; }
+.ck-input-group { display: flex; }
+.ck-input-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid #d7dee8;
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+  background: #f8fafc;
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+}
+.ck-input-group .ck-input { border-radius: 0 10px 10px 0; }
+.ck-hint { display: block; font-size: 12px; color: #64748b; margin-top: 6px; line-height: 1.4; }
+
+.ck-segment { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ck-segment-opt { position: relative; margin: 0; cursor: pointer; }
+.ck-segment-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.ck-segment-opt span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  border: 1px solid #d7dee8;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+  transition: all 0.15s ease;
+}
+.ck-segment-opt input:checked + span { border-color: #2eca7f; background: #f0fbf6; color: #1a2d62; box-shadow: inset 0 0 0 1px #2eca7f; }
+.ck-segment-opt input:focus-visible + span { box-shadow: 0 0 0 4px rgba(46, 202, 127, 0.2); }
+.ck-subbox { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 16px; }
+
+/* --- Métodos de pago --- */
+.ck-methods { display: flex; flex-direction: column; gap: 10px; }
+.ck-method {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #d7dee8;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ck-method:hover { border-color: #b8c4d3; }
+.ck-method.checked { border-color: #2eca7f; background: #f6fdf9; box-shadow: inset 0 0 0 1px #2eca7f; }
+.ck-method input { width: 18px; height: 18px; margin: 0; flex-shrink: 0; accent-color: #2eca7f; }
+.ck-method-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  color: #fff;
+}
+.ck-method-icon.is-mp { background: #009ee3; }
+.ck-method-icon.is-yape { background: #742284; }
+.ck-method-icon.is-plin { background: #00a7d0; }
+.ck-method-body { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
+.ck-method-body strong { font-size: 15px; font-weight: 800; color: #0f172a; }
+.ck-method-body small { font-size: 12.5px; color: #64748b; }
+.ck-tag { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; background: #e6f6fd; color: #0077b0; white-space: nowrap; }
+
+.ck-method-panel {
+  margin-top: 14px;
+  padding: 18px;
+  border: 1px solid #e6ebf1;
+  border-radius: 12px;
+  background: #f8fafc;
+  animation: ckFade 0.2s ease;
+}
+.ck-info { display: flex; align-items: flex-start; gap: 12px; }
+.ck-info > i { font-size: 22px; color: #009ee3; margin-top: 2px; }
+.ck-info strong { display: block; font-size: 14px; color: #0f172a; margin-bottom: 2px; }
+.ck-info p { font-size: 13px; color: #475569; line-height: 1.5; margin: 0; }
+.ck-brands { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.ck-brand {
+  padding: 5px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: #334155;
+}
+.ck-brand.is-visa { color: #1a1f71; }
+.ck-brand.is-mc { color: #eb001b; }
+.ck-brand.is-amex { color: #2e77bb; }
+.ck-brand.is-mp { color: #009ee3; }
+
+.ck-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; margin-bottom: 16px; border-radius: 10px; background: #eef2f6; }
+.ck-tab {
+  height: 38px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ck-tab.is-active { background: #fff; color: #1a2d62; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1); }
+.ck-theme-yape .ck-tab.is-active { color: #742284; }
+.ck-theme-plin .ck-tab.is-active { color: #0089ab; }
+.ck-howto { list-style: decimal; padding-left: 18px; margin: 0 0 14px; font-size: 13px; color: #475569; line-height: 1.6; }
+.ck-howto li { list-style: decimal; }
+.ck-qr { display: flex; align-items: center; justify-content: center; gap: 20px; }
+.ck-qr img { width: 150px; height: 150px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
+.ck-qr-info { display: flex; flex-direction: column; gap: 2px; }
+.ck-qr-info strong { font-size: 14px; color: #0f172a; }
+.ck-qr-amount { font-size: 24px; font-weight: 900; color: #1a2d62; }
+.ck-qr-info small { font-size: 12px; color: #64748b; }
+
+/* --- Cuenta del alumno --- */
+.ck-user-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid #c9eedb;
+  border-radius: 12px;
+  background: #f6fdf9;
+}
+.ck-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #2eca7f;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+}
+.ck-user-info { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.4; }
+.ck-user-info strong { font-size: 15px; font-weight: 800; color: #0f172a; }
+.ck-user-info span { font-size: 12.5px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ck-chip { padding: 4px 10px; border-radius: 999px; background: #dcfce7; color: #15803d; font-size: 11.5px; font-weight: 800; white-space: nowrap; }
+.ck-link-btn { padding: 0; border: none; background: none; font-family: inherit; font-size: 13px; font-weight: 700; color: #1a2d62; text-decoration: underline; cursor: pointer; white-space: nowrap; }
+.ck-user-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #fde3a7;
+  border-radius: 12px;
+  background: #fffaf0;
+}
+.ck-user-empty strong { display: block; font-size: 14.5px; font-weight: 800; color: #92400e; margin-bottom: 2px; }
+.ck-user-empty span { font-size: 13px; color: #78350f; line-height: 1.45; }
+.ck-user-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ck-user.is-attention .ck-user-empty { animation: ckPulse 0.9s ease 2; }
+
+/* --- Botones --- */
+.ck-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ck-btn-sm { height: 38px; padding: 0 14px; font-size: 13px; }
+.ck-btn-dark { background: #1a2d62; color: #fff !important; }
+.ck-btn-dark:hover { background: #142350; }
+.ck-btn-ghost { background: #fff; border-color: #d7dee8; color: #1a2d62 !important; }
+.ck-btn-ghost:hover { border-color: #1a2d62; }
+.ck-btn-soft { background: #eaf6fd; color: #0077b0 !important; }
+.ck-btn-soft:hover { background: #d8eefb; }
+.ck-btn-mp { background: #009ee3; color: #fff !important; }
+.ck-btn-mp:hover { background: #008acb; }
+.ck-btn-success { background: #2eca7f; color: #fff !important; }
+.ck-btn-success:hover { background: #26b36f; }
+.ck-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* --- Resumen --- */
+.ck-summary { position: sticky; top: 96px; }
+.ck-summary-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+.ck-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid #fde3a7;
+  border-radius: 999px;
+  background: #fff7e6;
+  font-size: 12px;
+  font-weight: 800;
+  color: #b45309;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ck-items { margin: 0 0 12px; }
+.ck-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #eef2f6; }
+.ck-item:first-child { padding-top: 0; }
+.ck-item img { width: 64px; height: 64px; flex-shrink: 0; border-radius: 10px; object-fit: cover; }
+.ck-item-info { flex: 1; min-width: 0; }
+.ck-item-info strong { display: block; font-size: 14px; font-weight: 800; color: #0f172a; line-height: 1.35; }
+.ck-item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; font-size: 12px; color: #64748b; line-height: 1.4; }
+.ck-mod { padding: 2px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; }
+.ck-mod.is-virtual { background: #e8f1ff; color: #1d5fd0; }
+.ck-mod.is-presencial { background: #e7f8ef; color: #1f9e62; }
+.ck-item-price { font-size: 14px; font-weight: 800; color: #1a2d62; white-space: nowrap; }
+
+.ck-totals { margin: 0 0 18px; }
+.ck-totals > div { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; font-size: 14px; }
+.ck-totals dt { font-weight: 600; color: #475569; }
+.ck-totals dd { margin: 0; font-weight: 700; color: #0f172a; }
+.ck-totals .ck-total { margin-top: 8px; padding-top: 14px; border-top: 1px dashed #d7dee8; }
+.ck-totals .ck-total dt { font-size: 15px; font-weight: 800; color: #1a2d62; }
+.ck-totals .ck-total dd { font-size: 24px; font-weight: 900; color: #1a2d62; }
+
+.ck-pay-btn {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #009ee3;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 158, 227, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.ck-pay-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0, 158, 227, 0.34); }
+.ck-pay-btn[data-method="YAPE"] { background: #742284; box-shadow: 0 8px 20px rgba(116, 34, 132, 0.28); }
+.ck-pay-btn[data-method="PLIN"] { background: #00a7d0; box-shadow: 0 8px 20px rgba(0, 167, 208, 0.28); }
+.ck-pay-btn.is-success { background: #16a34a; box-shadow: none; }
+.ck-pay-btn:disabled { cursor: default; transform: none; opacity: 0.92; }
+.ck-legal { margin: 12px 0 0; font-size: 12px; color: #64748b; text-align: center; line-height: 1.5; }
+.ck-legal a { color: #1a2d62; text-decoration: underline; }
+
+/* --- Orden de pago Mercado Pago --- */
+.ck-mp { margin-top: 18px; border: 1px solid #bfe6f8; border-radius: 12px; overflow: hidden; animation: ckFade 0.25s ease; }
+.ck-mp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #009ee3;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+}
+.ck-mp-badge { padding: 3px 9px; border-radius: 999px; background: rgba(255, 255, 255, 0.2); font-size: 11px; font-weight: 800; white-space: nowrap; }
+.ck-mp-body { padding: 16px; background: #f5fbfe; }
+.ck-mp-body > p { margin: 0 0 14px; font-size: 13px; color: #334155; line-height: 1.5; }
+.ck-mp-body .ck-btn { width: 100%; margin-bottom: 10px; }
+.ck-copy-label { display: block; margin: 6px 0 6px; font-size: 12px; font-weight: 700; color: #64748b; }
+.ck-copy { display: flex; border: 1px solid #d7dee8; border-radius: 10px; overflow: hidden; background: #fff; }
+.ck-copy input { flex: 1; min-width: 0; height: 40px; padding: 0 12px; border: none; background: transparent; font-family: monospace; font-size: 12px; color: #334155; }
+.ck-copy input:focus { outline: none; }
+.ck-copy button { padding: 0 14px; border: none; background: #1a2d62; font-family: inherit; font-size: 12px; font-weight: 800; color: #fff; cursor: pointer; white-space: nowrap; }
+.ck-copy button.is-copied { background: #16a34a; }
+.ck-copy-hint { display: block; margin-top: 8px; font-size: 11.5px; color: #64748b; line-height: 1.45; }
+
+/* --- Sellos de confianza --- */
+.ck-trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0; }
+.ck-trust li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 6px;
+  border: 1px solid #e6ebf1;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  text-align: center;
+  line-height: 1.3;
+}
+.ck-trust i { font-size: 18px; color: #2eca7f; }
+
+@keyframes ckFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes ckPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } 50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.25); } }
+
+@media (max-width: 991px) {
+  .ck-page { padding: 32px 0 56px; }
+  .ck-summary { position: static; }
+}
+@media (max-width: 575px) {
+  .ck-card { padding: 18px; }
+  .ck-segment { grid-template-columns: 1fr; }
+  .ck-tag, .ck-chip { display: none; }
+  .ck-qr { flex-direction: column; text-align: center; }
+  .ck-user-row { flex-wrap: wrap; }
+}

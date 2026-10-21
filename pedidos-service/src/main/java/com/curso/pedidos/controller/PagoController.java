@@ -98,11 +98,11 @@ public class PagoController {
 
             if (response != null && response.containsKey("id")) {
                 String id = (String) response.get("id");
-                String sandboxInitPoint = (String) response.get("sandbox_init_point");
                 String initPoint = (String) response.get("init_point");
+                String sandboxInitPoint = (String) response.get("sandbox_init_point");
 
-                // En modo Sandbox, priorizamos sandbox_init_point para pruebas seguras
-                String finalInitPoint = (sandboxInitPoint != null && !sandboxInitPoint.isBlank()) ? sandboxInitPoint : initPoint;
+                // Usamos init_point oficial (con credenciales TEST opera en Sandbox con URL real de Mercado Pago)
+                String finalInitPoint = (initPoint != null && !initPoint.isBlank()) ? initPoint : sandboxInitPoint;
 
                 log.info("[MERCADO PAGO] Preferencia creada exitosamente. id={}, initPoint={}", id, finalInitPoint);
                 return ResponseEntity.ok(new CrearPreferenciaResponse(id, finalInitPoint));

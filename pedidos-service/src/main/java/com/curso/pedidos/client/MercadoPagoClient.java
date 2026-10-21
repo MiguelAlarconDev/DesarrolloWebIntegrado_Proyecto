@@ -92,7 +92,7 @@ public class MercadoPagoClient {
                 String id = (String) response.get("id");
                 String sandboxInitPoint = (String) response.get("sandbox_init_point");
                 String initPoint = (String) response.get("init_point");
-                String url = (sandboxInitPoint != null && !sandboxInitPoint.isBlank()) ? sandboxInitPoint : initPoint;
+                String url = (initPoint != null && !initPoint.isBlank()) ? initPoint : sandboxInitPoint;
 
                 log.info("[MERCADO PAGO] Preferencia creada con exito: {} -> URL: {}", id, url);
                 return new PreferenciaResponse(id, url);

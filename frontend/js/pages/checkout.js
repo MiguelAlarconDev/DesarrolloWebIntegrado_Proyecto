@@ -1,13 +1,13 @@
 /**
  * checkout.js - Lógica del Proceso de Pago y Emisión de Comprobantes
- * Control de usuario obligatorio para matrícula, selección de pasarela
- * (Yape, Plin, Mercado Pago Checkout Pro Sandbox), generación interactiva de initPoint
- * y emisión de comprobantes oficiales SUNAT.
+ * Integración unificada con el diseño de Gestión de Cursos (ck-)
+ * Mercado Pago Checkout Pro (init_point oficial), Yape y Plin
  */
 
 let tipoComp = 'BOLETA';
-let metodoPagoSeleccionado = 'YAPE';
+let metodoPagoSeleccionado = 'TARJETA';
 let currentPendingMpOrder = null;
+let timerInterval = null;
 
 function selectMetodoPago(metodo) {
 	metodoPagoSeleccionado = metodo;
@@ -34,7 +34,7 @@ function selectMetodoPago(metodo) {
 		}
 	});
 
-	// Ocultar modal de MP al cambiar de método
+	// Ocultar drawer de MP al cambiar de método
 	const modalMp = document.getElementById('mp-modal-container');
 	if (modalMp && metodo !== 'TARJETA') {
 		modalMp.classList.add('d-none');
@@ -52,25 +52,13 @@ function switchYapeModo(modo) {
 	if (!btnCode || !btnQr || !panelCode || !panelQr) return;
 
 	if (modo === 'CODE') {
-		btnCode.style.background = '#742284';
-		btnCode.style.color = '#fff';
-		btnCode.style.border = 'none';
-
-		btnQr.style.background = '#fff';
-		btnQr.style.color = '#374151';
-		btnQr.style.border = '1px solid #d1d5db';
-
+		btnCode.classList.add('is-active');
+		btnQr.classList.remove('is-active');
 		panelCode.classList.remove('d-none');
 		panelQr.classList.add('d-none');
 	} else {
-		btnQr.style.background = '#742284';
-		btnQr.style.color = '#fff';
-		btnQr.style.border = 'none';
-
-		btnCode.style.background = '#fff';
-		btnCode.style.color = '#374151';
-		btnCode.style.border = '1px solid #d1d5db';
-
+		btnQr.classList.add('is-active');
+		btnCode.classList.remove('is-active');
 		panelQr.classList.remove('d-none');
 		panelCode.classList.add('d-none');
 	}
@@ -85,25 +73,13 @@ function switchPlinModo(modo) {
 	if (!btnCode || !btnQr || !panelCode || !panelQr) return;
 
 	if (modo === 'CODE') {
-		btnCode.style.background = '#00A7D0';
-		btnCode.style.color = '#fff';
-		btnCode.style.border = 'none';
-
-		btnQr.style.background = '#fff';
-		btnQr.style.color = '#374151';
-		btnQr.style.border = '1px solid #d1d5db';
-
+		btnCode.classList.add('is-active');
+		btnQr.classList.remove('is-active');
 		panelCode.classList.remove('d-none');
 		panelQr.classList.add('d-none');
 	} else {
-		btnQr.style.background = '#00A7D0';
-		btnQr.style.color = '#fff';
-		btnQr.style.border = 'none';
-
-		btnCode.style.background = '#fff';
-		btnCode.style.color = '#374151';
-		btnCode.style.border = '1px solid #d1d5db';
-
+		btnQr.classList.add('is-active');
+		btnCode.classList.remove('is-active');
 		panelQr.classList.remove('d-none');
 		panelCode.classList.add('d-none');
 	}
@@ -114,29 +90,26 @@ function actualizarBotonPago() {
 	const btn = document.getElementById('btn-pago-penn');
 	if (!btn) return;
 
+	btn.setAttribute('data-method', metodoPagoSeleccionado);
+	btn.classList.remove('is-success');
+
 	const elYapeMonto = document.getElementById('yape-qr-monto');
 	if (elYapeMonto) elYapeMonto.textContent = `S/ ${totals.total}`;
 
 	const elPlinMonto = document.getElementById('plin-qr-monto');
 	if (elPlinMonto) elPlinMonto.textContent = `S/ ${totals.total}`;
 
-	const user = AuthService.getCurrentUser();
-
 	if (metodoPagoSeleccionado === 'YAPE') {
-		btn.innerHTML = `<i class="fa fa-qrcode" style="margin-right: 6px;"></i> PAGAR CON YAPE (S/ ${totals.total})`;
-		btn.style.background = '#742284';
+		btn.innerHTML = `<i class="fa fa-qrcode"></i> Pagar con Yape · S/ ${totals.total}`;
 	} else if (metodoPagoSeleccionado === 'PLIN') {
-		btn.innerHTML = `<i class="fa fa-mobile" style="margin-right: 6px;"></i> PAGAR CON PLIN (S/ ${totals.total})`;
-		btn.style.background = '#00A7D0';
+		btn.innerHTML = `<i class="fa fa-mobile"></i> Pagar con Plin · S/ ${totals.total}`;
 	} else {
-		btn.innerHTML = `<i class="fa fa-credit-card" style="margin-right: 6px;"></i> OBTENER LINK DE PAGO MERCADO PAGO (S/ ${totals.total})`;
-		btn.style.background = '#009ee3';
+		btn.innerHTML = `<i class="fa fa-lock"></i> Pagar con Mercado Pago · S/ ${totals.total}`;
 	}
 }
 
 /**
- * Renderiza el estado del usuario en el Checkout.
- * Obliga a que el usuario esté cargado antes de inscribirse.
+ * Renderiza la tarjeta de estado del alumno con las clases unificadas .ck-user-row / .ck-user-empty
  */
 function renderUserStatusCard() {
 	const card = document.getElementById('user-status-card');
@@ -145,30 +118,23 @@ function renderUserStatusCard() {
 	const user = AuthService.getCurrentUser();
 
 	if (user) {
-		const nombreCompleto = `${user.nombres || ''} ${user.apellidos || ''}`.trim() || 'Carlos Estudiante';
-		card.style.background = '#f0fdf4';
-		card.style.border = '1px solid #86efac';
+		const nombreCompleto = `${user.nombres || ''} ${user.apellidos || ''}`.trim() || 'Alumno Registrado';
+		const iniciales = ((user.nombres ? user.nombres[0] : '') + (user.apellidos ? user.apellidos[0] : '')).toUpperCase() || 'AL';
+
 		card.innerHTML = `
-			<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-				<div>
-					<div style="font-weight: 800; color: #166534; font-size: 14px;">
-						<i class="fa fa-check-circle text-success me-1"></i> Usuario Conectado: ${nombreCompleto}
-					</div>
-					<div style="font-size: 12px; color: #334155; margin-top: 3px;">
-						<span class="me-2"><i class="fa fa-envelope text-muted me-1"></i>${user.correo}</span>
-						<span class="me-2">&bull; <i class="fa fa-id-card text-muted me-1"></i>DNI: <strong>${user.dni || '30000003'}</strong></span>
-						<span>&bull; <i class="fa fa-whatsapp text-success me-1"></i>WhatsApp: <strong>${user.whatsapp || '+51 999555666'}</strong></span>
-					</div>
+			<div class="ck-user-row">
+				<div class="ck-avatar">${iniciales}</div>
+				<div class="ck-user-info">
+					<strong>${nombreCompleto} <span class="ck-chip"><i class="fa fa-check-circle"></i> Sesión iniciada</span></strong>
+					<span>${user.correo} &bull; DNI: <strong>${user.dni || '30000003'}</strong> &bull; WA: <strong>+51 ${user.whatsapp ? user.whatsapp.replace('+51', '') : '999555666'}</strong></span>
 				</div>
-				<div>
-					<button type="button" class="btn btn-sm btn-outline-danger" onclick="AuthService.logout()" style="font-size: 11px; padding: 4px 10px; border-radius: 4px;">
-						<i class="fa fa-sign-out"></i> Cambiar Usuario
-					</button>
-				</div>
+				<button type="button" class="ck-link-btn" onclick="cerrarSesionCheckout()" title="Ingresar con otra cuenta">
+					Cambiar cuenta
+				</button>
 			</div>
 		`;
 
-		// Prellenar campos automáticamente con el usuario cargado
+		// Prellenar campos automáticamente
 		const chkNom = document.getElementById('chk-nombres');
 		if (chkNom) chkNom.value = user.nombres || 'Carlos';
 		const chkApe = document.getElementById('chk-apellidos');
@@ -178,7 +144,7 @@ function renderUserStatusCard() {
 		const chkDni = document.getElementById('chk-dni');
 		if (chkDni) chkDni.value = user.dni || '30000003';
 		const chkWa = document.getElementById('chk-whatsapp');
-		if (chkWa) chkWa.value = user.whatsapp ? user.whatsapp.replace('+51', '') : '999555666';
+		if (chkWa) chkWa.value = user.whatsapp ? user.whatsapp.replace('+51', '').trim() : '999555666';
 
 		const yapeCel = document.getElementById('yape-celular');
 		if (yapeCel) yapeCel.value = chkWa ? chkWa.value : '999555666';
@@ -186,44 +152,67 @@ function renderUserStatusCard() {
 		if (plinCel) plinCel.value = chkWa ? chkWa.value : '999555666';
 
 	} else {
-		card.style.background = '#fffbeb';
-		card.style.border = '1px solid #fde68a';
 		card.innerHTML = `
-			<div style="border-left: 4px solid #f59e0b; padding-left: 12px;">
-				<div style="font-weight: 800; color: #b45309; font-size: 14px; margin-bottom: 4px;">
-					<i class="fa fa-exclamation-triangle text-warning me-1"></i> Debes cargar tu usuario de estudiante para inscribirte
+			<div class="ck-user-empty">
+				<div>
+					<strong><i class="fa fa-user-circle-o"></i> Identifícate para matricularte</strong>
+					<span>Asociaremos tu vacante oficial, tu comprobante SUNAT y te enviaremos los accesos de clase por WhatsApp y correo electrónico.</span>
 				</div>
-				<p style="font-size: 12px; color: #78350f; margin-bottom: 12px; line-height: 1.4;">
-					Para asegurar tu vacante, emitir tu comprobante oficial y enviarte los accesos de clase a tu WhatsApp y correo, es necesario que ingreses con tu cuenta de alumno:
-				</p>
-				<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-					<a href="login.html?redirect=checkout.html" class="btn btn-sm" style="background: #1e293b; color: #fff; font-size: 12px; font-weight: 700; padding: 6px 14px; text-decoration: none; border-radius: 4px;">
-						<i class="fa fa-sign-in"></i> Iniciar Sesión
-					</a>
-					<a href="registro.html?redirect=checkout.html" class="btn btn-sm" style="background: #e2e8f0; color: #1e293b; font-size: 12px; font-weight: 700; padding: 6px 14px; text-decoration: none; border-radius: 4px;">
-						<i class="fa fa-user-plus"></i> Crear Cuenta
-					</a>
-					<button type="button" onclick="cargarUsuarioDemoCheckout()" class="btn btn-sm" style="background: #0284c7; color: #fff; font-size: 12px; font-weight: 700; padding: 6px 14px; border: none; cursor: pointer; border-radius: 4px;">
-						<i class="fa fa-bolt"></i> ⚡ Cargar Usuario Alumno (1 Clic)
+				<div class="ck-user-actions">
+					<button type="button" onclick="cargarUsuarioDemoCheckout()" class="ck-btn ck-btn-sm ck-btn-dark">
+						<i class="fa fa-bolt"></i> Cargar alumno de prueba (1 clic)
 					</button>
+					<a href="login.html?redirect=checkout.html" class="ck-btn ck-btn-sm ck-btn-ghost">
+						<i class="fa fa-sign-in"></i> Iniciar sesión
+					</a>
+					<a href="registro.html?redirect=checkout.html" class="ck-btn ck-btn-sm ck-btn-ghost">
+						<i class="fa fa-user-plus"></i> Crear cuenta
+					</a>
 				</div>
 			</div>
 		`;
 	}
 }
 
+function cerrarSesionCheckout() {
+	AuthService.logout();
+	renderUserStatusCard();
+	actualizarBotonPago();
+	Notifications.showToast('Sesión cerrada. Puedes ingresar con otra cuenta.', 'info');
+}
+
 // Carga inmediata del usuario estudiante en el checkout
 async function cargarUsuarioDemoCheckout() {
 	try {
-		Notifications.showToast('Cargando usuario estudiante desde auth-service...', 'info');
+		Notifications.showToast('Cargando cuenta de alumno...', 'info');
 		const res = await AuthService.login('estudiante@cursos.com', '123456');
-		Notifications.showToast(`¡Usuario ${res.user.nombres} cargado exitosamente!`, 'success');
+		Notifications.showToast(`¡Bienvenido, ${res.user.nombres}!`, 'success');
 		renderUserStatusCard();
 		actualizarBotonPago();
 	} catch (err) {
 		console.error('Error al cargar usuario demo:', err);
 		Notifications.showToast('Error: ' + err.message, 'error');
 	}
+}
+
+function startCheckoutTimer() {
+	if (timerInterval) clearInterval(timerInterval);
+	const timerEl = document.getElementById('ck-timer-text');
+	if (!timerEl) return;
+
+	CartService.startReservationTimer();
+
+	const tick = () => {
+		const t = CartService.getRemainingTime();
+		if (t) {
+			timerEl.textContent = t.formatted;
+			if (t.expired) {
+				timerEl.textContent = '00:00';
+			}
+		}
+	};
+	tick();
+	timerInterval = setInterval(tick, 1000);
 }
 
 function initPennCheckout() {
@@ -234,7 +223,7 @@ function initPennCheckout() {
 		return;
 	}
 
-	// Renderizar estado del usuario obligatorio
+	// Renderizar estado del usuario
 	renderUserStatusCard();
 
 	// Sincronizar número de celular para Yape y Plin
@@ -258,20 +247,27 @@ function initPennCheckout() {
 	const elTot = document.getElementById('side-total');
 	if (elTot) elTot.textContent = `S/ ${totals.total}`;
 
+	// Renderizar cursos en el resumen con formato .ck-item
 	const list = document.getElementById('penn-order-items-list');
 	if (list) {
 		list.innerHTML = cart.map(c => `
-			<li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-				<div>
-					<div class="fw-bold text-dark small">${c.titulo}</div>
-					<small class="badge ${c.modalidad === 'VIRTUAL' ? 'bg-primary' : 'bg-success'}">${c.modalidad}</small>
+			<li class="ck-item">
+				<img src="${c.imagen || 'assets/images/all-img/c1.png'}" alt="${c.titulo}">
+				<div class="ck-item-info">
+					<strong>${c.titulo}</strong>
+					<div class="ck-item-meta">
+						<span class="ck-mod ${c.modalidad === 'VIRTUAL' ? 'is-virtual' : 'is-presencial'}">${c.modalidad || 'VIRTUAL'}</span>
+						<span>&bull; ${c.horario || 'Horario flexible'}</span>
+					</div>
 				</div>
-				<span class="fw-bold text-primary">S/ ${Number(c.precio).toFixed(2)}</span>
+				<div class="ck-item-price">S/ ${Number(c.precio).toFixed(2)}</div>
 			</li>
 		`).join('');
 	}
 
+	startCheckoutTimer();
 	actualizarBotonPago();
+
 	if (window.location.search && window.location.search.includes('tab=plin')) {
 		selectMetodoPago('PLIN');
 	}
@@ -315,12 +311,16 @@ function toggleFactura(isFactura) {
 async function ejecutarPago(e) {
 	if (e && e.preventDefault) e.preventDefault();
 
-	// 1. Validar que el usuario esté cargado antes de inscribirse
+	// 1. Validar usuario cargado
 	const user = AuthService.getCurrentUser();
 	if (!user) {
-		Notifications.showToast('Debes cargar o iniciar sesión con tu usuario para poder inscribirte.', 'warning');
+		Notifications.showToast('Por favor identifícate como alumno para continuar.', 'warning');
 		const card = document.getElementById('user-status-card');
-		if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		if (card) {
+			card.classList.add('is-attention');
+			setTimeout(() => card.classList.remove('is-attention'), 2000);
+			card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
 		return;
 	}
 
@@ -337,17 +337,16 @@ async function ejecutarPago(e) {
 	const correo = (document.getElementById('chk-correo') ? document.getElementById('chk-correo').value.trim() : '') || user.correo || 'estudiante@cursos.com';
 	const docIdent = tipoComp === 'FACTURA' ? (document.getElementById('chk-ruc') ? document.getElementById('chk-ruc').value || '20601234567' : '20601234567') : dni;
 
-	// ID real del estudiante en la base de datos PostgreSQL
 	const estId = user.id || 'a0000000-0000-0000-0000-000000000003';
 
 	// ============================================================
-	// FLUJO MERCADO PAGO CHECKOUT PRO (SANDBOX LINK PREVIEW)
+	// FLUJO MERCADO PAGO CHECKOUT PRO
 	// ============================================================
 	if (metodoPagoSeleccionado === 'TARJETA') {
-		if (btn) btn.innerHTML = `<i class="fa fa-spinner fa-spin me-2"></i> Generando preferencia Mercado Pago...`;
+		if (btn) btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Generando orden de pago...`;
 
 		try {
-			// 1. Crear el pedido en PostgreSQL con el usuario cargado y bloquear vacante
+			// 1. Crear pedido en PostgreSQL
 			const pedido = await PedidosService.crearPedido(cart[0].id, estId);
 
 			const payInfo = {
@@ -359,41 +358,43 @@ async function ejecutarPago(e) {
 				correo: correo
 			};
 
-			// Guardar estado pendiente de pago
 			currentPendingMpOrder = { pedido, payInfo };
 			sessionStorage.setItem('pending_mp_order', JSON.stringify(currentPendingMpOrder));
 
-			// 2. Solicitar la preferencia oficial a Mercado Pago
+			// 2. Obtener initPoint oficial desde el backend
 			let prefData = null;
-			const prefPayload = {
-				titulo: cart[0].titulo || 'Curso Gestión de Cursos',
-				cantidad: 1,
-				precio: parseFloat(cart[0].precio) || 150.00
-			};
+			if (pedido && pedido.initPoint) {
+				prefData = { id: pedido.mpPreferenceId || pedido.codigoOrden, initPoint: pedido.initPoint };
+			} else {
+				const prefPayload = {
+					titulo: cart[0].titulo || 'Curso Gestión de Cursos',
+					cantidad: 1,
+					precio: parseFloat(cart[0].precio) || 150.00
+				};
 
-			try {
-				const resGw = await fetch('http://localhost:8080/api/pagos/crear-preferencia', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(prefPayload)
-				});
-				if (!resGw.ok) throw new Error('Gateway error: ' + resGw.status);
-				prefData = await resGw.json();
-			} catch (_) {
-				// Fallback directo a pedidos-service
-				const resDir = await fetch('http://localhost:8083/api/pagos/crear-preferencia', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(prefPayload)
-				});
-				prefData = await resDir.json();
+				try {
+					const resGw = await fetch('http://localhost:8080/api/pagos/crear-preferencia', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(prefPayload)
+					});
+					if (!resGw.ok) throw new Error('Gateway error: ' + resGw.status);
+					prefData = await resGw.json();
+				} catch (_) {
+					const resDir = await fetch('http://localhost:8083/api/pagos/crear-preferencia', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(prefPayload)
+					});
+					prefData = await resDir.json();
+				}
 			}
 
 			if (!prefData || !prefData.initPoint) {
-				throw new Error('No se pudo generar el initPoint de Mercado Pago.');
+				throw new Error('No se pudo generar la preferencia de Mercado Pago.');
 			}
 
-			// 3. Renderizar el enlace en pantalla (Sin redirección automática)
+			// 3. Renderizar el drawer de pago
 			const modalMp = document.getElementById('mp-modal-container');
 			const linkInput = document.getElementById('mp-link-input');
 			const btnOpen = document.getElementById('btn-mp-open-direct');
@@ -406,7 +407,7 @@ async function ejecutarPago(e) {
 				btnOpen.setAttribute('rel', 'noopener noreferrer');
 			}
 			if (badgePref && prefData.id) {
-				badgePref.textContent = `PREFERENCIA: ${prefData.id.substring(0, 15)}...`;
+				badgePref.textContent = `ORDEN: ${String(prefData.id).substring(0, 16)}...`;
 			}
 
 			if (modalMp) {
@@ -414,10 +415,10 @@ async function ejecutarPago(e) {
 				modalMp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 			}
 
-			Notifications.showToast('¡Enlace de Mercado Pago generado con éxito!', 'success');
+			Notifications.showToast('¡Orden de Mercado Pago generada!', 'success');
 			if (btn) {
-				btn.innerHTML = `<i class="fa fa-check"></i> Enlace Listo - Paga en la Nueva Pestaña`;
-				btn.style.background = '#059669';
+				btn.classList.add('is-success');
+				btn.innerHTML = `<i class="fa fa-check"></i> Orden lista · Paga en Mercado Pago`;
 			}
 
 		} catch (err) {
@@ -432,12 +433,12 @@ async function ejecutarPago(e) {
 	}
 
 	// ============================================================
-	// FLUJO ESTÁNDAR YAPE / PLIN
+	// FLUJO DIRECTO YAPE / PLIN
 	// ============================================================
 	try {
-		let nombreMetodo = 'Yape (Mercado Pago)';
+		let nombreMetodo = 'Yape';
 		if (metodoPagoSeleccionado === 'PLIN') {
-			nombreMetodo = 'Plin (Interoperable)';
+			nombreMetodo = 'Plin';
 			const plinOtp = document.getElementById('plin-otp');
 			if (plinOtp && !plinOtp.value) plinOtp.value = '582910';
 		} else {
@@ -445,15 +446,15 @@ async function ejecutarPago(e) {
 			if (yapeOtp && !yapeOtp.value) yapeOtp.value = '482910';
 		}
 
-		if (btn) btn.innerHTML = `<i class="fa fa-spinner fa-spin me-2"></i> Procesando matrícula con ${nombreMetodo}...`;
+		if (btn) btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Confirmando pago con ${nombreMetodo}...`;
 		await new Promise(r => setTimeout(r, 600));
 
-		// 1. Crear pedido y bloquear cupo en backend PostgreSQL con el usuario cargado
+		// 1. Crear pedido en PostgreSQL
 		const pedido = await PedidosService.crearPedido(cart[0].id, estId);
 
-		// 2. Procesar pago en pasarela
+		// 2. Procesar pago
 		const payInfo = {
-			metodoPago: nombreMetodo,
+			metodoPago: `${nombreMetodo} (Mercado Pago)`,
 			tipoComprobante: tipoComp,
 			clienteNombres: `${nombres} ${apellidos}`.trim(),
 			docIdentidad: docIdent,
@@ -463,7 +464,10 @@ async function ejecutarPago(e) {
 
 		await PedidosService.procesarPagoMercadoPago(pedido, payInfo);
 
-		if (btn) btn.innerHTML = `<i class="fa fa-check-circle me-2"></i> ¡Pago con ${metodoPagoSeleccionado} Aprobado!`;
+		if (btn) {
+			btn.classList.add('is-success');
+			btn.innerHTML = `<i class="fa fa-check-circle"></i> ¡Pago con ${nombreMetodo} aprobado!`;
+		}
 		Notifications.showToast(`¡Matrícula exitosa con ${nombreMetodo}!`, 'success');
 
 		setTimeout(() => {
@@ -472,7 +476,7 @@ async function ejecutarPago(e) {
 
 	} catch (err) {
 		console.error('Error durante el pago:', err);
-		Notifications.showToast('Error en pasarela: ' + err.message, 'error');
+		Notifications.showToast('Error en el pago: ' + err.message, 'error');
 		if (btn) {
 			btn.disabled = false;
 			actualizarBotonPago();
@@ -490,11 +494,11 @@ async function copiarLinkMp() {
 		await navigator.clipboard.writeText(input.value);
 		if (btn) {
 			const orig = btn.innerHTML;
+			btn.classList.add('is-copied');
 			btn.innerHTML = `<i class="fa fa-check"></i> Copiado`;
-			btn.style.background = '#15803d';
 			setTimeout(() => {
+				btn.classList.remove('is-copied');
 				btn.innerHTML = orig;
-				btn.style.background = '#0f172a';
 			}, 2500);
 		}
 	} catch (_) {
@@ -504,12 +508,12 @@ async function copiarLinkMp() {
 	}
 }
 
-// Confirmar matrícula después del pago en Mercado Pago
+// Confirmar matrícula después de completar el pago en Mercado Pago
 async function finalizarMatriculaMp() {
 	const btnConfirm = document.getElementById('btn-mp-confirmar-pago');
 	if (btnConfirm) {
 		btnConfirm.disabled = true;
-		btnConfirm.innerHTML = `<i class="fa fa-spinner fa-spin me-2"></i> Confirmando pago y emitiendo boleta...`;
+		btnConfirm.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Verificando pago y emitiendo comprobante...`;
 	}
 
 	let orderData = currentPendingMpOrder;
@@ -534,10 +538,10 @@ async function finalizarMatriculaMp() {
 		Notifications.showToast('Error al confirmar matrícula: ' + err.message, 'error');
 		if (btnConfirm) {
 			btnConfirm.disabled = false;
-			btnConfirm.innerHTML = `<i class="fa fa-graduation-cap"></i> Reintentar Confirmación`;
+			btnConfirm.innerHTML = `<i class="fa fa-refresh"></i> Reintentar confirmación`;
 		}
 	}
 }
 
-// Inicialización
+// Inicialización al cargar la página
 $(document).ready(initPennCheckout);
