@@ -136,18 +136,10 @@ function reservar(cursoId) {
 	CartService.addToCart(c);
 	actualizarEstadoNavbar();
 
-	// Si no tiene usuario cargado, solicitar que inicie sesión para completar su matrícula
-	if (!AuthService.isAuthenticated()) {
-		Notifications.showToast('Para inscribirte necesitas cargar tu usuario. Redirigiendo...', 'info');
-		setTimeout(() => {
-			window.location.href = 'login.html?redirect=checkout.html';
-		}, 500);
-	} else {
-		Notifications.showToast('¡Curso reservado! Continuando a la matrícula...', 'success');
-		setTimeout(() => {
-			window.location.href = 'carrito.html';
-		}, 300);
-	}
+	Notifications.showToast('¡Curso agregado a tu carrito!', 'success');
+	setTimeout(() => {
+		window.location.href = 'carrito.html';
+	}, 250);
 }
 
 // Inicialización

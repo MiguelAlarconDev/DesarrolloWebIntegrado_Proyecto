@@ -194,119 +194,41 @@
 							<span class="ck-card-num">3</span>
 							<div>
 								<h3 class="ck-card-title">Método de pago</h3>
-								<p class="ck-card-sub">Todas las transacciones son seguras y están cifradas.</p>
+								<p class="ck-card-sub">Todas las transacciones son procesadas mediante la pasarela oficial y segura de Mercado Pago.</p>
 							</div>
 						</div>
 
-						<div class="ck-methods" role="radiogroup">
-							<label class="ck-method checked" id="lbl-metodo-card" onclick="selectMetodoPago('TARJETA')">
-								<input type="radio" name="metodoPagoRadio" id="radio-card" value="TARJETA" checked>
-								<span class="ck-method-icon is-mp"><i class="fa fa-credit-card"></i></span>
-								<span class="ck-method-body">
-									<strong>Mercado Pago</strong>
-									<small>Tarjetas de crédito o débito y saldo en Mercado Pago</small>
+						<!-- Tarjeta Exclusiva Mercado Pago -->
+						<div class="ck-mp-box">
+							<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+								<div class="d-flex align-items-center gap-3">
+									<div class="ck-mp-logo-badge">
+										<i class="fa fa-credit-card"></i>
+									</div>
+									<div>
+										<strong style="font-size: 16px; color: #1a2d62; display: block;">Mercado Pago Checkout</strong>
+										<small style="color: #64748b;">Tarjetas de crédito o débito, saldo MP y transferencias bancarias</small>
+									</div>
+								</div>
+								<span class="ck-tag" style="background: #e6fdf0; color: #15803d; border: 1px solid #bbf7d0;">
+									<i class="fa fa-shield me-1"></i> Oficial &bull; 100% Seguro
 								</span>
-								<span class="ck-tag">Recomendado</span>
-							</label>
+							</div>
 
-							<label class="ck-method" id="lbl-metodo-yape" onclick="selectMetodoPago('YAPE')">
-								<input type="radio" name="metodoPagoRadio" id="radio-yape" value="YAPE">
-								<span class="ck-method-icon is-yape"><i class="fa fa-qrcode"></i></span>
-								<span class="ck-method-body">
-									<strong>Yape</strong>
-									<small>Código de aprobación o QR</small>
-								</span>
-							</label>
-
-							<label class="ck-method" id="lbl-metodo-plin" onclick="selectMetodoPago('PLIN')">
-								<input type="radio" name="metodoPagoRadio" id="radio-plin" value="PLIN">
-								<span class="ck-method-icon is-plin"><i class="fa fa-mobile"></i></span>
-								<span class="ck-method-body">
-									<strong>Plin</strong>
-									<small>Interbank, BBVA, Scotiabank y BanBif</small>
-								</span>
-							</label>
-						</div>
-
-						<!-- Panel Mercado Pago -->
-						<div class="ck-method-panel" id="panel-card">
-							<div class="ck-info">
-								<i class="fa fa-shield"></i>
+							<div class="ck-info mb-3">
+								<i class="fa fa-lock" style="color: #2eca7f;"></i>
 								<div>
-									<strong>Pagarás en la ventana segura de Mercado Pago</strong>
-									<p>Al confirmar, reservamos tu vacante y generamos tu orden de pago. Tus datos de tarjeta nunca pasan por nuestros servidores.</p>
+									<strong>Protección con cifrado SSL de 256 bits</strong>
+									<p>Al hacer clic en pagar, nos conectaremos directamente con la plataforma segura de Mercado Pago. Tus datos financieros nunca se almacenan en nuestros servidores.</p>
 								</div>
 							</div>
+
 							<div class="ck-brands">
-								<span class="ck-brand is-visa">VISA</span>
-								<span class="ck-brand is-mc">Mastercard</span>
-								<span class="ck-brand is-amex">AMEX</span>
-								<span class="ck-brand">Diners</span>
-								<span class="ck-brand is-mp">Mercado Pago</span>
-							</div>
-						</div>
-
-						<!-- Panel Yape -->
-						<div class="ck-method-panel ck-theme-yape d-none" id="panel-yape">
-							<div class="ck-tabs">
-								<button type="button" id="btn-tab-yape-code" class="ck-tab is-active" onclick="switchYapeModo('CODE')"><i class="fa fa-key"></i> Código de aprobación</button>
-								<button type="button" id="btn-tab-yape-qr" class="ck-tab" onclick="switchYapeModo('QR')"><i class="fa fa-qrcode"></i> Escanear QR</button>
-							</div>
-							<div id="yape-modo-code">
-								<ol class="ck-howto">
-									<li>Abre Yape y entra a <em>Código de aprobación</em>.</li>
-									<li>Ingresa tu celular y el código de 6 dígitos.</li>
-								</ol>
-								<div class="row g-3">
-									<div class="col-sm-6">
-										<label class="ck-label" for="yape-celular">Celular Yape</label>
-										<input class="ck-input" type="tel" id="yape-celular" maxlength="9" placeholder="999 555 666" inputmode="numeric">
-									</div>
-									<div class="col-sm-6">
-										<label class="ck-label" for="yape-otp">Código de aprobación</label>
-										<input class="ck-input ck-input-otp" type="text" id="yape-otp" maxlength="6" placeholder="••••••" inputmode="numeric">
-									</div>
-								</div>
-							</div>
-							<div id="yape-modo-qr" class="ck-qr d-none">
-								<img id="yape-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=00020101021226480014pe.com.yape011299955566652044812530360454050.005802PE5913GESTION_CURSOS6004LIMA62070503***6304" alt="Código QR de Yape">
-								<div class="ck-qr-info">
-									<strong>Gestión de Cursos</strong>
-									<span id="yape-qr-monto" class="ck-qr-amount">S/ 0.00</span>
-									<small>Escanea con la app Yape</small>
-								</div>
-							</div>
-						</div>
-
-						<!-- Panel Plin -->
-						<div class="ck-method-panel ck-theme-plin d-none" id="panel-plin">
-							<div class="ck-tabs">
-								<button type="button" id="btn-tab-plin-code" class="ck-tab is-active" onclick="switchPlinModo('CODE')"><i class="fa fa-mobile"></i> Transferencia</button>
-								<button type="button" id="btn-tab-plin-qr" class="ck-tab" onclick="switchPlinModo('QR')"><i class="fa fa-qrcode"></i> Escanear QR</button>
-							</div>
-							<div id="plin-modo-code">
-								<ol class="ck-howto">
-									<li>Abre la app de tu banco y elige <em>Plin</em>.</li>
-									<li>Ingresa tu celular y el número de operación.</li>
-								</ol>
-								<div class="row g-3">
-									<div class="col-sm-6">
-										<label class="ck-label" for="plin-celular">Celular Plin</label>
-										<input class="ck-input" type="tel" id="plin-celular" maxlength="9" placeholder="999 555 666" inputmode="numeric">
-									</div>
-									<div class="col-sm-6">
-										<label class="ck-label" for="plin-otp">Nro. de operación</label>
-										<input class="ck-input ck-input-otp" type="text" id="plin-otp" maxlength="8" placeholder="••••••" inputmode="numeric">
-									</div>
-								</div>
-							</div>
-							<div id="plin-modo-qr" class="ck-qr d-none">
-								<img id="plin-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=00020101021226480014pe.com.plin011299955566652044812530360454050.005802PE5913GESTION_CURSOS6004LIMA62070503***6304" alt="Código QR de Plin">
-								<div class="ck-qr-info">
-									<strong>Gestión de Cursos</strong>
-									<span id="plin-qr-monto" class="ck-qr-amount">S/ 0.00</span>
-									<small>Escanea con tu app bancaria</small>
-								</div>
+								<span class="ck-brand is-visa"><i class="fa fa-cc-visa"></i> VISA</span>
+								<span class="ck-brand is-mc"><i class="fa fa-cc-mastercard"></i> Mastercard</span>
+								<span class="ck-brand is-amex"><i class="fa fa-cc-amex"></i> AMEX</span>
+								<span class="ck-brand"><i class="fa fa-credit-card"></i> Diners</span>
+								<span class="ck-brand is-mp"><i class="fa fa-check-circle"></i> Débito y Saldo</span>
 							</div>
 						</div>
 					</div>
@@ -336,26 +258,32 @@
 							</button>
 							<p class="ck-legal">Al pagar aceptas los <a href="#">Términos del servicio</a>. Recibirás tu comprobante por correo y tus accesos por WhatsApp.</p>
 
-							<!-- Orden de pago generada por el backend (sin redirección automática) -->
+							<!-- Estado de Pago en Mercado Pago -->
 							<div id="mp-modal-container" class="ck-mp d-none">
 								<div class="ck-mp-head">
-									<span><i class="fa fa-check-circle"></i> Orden de pago lista</span>
-									<span id="mp-pref-badge" class="ck-mp-badge">Mercado Pago</span>
+									<span><i class="fa fa-shield"></i> Pasarela Mercado Pago</span>
+									<span id="mp-pref-badge" class="ck-mp-badge">Orden Generada</span>
 								</div>
-								<div class="ck-mp-body">
-									<p>Tu vacante está reservada. Completa el pago en la ventana segura de Mercado Pago y luego regresa aquí.</p>
-									<a id="btn-mp-open-direct" href="#" target="_blank" rel="noopener noreferrer" class="ck-btn ck-btn-mp">
-										<i class="fa fa-external-link"></i> Ir a pagar en Mercado Pago
-									</a>
-									<button type="button" id="btn-mp-confirmar-pago" onclick="finalizarMatriculaMp()" class="ck-btn ck-btn-success">
-										<i class="fa fa-check"></i> Ya pagué · Ver mi comprobante
-									</button>
-									<label class="ck-copy-label" for="mp-link-input">Enlace de pago</label>
-									<div class="ck-copy">
-										<input type="text" id="mp-link-input" readonly value="">
-										<button type="button" id="btn-mp-copiar" onclick="copiarLinkMp()"><i class="fa fa-clone"></i> Copiar</button>
+								<div class="ck-mp-body text-center py-3">
+									<div class="mb-3">
+										<div style="width: 48px; height: 48px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: inline-flex; align-items: center; justify-content: center; font-size: 20px;">
+											<i class="fa fa-external-link"></i>
+										</div>
 									</div>
-									<small class="ck-copy-hint"><i class="fa fa-info-circle"></i> Modo prueba: ábrelo en una ventana de incógnito para pagar con tarjetas de prueba.</small>
+									<h5 style="color: #1a2d62; font-weight: 800; font-size: 15px; margin-bottom: 6px;">
+										Ventana segura de pago abierta
+									</h5>
+									<p style="font-size: 13px; color: #475569; margin-bottom: 16px; line-height: 1.45;">
+										Completa tu pago en la pestaña oficial de Mercado Pago. Cuando termines, haz clic en el botón de abajo para emitir tu comprobante y habilitar tus clases:
+									</p>
+									<button type="button" id="btn-mp-confirmar-pago" onclick="finalizarMatriculaMp()" class="ck-btn ck-btn-success w-100 mb-2" style="font-size: 14px;">
+										<i class="fa fa-check-circle"></i> Ya pagué · Ver mi comprobante
+									</button>
+									<div>
+										<a id="btn-mp-open-direct" href="#" target="_blank" rel="noopener noreferrer" style="font-size: 12.5px; color: #009ee3; text-decoration: underline; font-weight: 600;">
+											¿No se abrió la ventana? Haz clic aquí para reabrirla
+										</a>
+									</div>
 								</div>
 							</div>
 						</div>

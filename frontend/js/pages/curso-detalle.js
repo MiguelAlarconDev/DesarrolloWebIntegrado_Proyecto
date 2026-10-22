@@ -184,17 +184,10 @@ async function initDetalle() {
 			if (!activeCurso) return;
 			const res = CartService.addToCart(activeCurso);
 
-			if (!AuthService.isAuthenticated()) {
-				Notifications.showToast('Para inscribirte necesitas cargar tu usuario. Redirigiendo...', 'info');
-				setTimeout(() => {
-					window.location.href = 'login.html?redirect=checkout.html';
-				}, 500);
-			} else {
-				Notifications.showToast(res.message, res.success ? 'success' : 'info');
-				setTimeout(() => {
-					window.location.href = 'carrito.html';
-				}, 300);
-			}
+			Notifications.showToast(res.message || '¡Curso agregado al carrito!', 'success');
+			setTimeout(() => {
+				window.location.href = 'carrito.html';
+			}, 250);
 		});
 	}
 }

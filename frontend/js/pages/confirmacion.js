@@ -17,7 +17,7 @@ function initConfirmacion() {
 		order = {
 			codigoOrden: 'ORD-894210',
 			estado: 'PAGADO',
-			metodoPago: 'Yape (Mercado Pago)',
+			metodoPago: 'Mercado Pago Checkout',
 			curso: {
 				titulo: 'Desarrollo de Microservicios con Spring Boot y Cloud',
 				modalidad: 'VIRTUAL',
@@ -95,7 +95,7 @@ function initConfirmacion() {
 	if (elAutoWa) elAutoWa.textContent = cleanTel;
 
 	// Medio de Pago
-	const metodo = order.metodoPago || 'Yape (Mercado Pago)';
+	const metodo = order.metodoPago || 'Mercado Pago';
 	const recMetodo = document.getElementById('rec-metodo');
 	if (recMetodo) {
 		recMetodo.textContent = metodo;
@@ -198,7 +198,7 @@ function abrirChatWhatsApp() {
 		`📅 *Horario:* ${curso.horario || 'Por coordinar'}\n` +
 		`${accesoTexto}\n\n` +
 		`📄 *Comprobante Electrónico:* ${comp.correlativo || 'B001-00001001'} (Total: S/ ${comp.total || '0.00'})\n` +
-		`💳 *Forma de Pago:* ${order.metodoPago || 'Yape (Mercado Pago)'}\n\n` +
+		`💳 *Forma de Pago:* ${order.metodoPago || 'Mercado Pago'}\n\n` +
 		`¡Muchos éxitos en tus clases! 🚀 - Gestión de Cursos`;
 
 	Notifications.showToast(`¡Abriendo chat de WhatsApp para +${phone}!`, 'info');
@@ -234,7 +234,7 @@ function abrirClienteCorreo() {
 		`- Horario: ${curso.horario || 'Por coordinar'}\n` +
 		`- Enlace de Clase: ${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}\n` +
 		`- Comprobante SUNAT: ${comp.correlativo || 'B001-00001001'}\n` +
-		`- Total Pagado: S/ ${comp.total || '0.00'} (${order.metodoPago || 'Yape'})\n\n` +
+		`- Total Pagado: S/ ${comp.total || '0.00'} (${order.metodoPago || 'Mercado Pago'})\n\n` +
 		`Adjuntamos en tu cuenta el comprobante electrónico oficial en formato PDF y XML.\n\n` +
 		`Atentamente,\nEquipo Académico - Gestión de Cursos S.A.C.`;
 

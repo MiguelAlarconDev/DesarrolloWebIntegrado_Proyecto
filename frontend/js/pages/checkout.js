@@ -1,7 +1,7 @@
 /**
  * checkout.js - Lógica del Proceso de Pago y Emisión de Comprobantes
- * Integración unificada con el diseño de Gestión de Cursos (ck-)
- * Mercado Pago Checkout Pro (init_point oficial), Yape y Plin
+ * Integración 100% enfocada en Mercado Pago Checkout Pro (Oficial y Seguro)
+ * Experiencia de usuario simplificada y sin elementos distractores.
  */
 
 let tipoComp = 'BOLETA';
@@ -10,79 +10,8 @@ let currentPendingMpOrder = null;
 let timerInterval = null;
 
 function selectMetodoPago(metodo) {
-	metodoPagoSeleccionado = metodo;
-
-	const metodos = [
-		{ id: 'yape', key: 'YAPE' },
-		{ id: 'plin', key: 'PLIN' },
-		{ id: 'card', key: 'TARJETA' }
-	];
-
-	metodos.forEach(m => {
-		const lbl = document.getElementById('lbl-metodo-' + m.id);
-		const radio = document.getElementById('radio-' + m.id);
-		const panel = document.getElementById('panel-' + m.id);
-
-		if (m.key === metodo) {
-			if (lbl) lbl.classList.add('checked');
-			if (radio) radio.checked = true;
-			if (panel) panel.classList.remove('d-none');
-		} else {
-			if (lbl) lbl.classList.remove('checked');
-			if (radio) radio.checked = false;
-			if (panel) panel.classList.add('d-none');
-		}
-	});
-
-	// Ocultar drawer de MP al cambiar de método
-	const modalMp = document.getElementById('mp-modal-container');
-	if (modalMp && metodo !== 'TARJETA') {
-		modalMp.classList.add('d-none');
-	}
-
+	metodoPagoSeleccionado = 'TARJETA';
 	actualizarBotonPago();
-}
-
-function switchYapeModo(modo) {
-	const btnCode = document.getElementById('btn-tab-yape-code');
-	const btnQr = document.getElementById('btn-tab-yape-qr');
-	const panelCode = document.getElementById('yape-modo-code');
-	const panelQr = document.getElementById('yape-modo-qr');
-
-	if (!btnCode || !btnQr || !panelCode || !panelQr) return;
-
-	if (modo === 'CODE') {
-		btnCode.classList.add('is-active');
-		btnQr.classList.remove('is-active');
-		panelCode.classList.remove('d-none');
-		panelQr.classList.add('d-none');
-	} else {
-		btnQr.classList.add('is-active');
-		btnCode.classList.remove('is-active');
-		panelQr.classList.remove('d-none');
-		panelCode.classList.add('d-none');
-	}
-}
-
-function switchPlinModo(modo) {
-	const btnCode = document.getElementById('btn-tab-plin-code');
-	const btnQr = document.getElementById('btn-tab-plin-qr');
-	const panelCode = document.getElementById('plin-modo-code');
-	const panelQr = document.getElementById('plin-modo-qr');
-
-	if (!btnCode || !btnQr || !panelCode || !panelQr) return;
-
-	if (modo === 'CODE') {
-		btnCode.classList.add('is-active');
-		btnQr.classList.remove('is-active');
-		panelCode.classList.remove('d-none');
-		panelQr.classList.add('d-none');
-	} else {
-		btnQr.classList.add('is-active');
-		btnCode.classList.remove('is-active');
-		panelQr.classList.remove('d-none');
-		panelCode.classList.add('d-none');
-	}
 }
 
 function actualizarBotonPago() {
@@ -90,26 +19,12 @@ function actualizarBotonPago() {
 	const btn = document.getElementById('btn-pago-penn');
 	if (!btn) return;
 
-	btn.setAttribute('data-method', metodoPagoSeleccionado);
-	btn.classList.remove('is-success');
-
-	const elYapeMonto = document.getElementById('yape-qr-monto');
-	if (elYapeMonto) elYapeMonto.textContent = `S/ ${totals.total}`;
-
-	const elPlinMonto = document.getElementById('plin-qr-monto');
-	if (elPlinMonto) elPlinMonto.textContent = `S/ ${totals.total}`;
-
-	if (metodoPagoSeleccionado === 'YAPE') {
-		btn.innerHTML = `<i class="fa fa-qrcode"></i> Pagar con Yape · S/ ${totals.total}`;
-	} else if (metodoPagoSeleccionado === 'PLIN') {
-		btn.innerHTML = `<i class="fa fa-mobile"></i> Pagar con Plin · S/ ${totals.total}`;
-	} else {
-		btn.innerHTML = `<i class="fa fa-lock"></i> Pagar con Mercado Pago · S/ ${totals.total}`;
-	}
+	btn.setAttribute('data-method', 'TARJETA');
+	btn.innerHTML = `<i class="fa fa-lock"></i> Pagar con Mercado Pago · S/ ${totals.total}`;
 }
 
 /**
- * Renderiza la tarjeta de estado del alumno con las clases unificadas .ck-user-row / .ck-user-empty
+ * Renderiza la tarjeta de estado del alumno
  */
 function renderUserStatusCard() {
 	const card = document.getElementById('user-status-card');
@@ -145,11 +60,6 @@ function renderUserStatusCard() {
 		if (chkDni) chkDni.value = user.dni || '30000003';
 		const chkWa = document.getElementById('chk-whatsapp');
 		if (chkWa) chkWa.value = user.whatsapp ? user.whatsapp.replace('+51', '').trim() : '999555666';
-
-		const yapeCel = document.getElementById('yape-celular');
-		if (yapeCel) yapeCel.value = chkWa ? chkWa.value : '999555666';
-		const plinCel = document.getElementById('plin-celular');
-		if (plinCel) plinCel.value = chkWa ? chkWa.value : '999555666';
 
 	} else {
 		card.innerHTML = `
@@ -226,18 +136,6 @@ function initPennCheckout() {
 	// Renderizar estado del usuario
 	renderUserStatusCard();
 
-	// Sincronizar número de celular para Yape y Plin
-	const chkWaEl = document.getElementById('chk-whatsapp');
-	if (chkWaEl) {
-		chkWaEl.addEventListener('input', (e) => {
-			const val = e.target.value.trim();
-			const yapeCel = document.getElementById('yape-celular');
-			if (yapeCel) yapeCel.value = val;
-			const plinCel = document.getElementById('plin-celular');
-			if (plinCel) plinCel.value = val;
-		});
-	}
-
 	// Totales del carrito
 	const totals = CartService.getTotals();
 	const elSub = document.getElementById('side-subtotal');
@@ -267,13 +165,6 @@ function initPennCheckout() {
 
 	startCheckoutTimer();
 	actualizarBotonPago();
-
-	if (window.location.search && window.location.search.includes('tab=plin')) {
-		selectMetodoPago('PLIN');
-	}
-	if (window.location.search && window.location.search.includes('tab=card')) {
-		selectMetodoPago('TARJETA');
-	}
 
 	const cartCountEl = document.getElementById('cart-nav-counter');
 	if (cartCountEl) cartCountEl.textContent = CartService.getCartCount();
@@ -311,10 +202,10 @@ function toggleFactura(isFactura) {
 async function ejecutarPago(e) {
 	if (e && e.preventDefault) e.preventDefault();
 
-	// 1. Validar usuario cargado
+	// 1. Validar usuario identificado
 	const user = AuthService.getCurrentUser();
 	if (!user) {
-		Notifications.showToast('Por favor identifícate como alumno para continuar.', 'warning');
+		Notifications.showToast('Por favor identifícate como alumno para matricularte.', 'warning');
 		const card = document.getElementById('user-status-card');
 		if (card) {
 			card.classList.add('is-attention');
@@ -328,7 +219,10 @@ async function ejecutarPago(e) {
 	if (cart.length === 0) return;
 
 	const btn = document.getElementById('btn-pago-penn');
-	if (btn) btn.disabled = true;
+	if (btn) {
+		btn.disabled = true;
+		btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Conectando con Mercado Pago...`;
+	}
 
 	const nombres = (document.getElementById('chk-nombres') ? document.getElementById('chk-nombres').value.trim() : '') || user.nombres || 'Carlos';
 	const apellidos = (document.getElementById('chk-apellidos') ? document.getElementById('chk-apellidos').value.trim() : '') || user.apellidos || 'Alarcón';
@@ -339,122 +233,12 @@ async function ejecutarPago(e) {
 
 	const estId = user.id || 'a0000000-0000-0000-0000-000000000003';
 
-	// ============================================================
-	// FLUJO MERCADO PAGO CHECKOUT PRO
-	// ============================================================
-	if (metodoPagoSeleccionado === 'TARJETA') {
-		if (btn) btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Generando orden de pago...`;
-
-		try {
-			// 1. Crear pedido en PostgreSQL
-			const pedido = await PedidosService.crearPedido(cart[0].id, estId);
-
-			const payInfo = {
-				metodoPago: 'Mercado Pago Checkout Pro',
-				tipoComprobante: tipoComp,
-				clienteNombres: `${nombres} ${apellidos}`.trim(),
-				docIdentidad: docIdent,
-				whatsapp: whatsapp,
-				correo: correo
-			};
-
-			currentPendingMpOrder = { pedido, payInfo };
-			sessionStorage.setItem('pending_mp_order', JSON.stringify(currentPendingMpOrder));
-
-			// 2. Obtener initPoint oficial desde el backend
-			let prefData = null;
-			if (pedido && pedido.initPoint) {
-				prefData = { id: pedido.mpPreferenceId || pedido.codigoOrden, initPoint: pedido.initPoint };
-			} else {
-				const prefPayload = {
-					titulo: cart[0].titulo || 'Curso Gestión de Cursos',
-					cantidad: 1,
-					precio: parseFloat(cart[0].precio) || 150.00
-				};
-
-				try {
-					const resGw = await fetch('http://localhost:8080/api/pagos/crear-preferencia', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify(prefPayload)
-					});
-					if (!resGw.ok) throw new Error('Gateway error: ' + resGw.status);
-					prefData = await resGw.json();
-				} catch (_) {
-					const resDir = await fetch('http://localhost:8083/api/pagos/crear-preferencia', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify(prefPayload)
-					});
-					prefData = await resDir.json();
-				}
-			}
-
-			if (!prefData || !prefData.initPoint) {
-				throw new Error('No se pudo generar la preferencia de Mercado Pago.');
-			}
-
-			// 3. Renderizar el drawer de pago
-			const modalMp = document.getElementById('mp-modal-container');
-			const linkInput = document.getElementById('mp-link-input');
-			const btnOpen = document.getElementById('btn-mp-open-direct');
-			const badgePref = document.getElementById('mp-pref-badge');
-
-			if (linkInput) linkInput.value = prefData.initPoint;
-			if (btnOpen) {
-				btnOpen.href = prefData.initPoint;
-				btnOpen.setAttribute('target', '_blank');
-				btnOpen.setAttribute('rel', 'noopener noreferrer');
-			}
-			if (badgePref && prefData.id) {
-				badgePref.textContent = `ORDEN: ${String(prefData.id).substring(0, 16)}...`;
-			}
-
-			if (modalMp) {
-				modalMp.classList.remove('d-none');
-				modalMp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-			}
-
-			Notifications.showToast('¡Orden de Mercado Pago generada!', 'success');
-			if (btn) {
-				btn.classList.add('is-success');
-				btn.innerHTML = `<i class="fa fa-check"></i> Orden lista · Paga en Mercado Pago`;
-			}
-
-		} catch (err) {
-			console.error('Error al generar Checkout Pro:', err);
-			Notifications.showToast('Error en Mercado Pago: ' + err.message, 'error');
-			if (btn) {
-				btn.disabled = false;
-				actualizarBotonPago();
-			}
-		}
-		return;
-	}
-
-	// ============================================================
-	// FLUJO DIRECTO YAPE / PLIN
-	// ============================================================
 	try {
-		let nombreMetodo = 'Yape';
-		if (metodoPagoSeleccionado === 'PLIN') {
-			nombreMetodo = 'Plin';
-			const plinOtp = document.getElementById('plin-otp');
-			if (plinOtp && !plinOtp.value) plinOtp.value = '582910';
-		} else {
-			const yapeOtp = document.getElementById('yape-otp');
-			if (yapeOtp && !yapeOtp.value) yapeOtp.value = '482910';
-		}
-
-		if (btn) btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Confirmando pago con ${nombreMetodo}...`;
-		await new Promise(r => setTimeout(r, 600));
-
 		// 1. Crear pedido en PostgreSQL
 		const pedido = await PedidosService.crearPedido(cart[0].id, estId);
 
-		// 2. Procesar pago
 		const payInfo = {
-			metodoPago: `${nombreMetodo} (Mercado Pago)`,
+			metodoPago: 'Mercado Pago Checkout',
 			tipoComprobante: tipoComp,
 			clienteNombres: `${nombres} ${apellidos}`.trim(),
 			docIdentidad: docIdent,
@@ -462,49 +246,79 @@ async function ejecutarPago(e) {
 			correo: correo
 		};
 
-		await PedidosService.procesarPagoMercadoPago(pedido, payInfo);
+		currentPendingMpOrder = { pedido, payInfo };
+		sessionStorage.setItem('pending_mp_order', JSON.stringify(currentPendingMpOrder));
 
-		if (btn) {
-			btn.classList.add('is-success');
-			btn.innerHTML = `<i class="fa fa-check-circle"></i> ¡Pago con ${nombreMetodo} aprobado!`;
+		// 2. Obtener initPoint oficial desde el backend
+		let prefData = null;
+		if (pedido && pedido.initPoint) {
+			prefData = { id: pedido.mpPreferenceId || pedido.codigoOrden, initPoint: pedido.initPoint };
+		} else {
+			const prefPayload = {
+				titulo: cart[0].titulo || 'Curso Gestión de Cursos',
+				cantidad: 1,
+				precio: parseFloat(cart[0].precio) || 150.00
+			};
+
+			try {
+				const resGw = await fetch('http://localhost:8080/api/pagos/crear-preferencia', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(prefPayload)
+				});
+				if (!resGw.ok) throw new Error('Gateway error: ' + resGw.status);
+				prefData = await resGw.json();
+			} catch (_) {
+				const resDir = await fetch('http://localhost:8083/api/pagos/crear-preferencia', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(prefPayload)
+				});
+				prefData = await resDir.json();
+			}
 		}
-		Notifications.showToast(`¡Matrícula exitosa con ${nombreMetodo}!`, 'success');
 
-		setTimeout(() => {
-			window.location.href = 'confirmacion.html';
-		}, 700);
+		if (!prefData || !prefData.initPoint) {
+			throw new Error('No se pudo generar la preferencia de Mercado Pago.');
+		}
+
+		// 3. Renderizar la tarjeta informativa de pago
+		const modalMp = document.getElementById('mp-modal-container');
+		const btnOpen = document.getElementById('btn-mp-open-direct');
+		const badgePref = document.getElementById('mp-pref-badge');
+
+		if (btnOpen) {
+			btnOpen.href = prefData.initPoint;
+			btnOpen.setAttribute('target', '_blank');
+			btnOpen.setAttribute('rel', 'noopener noreferrer');
+		}
+		if (badgePref && prefData.id) {
+			badgePref.textContent = `ORDEN: ${String(prefData.id).substring(0, 16)}...`;
+		}
+
+		if (modalMp) {
+			modalMp.classList.remove('d-none');
+			modalMp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+		}
+
+		// 4. Abrir la pasarela de Mercado Pago de forma directa
+		window.open(prefData.initPoint, '_blank');
+
+		Notifications.showToast('¡Ventana de Mercado Pago abierta! Completa tu pago para finalizar tu matrícula.', 'success');
+		if (btn) {
+			btn.disabled = false;
+			btn.classList.add('is-success');
+			btn.innerHTML = `<i class="fa fa-external-link"></i> Pagar en Mercado Pago`;
+			btn.onclick = () => window.open(prefData.initPoint, '_blank');
+		}
 
 	} catch (err) {
-		console.error('Error durante el pago:', err);
-		Notifications.showToast('Error en el pago: ' + err.message, 'error');
+		console.error('Error al generar Checkout de Mercado Pago:', err);
+		Notifications.showToast('Error en Mercado Pago: ' + err.message, 'error');
 		if (btn) {
 			btn.disabled = false;
 			actualizarBotonPago();
 		}
-	}
-}
-
-// Copiar link al portapapeles
-async function copiarLinkMp() {
-	const input = document.getElementById('mp-link-input');
-	const btn = document.getElementById('btn-mp-copiar');
-	if (!input || !input.value) return;
-
-	try {
-		await navigator.clipboard.writeText(input.value);
-		if (btn) {
-			const orig = btn.innerHTML;
-			btn.classList.add('is-copied');
-			btn.innerHTML = `<i class="fa fa-check"></i> Copiado`;
-			setTimeout(() => {
-				btn.classList.remove('is-copied');
-				btn.innerHTML = orig;
-			}, 2500);
-		}
-	} catch (_) {
-		input.select();
-		document.execCommand('copy');
-		Notifications.showToast('¡Enlace copiado al portapapeles!', 'info');
 	}
 }
 
