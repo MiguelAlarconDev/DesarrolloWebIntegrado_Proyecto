@@ -27,6 +27,15 @@
 	<link rel="stylesheet" href="assets/css/shop.css" />				
 	<link rel="stylesheet" href="assets/css/style.css" />				
 	<link rel="stylesheet" href="css/custom.css" />
+
+	<!-- Protección de ruta privada: redirige de inmediato a login si no hay sesión -->
+	<script>
+		try {
+			if (!localStorage.getItem('current_user_profile')) {
+				window.location.replace('login.html?redirect=mis-cursos.html');
+			}
+		} catch (_) {}
+	</script>
 </head>
 <body>
 	

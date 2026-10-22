@@ -17,10 +17,20 @@ async function cargarAlumnoDemoMisCursos() {
 }
 
 function cerrarSesionMisCursos() {
-	AuthService.logout('mis-cursos.html');
+	AuthService.logout('login.html');
 }
 
 async function initMisCursos() {
+	const user = AuthService.getCurrentUser();
+
+	// =========================================================================
+	// 1. REGLA ESTRICTA: SI NO HAY USUARIO, REDIRIGIR INMEDIATAMENTE A LOGIN
+	// =========================================================================
+	if (!user) {
+		window.location.replace('login.html?redirect=mis-cursos.html');
+		return;
+	}
+
 	const container = document.getElementById('mis-cursos-penn-list');
 	if (!container) return;
 
@@ -30,37 +40,6 @@ async function initMisCursos() {
 	const counterEl = document.getElementById('cart-nav-counter');
 	if (counterEl) counterEl.textContent = CartService.getCartCount();
 	AuthService.updateNavbar();
-
-	const user = AuthService.getCurrentUser();
-
-	// =========================================================================
-	// 1. REGLA ESTRICTA: SI NO HAY USUARIO, NO MOSTRAR NINGÚN CURSO
-	// =========================================================================
-	if (!user) {
-		container.innerHTML = `
-			<div class="col-12 py-4">
-				<div class="mc-empty-card">
-					<div class="mc-empty-icon">
-						<i class="ti-book"></i>
-					</div>
-					<h3 class="mc-empty-title">Accede a tus clases</h3>
-					<p class="mc-empty-sub">Inicia sesión para entrar a tus salas virtuales de Zoom/Meet y revisar tus horarios.</p>
-					<div class="mc-empty-actions">
-						<a href="login.html?redirect=mis-cursos.html" class="mc-btn-primary">
-							<i class="fa fa-sign-in me-1"></i> Iniciar sesión
-						</a>
-						<a href="registro.html?redirect=mis-cursos.html" class="mc-btn-secondary">
-							Crear cuenta
-						</a>
-					</div>
-					<div class="mc-empty-demo">
-						<span>¿Probando el sistema? <button type="button" onclick="cargarAlumnoDemoMisCursos()">Cargar alumno de prueba</button></span>
-					</div>
-				</div>
-			</div>
-		`;
-		return;
-	}
 
 	// =========================================================================
 	// 2. USUARIO AUTENTICADO: CARGAR SUS CURSOS CORRESPONDIENTES

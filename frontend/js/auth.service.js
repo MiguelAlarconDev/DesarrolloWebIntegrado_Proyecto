@@ -136,17 +136,24 @@ const AuthService = {
   },
 
   /**
-   * Actualiza el Navbar en todas las páginas mostrando el usuario conectado
+   * Actualiza el Navbar en todas las páginas:
+   * "Mis Clases" solo aparece si hay un usuario autenticado.
    */
   updateNavbar() {
     const user = this.getCurrentUser();
+
+    if (typeof document !== 'undefined') {
+      if (document.documentElement) document.documentElement.classList.toggle('is-logged-in', !!user);
+      if (document.body) document.body.classList.toggle('is-logged-in', !!user);
+    }
+
     const container = document.getElementById('auth-buttons-nav');
     if (container) {
       if (user) {
         const primerNombre = (user.nombres || 'Usuario').split(' ')[0];
         const rolTexto = user.rol === 'ADMIN' ? 'Admin' : 'Alumno';
         container.innerHTML = `
-          <a class="btn_one btn-nav-user" href="mis-cursos.html" title="Ver mis cursos comprados">
+          <a class="btn_one btn-nav-user" href="mis-cursos.html" title="Ver mis cursos matriculados">
             <i class="fa fa-user-circle me-1"></i> ${primerNombre} (${rolTexto})
           </a>
           <a class="btn_two btn-nav-logout" href="#" onclick="AuthService.logout(); return false;" title="Cerrar sesión">
@@ -161,25 +168,17 @@ const AuthService = {
       }
     }
 
-    // Actualizar también en el menú principal si existe
-    const mainMenu = document.querySelector('#main-menu ul, #navigation ul');
-    if (mainMenu && user) {
-      let existingUserLi = document.getElementById('nav-user-item');
-      if (!existingUserLi) {
-        existingUserLi = document.createElement('li');
-        existingUserLi.id = 'nav-user-item';
-        mainMenu.appendChild(existingUserLi);
+    // Regla: "Mis Clases" SOLO aparece en el menú cuando hay usuario logueado
+    const linksMisClases = document.querySelectorAll('a[href="mis-cursos.html"], a[href="mis-cursos"]');
+    linksMisClases.forEach(link => {
+      if (link.classList.contains('btn-nav-user')) return;
+      const parentLi = link.closest('li');
+      if (parentLi) {
+        parentLi.style.display = user ? '' : 'none';
+      } else {
+        link.style.display = user ? '' : 'none';
       }
-      const primerNombre = (user.nombres || 'Usuario').split(' ')[0];
-      existingUserLi.innerHTML = `
-        <a class="nav-link" href="mis-cursos.html" style="color: #2eca7f !important; font-weight: 700;">
-          <i class="fa fa-user-circle"></i> Mi Perfil (${primerNombre})
-        </a>
-      `;
-    } else if (mainMenu && !user) {
-      const existingUserLi = document.getElementById('nav-user-item');
-      if (existingUserLi) existingUserLi.remove();
-    }
+    });
   }
 };
 
