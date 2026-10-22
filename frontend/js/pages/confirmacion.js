@@ -1,8 +1,8 @@
 /**
  * confirmacion.js - Lógica de la Página de Confirmación de Matrícula
  * Renderizado de comprobante de pago SUNAT (Boleta / Factura),
- * detalles de acceso (Enlace Meet/Zoom para virtual o Aula/Sede para presencial),
- * integración con WhatsApp y correo electrónico para envío de accesos.
+ * confirmación de despacho 100% automático e invisible a WhatsApp y Correo,
+ * y acceso directo a "Mis Clases".
  */
 
 let currentOrder = null;
@@ -29,12 +29,12 @@ function initConfirmacion() {
 			comprobante: {
 				tipo: 'BOLETA',
 				correlativo: 'B001-00001042',
-				cliente: 'Jose Elmer Coronado Maldonado',
+				cliente: 'Carlos Alarcón',
 				docIdentidad: '74859612',
 				subtotal: '296.61',
 				igv: '53.39',
 				total: '350.00',
-				clienteCorreo: 'carlokasike333@gmail.com',
+				clienteCorreo: 'carlos.alarcon@ejemplo.com',
 				clienteTelefono: '935300159'
 			}
 		};
@@ -84,7 +84,7 @@ function initConfirmacion() {
 	const elMail = document.getElementById('rec-correo');
 	if (elMail) elMail.textContent = correoAlumno;
 
-	// Actualizar destinos automáticos
+	// Actualizar destinos automáticos en la tarjeta
 	const elAutoCorreo = document.getElementById('auto-correo-dest');
 	if (elAutoCorreo) elAutoCorreo.textContent = correoAlumno;
 	
@@ -99,13 +99,7 @@ function initConfirmacion() {
 	const recMetodo = document.getElementById('rec-metodo');
 	if (recMetodo) {
 		recMetodo.textContent = metodo;
-		if (metodo.includes('Plin')) {
-			recMetodo.style.background = '#00A7D0';
-		} else if (metodo.includes('Yape')) {
-			recMetodo.style.background = '#742284';
-		} else {
-			recMetodo.style.background = '#009ee3';
-		}
+		recMetodo.style.background = '#009ee3';
 	}
 
 	// Curso y Totales
@@ -166,102 +160,10 @@ function initConfirmacion() {
 	if (cartCountEl) cartCountEl.textContent = '0';
 	AuthService.updateNavbar();
 
-	// Notificación automática al cargar confirmando los envíos
+	// Notificación sutil y elegante de confirmación
 	setTimeout(() => {
-		Notifications.showToast('¡Comprobante y accesos enviados automáticamente a tu correo y WhatsApp!', 'success');
-	}, 400);
-}
-
-function abrirChatWhatsApp() {
-	const order = currentOrder || {};
-	const comp = order.comprobante || {};
-	const curso = order.curso || {};
-	const user = AuthService.getCurrentUser();
-
-	let rawPhone = (comp && comp.clienteTelefono) || (order.notificacionWhatsApp && order.notificacionWhatsApp.telefono) || (user && user.whatsapp) || '999555666';
-	let phone = rawPhone.replace(/\D/g, '');
-
-	if (phone.length === 9) {
-		phone = '51' + phone;
-	}
-
-	let accesoTexto = '';
-	if (curso.modalidad === 'PRESENCIAL') {
-		accesoTexto = `🏛️ *Sede:* ${curso.direccionClase || 'Av. Universitaria 1234'}\n🚪 *Aula:* ${curso.aula || 'Aula 101'}`;
-	} else {
-		accesoTexto = `🎥 *Enlace de Clase en Vivo (Zoom/Meet):*\n${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}`;
-	}
-
-	const mensaje = `¡Hola *${comp.cliente || 'Estudiante'}*! 🎉\n` +
-		`Tu matrícula en *${curso.titulo || 'Curso de Gestión de Cursos'}* está confirmada con éxito.\n\n` +
-		`📋 *Código de Orden:* ${order.codigoOrden || 'ORD-100201'}\n` +
-		`📅 *Horario:* ${curso.horario || 'Por coordinar'}\n` +
-		`${accesoTexto}\n\n` +
-		`📄 *Comprobante Electrónico:* ${comp.correlativo || 'B001-00001001'} (Total: S/ ${comp.total || '0.00'})\n` +
-		`💳 *Forma de Pago:* ${order.metodoPago || 'Mercado Pago'}\n\n` +
-		`¡Muchos éxitos en tus clases! 🚀 - Gestión de Cursos`;
-
-	Notifications.showToast(`¡Abriendo chat de WhatsApp para +${phone}!`, 'info');
-	Notifications.abrirWhatsAppWeb(phone, mensaje);
-}
-
-function contactarSoporte() {
-	const order = currentOrder || {};
-	const comp = order.comprobante || {};
-	const curso = order.curso || {};
-
-	const mensaje = `¡Hola Soporte de Gestión de Cursos! 👋\n` +
-		`Acabo de matricularme en el curso *${curso.titulo || 'Curso'}* con la orden *${order.codigoOrden || 'ORD-100201'}* y comprobante *${comp.correlativo || 'B001-00001001'}*.\n` +
-		`¿Podrían brindarme información adicional de las clases? Muchas gracias.`;
-
-	Notifications.abrirWhatsAppWeb('51999555666', mensaje);
-}
-
-function abrirClienteCorreo() {
-	const order = currentOrder || {};
-	const comp = order.comprobante || {};
-	const curso = order.curso || {};
-	const user = AuthService.getCurrentUser();
-
-	const email = (comp && comp.clienteCorreo) || (user && user.correo) || 'alumno@cursos.com';
-
-	const asunto = `Gestión de Cursos - Confirmación de Matrícula y Comprobante ${comp.correlativo || 'B001'}`;
-	const cuerpo = `Estimado(a) ${comp.cliente || 'Estudiante'},\n\n` +
-		`Te confirmamos que tu matrícula en el programa "${curso.titulo || 'Curso Especializado'}" ha sido procesada con éxito.\n\n` +
-		`Detalles de tu Matrícula:\n` +
-		`- Código de Orden: ${order.codigoOrden || 'ORD-100201'}\n` +
-		`- Modalidad: ${curso.modalidad || 'VIRTUAL'}\n` +
-		`- Horario: ${curso.horario || 'Por coordinar'}\n` +
-		`- Enlace de Clase: ${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}\n` +
-		`- Comprobante SUNAT: ${comp.correlativo || 'B001-00001001'}\n` +
-		`- Total Pagado: S/ ${comp.total || '0.00'} (${order.metodoPago || 'Mercado Pago'})\n\n` +
-		`Adjuntamos en tu cuenta el comprobante electrónico oficial en formato PDF y XML.\n\n` +
-		`Atentamente,\nEquipo Académico - Gestión de Cursos S.A.C.`;
-
-	Notifications.abrirCorreo(email, asunto, cuerpo);
-}
-
-async function reenviarCorreoAuto() {
-	const btn = document.getElementById('btn-reenviar-email');
-	if (!btn) return;
-	const originalText = btn.innerHTML;
-	btn.disabled = true;
-	btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Reenviando...`;
-
-	await new Promise(r => setTimeout(r, 600));
-
-	const order = currentOrder || {};
-	const comp = order.comprobante || {};
-	const user = AuthService.getCurrentUser();
-	const email = (comp && comp.clienteCorreo) || (user && user.correo) || 'alumno@cursos.com';
-
-	Notifications.showToast(`¡Comprobante reenviado con éxito a ${email}!`, 'success');
-	btn.innerHTML = `<i class="fa fa-check text-success"></i> ¡Reenviado!`;
-
-	setTimeout(() => {
-		btn.disabled = false;
-		btn.innerHTML = originalText;
-	}, 3000);
+		Notifications.showToast('¡Matrícula confirmada! Tus accesos y comprobante fueron despachados.', 'success');
+	}, 300);
 }
 
 // Inicialización
