@@ -23,7 +23,8 @@ async function hacerRegistro(e) {
 	try {
 		await AuthService.registro(data);
 		Notifications.showToast('¡Registro exitoso! Bienvenido a Gestión de Cursos.', 'success');
-		setTimeout(() => window.location.href = 'index.html', 600);
+		const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+		setTimeout(() => window.location.href = redirectUrl, 600);
 	} catch (err) {
 		Notifications.showToast(err.message, 'error');
 		if (btn) {

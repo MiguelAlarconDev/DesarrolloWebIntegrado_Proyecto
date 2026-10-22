@@ -151,9 +151,9 @@ function renderCart() {
 					</div>
 
 					<!-- UN SOLO BOTÓN PRINCIPAL DESTACADO -->
-					<a href="checkout.html" class="btn_one w-100" style="height: 50px; font-size: 15px; font-weight: 800; border-radius: 10px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(46, 202, 127, 0.35);">
+					<button type="button" onclick="procederAlPago()" class="btn_one w-100" style="height: 50px; font-size: 15px; font-weight: 800; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(46, 202, 127, 0.35);">
 						Continuar al Pago con Mercado Pago <i class="fa fa-arrow-right"></i>
-					</a>
+					</button>
 
 					<a href="cursos.html" class="d-block text-center mt-3 text-muted" style="font-size: 13px; text-decoration: none;">
 						<i class="fa fa-arrow-left me-1"></i> Seguir explorando cursos
@@ -175,6 +175,22 @@ function renderCart() {
 			</div>
 		</div>
 	`;
+}
+
+
+function procederAlPago() {
+	const cart = CartService.getCart();
+	if (cart.length === 0) {
+		Notifications.showToast('Tu carrito de matrícula está vacío.', 'warning');
+		return;
+	}
+
+	// Si no tiene sesión activa, redirigir a ingresar usuario directamente
+	if (!AuthService.isAuthenticated()) {
+		window.location.href = 'login.html?redirect=checkout.html';
+	} else {
+		window.location.href = 'checkout.html';
+	}
 }
 
 function quitar(id) {

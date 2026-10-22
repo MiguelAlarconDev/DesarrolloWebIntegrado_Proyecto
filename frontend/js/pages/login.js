@@ -55,7 +55,12 @@ $(document).ready(() => {
 	if (counterEl) counterEl.textContent = CartService.getCartCount();
 
 	const params = new URLSearchParams(window.location.search);
-	if (params.get('redirect')) {
-		Notifications.showToast('Por favor carga o inicia sesión con tu usuario para continuar con la inscripción.', 'info');
+	const redirectUrl = params.get('redirect');
+	if (redirectUrl) {
+		Notifications.showToast('Ingresa con tu usuario para completar tu inscripción.', 'info');
+		const linkReg = document.querySelector('a[href="registro.html"]');
+		if (linkReg) {
+			linkReg.href = 'registro.html?redirect=' + encodeURIComponent(redirectUrl);
+		}
 	}
 });

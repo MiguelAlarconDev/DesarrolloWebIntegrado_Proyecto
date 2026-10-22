@@ -86,9 +86,7 @@ function renderUserStatusCard() {
 
 function cerrarSesionCheckout() {
 	AuthService.logout(null);
-	renderUserStatusCard();
-	actualizarBotonPago();
-	Notifications.showToast('Sesión cerrada. Puedes ingresar con otra cuenta.', 'info');
+	window.location.replace('login.html?redirect=checkout.html');
 }
 
 // Carga inmediata del usuario estudiante en el checkout
@@ -130,6 +128,12 @@ function initPennCheckout() {
 	if (cart.length === 0) {
 		Notifications.showToast('No tienes cursos en el carrito.', 'warning');
 		setTimeout(() => window.location.href = 'cursos.html', 800);
+		return;
+	}
+
+	// Si no tiene sesión activa, redirigir inmediatamente a ingresar usuario
+	if (!AuthService.isAuthenticated()) {
+		window.location.replace('login.html?redirect=checkout.html');
 		return;
 	}
 
