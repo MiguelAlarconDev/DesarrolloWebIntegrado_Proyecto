@@ -36,7 +36,13 @@ async function hacerRegistro(e) {
 
 // Inicialización
 $(document).ready(() => {
+	CartService.updateBadge();
 	AuthService.updateNavbar();
-	const counterEl = document.getElementById('cart-nav-counter');
-	if (counterEl) counterEl.textContent = CartService.getCartCount();
+
+	const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+	if (redirectUrl) {
+		document.querySelectorAll('a[href="login.html"], a[href^="login.html?"]').forEach(link => {
+			link.href = 'login.html?redirect=' + encodeURIComponent(redirectUrl);
+		});
+	}
 });

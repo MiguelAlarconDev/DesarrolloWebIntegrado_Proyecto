@@ -205,9 +205,9 @@
   position: absolute !important;
   top: -5px !important;
   right: -5px !important;
-  width: 18px !important;
-  height: 18px !important;
-  font-size: 10px !important;
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 11px !important;
   font-weight: 800 !important;
   background: #2eca7f !important;
   color: #ffffff !important;
@@ -216,9 +216,42 @@
   align-items: center !important;
   justify-content: center !important;
   line-height: 1 !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 2px 6px rgba(46, 202, 127, 0.4) !important;
   margin: 0 !important;
   padding: 0 !important;
+  transition: all 0.25s ease !important;
+}
+
+/* Estado cuando el carrito no tiene cursos */
+.home_lc a .gactive.is-empty {
+  background: #94a3b8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Animaciones reactivas al agregar items al carrito */
+@keyframes cart-bump {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.25) rotate(-6deg); }
+  50% { transform: scale(1.15) rotate(6deg); }
+  75% { transform: scale(1.2) rotate(0deg); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cart-badge-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); background: #15803d !important; }
+  100% { transform: scale(1); }
+}
+
+.cart-bump,
+.home_lc a.cart-bump {
+  animation: cart-bump 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.cart-bump .gactive,
+.home_lc a.cart-bump .gactive {
+  animation: cart-badge-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 /* Reset de float y alineación para call_to_action */

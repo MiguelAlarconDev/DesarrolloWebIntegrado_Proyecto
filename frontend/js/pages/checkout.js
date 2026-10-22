@@ -1,7 +1,7 @@
 /**
  * checkout.js - Lógica del Proceso de Pago y Emisión de Comprobantes
  * Integración 100% enfocada en Mercado Pago Checkout Pro (Oficial y Seguro)
- * Experiencia de usuario simplificada y sin elementos distractores.
+ * Experiencia de usuario simplificada, sin elementos distractores y con detección automática de retorno de pago.
  */
 
 let tipoComp = 'BOLETA';
@@ -41,7 +41,7 @@ function renderUserStatusCard() {
 				<div class="ck-avatar">${iniciales}</div>
 				<div class="ck-user-info">
 					<strong>${nombreCompleto} <span class="ck-chip"><i class="fa fa-check-circle"></i> Sesión iniciada</span></strong>
-					<span>${user.correo} &bull; DNI: <strong>${user.dni || '30000003'}</strong> &bull; WA: <strong>+51 ${user.whatsapp ? user.whatsapp.replace('+51', '') : '999555666'}</strong></span>
+					<span>${user.correo} &bull; DNI: <strong>${user.dni || '30000003'}</strong> &bull; WA: <strong>+51 ${user.whatsapp ? user.whatsapp.replace('+51', '').trim() : '999555666'}</strong></span>
 				</div>
 				<button type="button" class="ck-link-btn" onclick="cerrarSesionCheckout()" title="Ingresar con otra cuenta">
 					Cambiar cuenta
@@ -51,15 +51,15 @@ function renderUserStatusCard() {
 
 		// Prellenar campos automáticamente
 		const chkNom = document.getElementById('chk-nombres');
-		if (chkNom) chkNom.value = user.nombres || 'Carlos';
+		if (chkNom && !chkNom.value) chkNom.value = user.nombres || 'Carlos';
 		const chkApe = document.getElementById('chk-apellidos');
-		if (chkApe) chkApe.value = user.apellidos || 'Alarcón';
+		if (chkApe && !chkApe.value) chkApe.value = user.apellidos || 'Alarcón';
 		const chkCorreo = document.getElementById('chk-correo');
-		if (chkCorreo) chkCorreo.value = user.correo || 'estudiante@cursos.com';
+		if (chkCorreo && !chkCorreo.value) chkCorreo.value = user.correo || 'estudiante@cursos.com';
 		const chkDni = document.getElementById('chk-dni');
-		if (chkDni) chkDni.value = user.dni || '30000003';
+		if (chkDni && !chkDni.value) chkDni.value = user.dni || '30000003';
 		const chkWa = document.getElementById('chk-whatsapp');
-		if (chkWa) chkWa.value = user.whatsapp ? user.whatsapp.replace('+51', '').trim() : '999555666';
+		if (chkWa && !chkWa.value) chkWa.value = user.whatsapp ? user.whatsapp.replace('+51', '').trim() : '999555666';
 
 	} else {
 		card.innerHTML = `
@@ -89,7 +89,7 @@ function cerrarSesionCheckout() {
 	window.location.replace('login.html?redirect=checkout.html');
 }
 
-// Carga inmediata del usuario estudiante en el checkout
+// Carga rápida del usuario estudiante de prueba
 async function cargarUsuarioDemoCheckout() {
 	try {
 		Notifications.showToast('Cargando cuenta de alumno...', 'info');
@@ -124,6 +124,15 @@ function startCheckoutTimer() {
 }
 
 function initPennCheckout() {
+	// Detección automática si el alumno regresó de Mercado Pago con éxito
+	const urlParams = new URLSearchParams(window.location.search);
+	const mpStatus = urlParams.get('status') || urlParams.get('collection_status');
+	if (mpStatus === 'approved') {
+		Notifications.showToast('¡Pago aprobado en Mercado Pago! Confirmando tu matrícula...', 'success');
+		setTimeout(() => finalizarMatriculaMp(), 500);
+		return;
+	}
+
 	const cart = CartService.getCart();
 	if (cart.length === 0) {
 		Notifications.showToast('No tienes cursos en el carrito.', 'warning');
@@ -170,8 +179,7 @@ function initPennCheckout() {
 	startCheckoutTimer();
 	actualizarBotonPago();
 
-	const cartCountEl = document.getElementById('cart-nav-counter');
-	if (cartCountEl) cartCountEl.textContent = CartService.getCartCount();
+	CartService.updateBadge();
 	AuthService.updateNavbar();
 
 	// Conectar el formulario de pago
@@ -231,14 +239,14 @@ async function ejecutarPago(e) {
 	const nombres = (document.getElementById('chk-nombres') ? document.getElementById('chk-nombres').value.trim() : '') || user.nombres || 'Carlos';
 	const apellidos = (document.getElementById('chk-apellidos') ? document.getElementById('chk-apellidos').value.trim() : '') || user.apellidos || 'Alarcón';
 	const dni = (document.getElementById('chk-dni') ? document.getElementById('chk-dni').value.trim() : '') || user.dni || '30000003';
-	const whatsapp = (document.getElementById('chk-whatsapp') ? document.getElementById('chk-whatsapp').value.trim() : '') || user.whatsapp || '935300159';
+	const whatsapp = (document.getElementById('chk-whatsapp') ? document.getElementById('chk-whatsapp').value.trim() : '') || user.whatsapp || '999555666';
 	const correo = (document.getElementById('chk-correo') ? document.getElementById('chk-correo').value.trim() : '') || user.correo || 'estudiante@cursos.com';
 	const docIdent = tipoComp === 'FACTURA' ? (document.getElementById('chk-ruc') ? document.getElementById('chk-ruc').value || '20601234567' : '20601234567') : dni;
 
 	const estId = user.id || 'a0000000-0000-0000-0000-000000000003';
 
 	try {
-		// 1. Crear pedido en PostgreSQL
+		// 1. Crear pedido oficial en PostgreSQL
 		const pedido = await PedidosService.crearPedido(cart[0].id, estId);
 
 		const payInfo = {
@@ -265,14 +273,12 @@ async function ejecutarPago(e) {
 			};
 
 			try {
-				const resGw = await fetch('http://localhost:8080/api/pagos/crear-preferencia', {
+				prefData = await API.request('/pagos/crear-preferencia', {
 					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(prefPayload)
 				});
-				if (!resGw.ok) throw new Error('Gateway error: ' + resGw.status);
-				prefData = await resGw.json();
 			} catch (_) {
+				// Fallback directo a 8083 si el gateway tuviera inconvenientes
 				const resDir = await fetch('http://localhost:8083/api/pagos/crear-preferencia', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },

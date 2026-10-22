@@ -12,7 +12,7 @@ async function initDetalle() {
 	activeCurso = await CursosService.getCursoById(id);
 
 	if (!activeCurso) {
-		window.location.href = 'index.html';
+		window.location.href = 'cursos.html';
 		return;
 	}
 
@@ -68,22 +68,57 @@ async function initDetalle() {
 		}
 	}
 
-	// Aforo
+	// Verificar si el alumno ya tiene este curso pagado
+	let isPaid = false;
+	const user = AuthService.getCurrentUser();
+	if (user) {
+		try {
+			const matriculas = await PedidosService.getMisMatriculas(user.id);
+			isPaid = (matriculas || []).some(m => {
+				const cid = (m.curso && m.curso.id) ? m.curso.id : (m.cursoId || m.id);
+				return m.estado === 'PAGADO' && cid === activeCurso.id;
+			});
+		} catch (_) {}
+	}
+
+	// Aforo y botón de acción principal
 	const total = activeCurso.aforoMaximo || 30;
 	const libres = activeCurso.aforoDisponible !== undefined ? activeCurso.aforoDisponible : 30;
 	const seatsBox = document.getElementById('seats-live-status-container');
 	const btnAction = document.getElementById('btn-enroll-action');
+	const inCart = CartService.isInCart(activeCurso.id);
 
 	if (seatsBox && btnAction) {
-		if (libres <= 0) {
+		if (isPaid) {
+			seatsBox.innerHTML = `<span class="seats-live-badge" style="background: #f0fdf4; color: #15803d; border-color: #86efac;"><i class="fa fa-check-circle"></i> <strong>Ya estás matriculado en este curso</strong></span>`;
+			btnAction.className = 'btn btn_one';
+			btnAction.style.background = '#16a34a';
+			btnAction.innerHTML = `<i class="fa fa-graduation-cap me-1"></i> Ir a Mis Clases`;
+			btnAction.onclick = () => window.location.href = 'mis-cursos.html';
+		} else if (inCart) {
+			seatsBox.innerHTML = `<span class="seats-live-badge" style="background: #f0f9ff; color: #0369a1; border-color: #bae6fd;"><i class="fa fa-shopping-cart"></i> <strong>Curso reservado en tu carrito</strong></span>`;
+			btnAction.className = 'btn btn_one';
+			btnAction.style.background = '#0284c7';
+			btnAction.innerHTML = `<i class="fa fa-arrow-right me-1"></i> Continuar al Pago`;
+			btnAction.onclick = () => window.location.href = 'carrito.html';
+		} else if (libres <= 0) {
 			seatsBox.innerHTML = `<span class="seats-live-badge soldout"><i class="fa fa-times-circle"></i> Aforo Completo (0 vacantes disponibles)</span>`;
 			btnAction.disabled = true;
 			btnAction.textContent = 'Vacantes Agotadas';
 			btnAction.className = 'btn btn-secondary';
-		} else if (libres <= 3) {
-			seatsBox.innerHTML = `<span class="seats-live-badge urgent"><i class="fa fa-bolt"></i> ¡ALERTA! Solo quedan ${libres} vacantes de ${total}</span>`;
 		} else {
-			seatsBox.innerHTML = `<span class="seats-live-badge"><i class="fa fa-table"></i> Quedan ${libres} vacantes libres de ${total}</span>`;
+			if (libres <= 3) {
+				seatsBox.innerHTML = `<span class="seats-live-badge urgent"><i class="fa fa-bolt"></i> ¡ALERTA! Solo quedan ${libres} vacantes de ${total}</span>`;
+			} else {
+				seatsBox.innerHTML = `<span class="seats-live-badge"><i class="fa fa-table"></i> Quedan ${libres} vacantes libres de ${total}</span>`;
+			}
+			btnAction.onclick = () => {
+				const res = CartService.addToCart(activeCurso);
+				Notifications.showToast(res.message || '¡Curso agregado al carrito!', 'success');
+				setTimeout(() => {
+					window.location.href = 'carrito.html';
+				}, 300);
+			};
 		}
 	}
 
@@ -173,23 +208,8 @@ async function initDetalle() {
 		`;
 	}
 
-	// Carrito counter y Auth
-	const cartCountEl = document.getElementById('cart-nav-counter');
-	if (cartCountEl) cartCountEl.textContent = CartService.getCartCount();
+	CartService.updateBadge();
 	AuthService.updateNavbar();
-
-	// Botón reservar con control de usuario
-	if (btnAction && libres > 0) {
-		btnAction.addEventListener('click', () => {
-			if (!activeCurso) return;
-			const res = CartService.addToCart(activeCurso);
-
-			Notifications.showToast(res.message || '¡Curso agregado al carrito!', 'success');
-			setTimeout(() => {
-				window.location.href = 'carrito.html';
-			}, 250);
-		});
-	}
 }
 
 // Inicialización

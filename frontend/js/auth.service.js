@@ -3,56 +3,65 @@
  */
 const AuthService = {
   /**
-   * Inicia sesión llamando a auth-service / Gateway con Spring Security
+   * Inicia sesión llamando a auth-service / Gateway con Spring Security.
+   * El modo demo local SOLO se usa si el backend no está disponible (error de red)
+   * y SOLO con las cuentas de prueba: una contraseña incorrecta nunca inicia sesión.
    */
   async login(correo, password) {
+    correo = (correo || '').trim().toLowerCase();
+    if (!correo || !password) {
+      throw new Error('Ingresa tu correo y contraseña.');
+    }
+
     try {
       const response = await API.request('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ correo, password })
       });
 
-      if (response && response.token) {
-        this.saveSession(response.token, {
-          id: response.usuarioId,
-          nombres: response.nombres,
-          apellidos: response.apellidos || '',
-          dni: response.dni || '',
-          correo: response.correo,
-          rol: response.rol,
-          whatsapp: response.whatsapp || '+51999555666'
-        });
+      if (!response || !response.token) {
+        throw new Error('No se pudo iniciar sesión. Inténtalo nuevamente.');
+      }
+
+      // Conservar datos de contacto guardados previamente para este mismo usuario
+      const previo = this.getCurrentUser();
+      const mismoUsuario = previo && previo.id === response.usuarioId;
+
+      this.saveSession(response.token, {
+        id: response.usuarioId,
+        nombres: response.nombres,
+        apellidos: response.apellidos || '',
+        dni: response.dni || (mismoUsuario ? previo.dni : '') || '',
+        correo: response.correo || correo,
+        rol: response.rol,
+        whatsapp: response.whatsapp || (mismoUsuario ? previo.whatsapp : '') || ''
+      });
+      return { success: true, user: this.getCurrentUser() };
+    } catch (err) {
+      if (err.status === 401 || err.status === 403) {
+        throw new Error('Correo o contraseña incorrectos.');
+      }
+      if (err.status) throw err;
+
+      // Backend caído: modo demo local solo con las cuentas de prueba de schema_local.sql
+      const demo = this.DEMO_USERS[correo];
+      if (demo && password === '123456') {
+        console.warn('[AuthService] Backend no disponible, usando cuenta demo local.');
+        this.saveSession('mock-jwt-token-' + demo.rol.toLowerCase(), { ...demo });
         return { success: true, user: this.getCurrentUser() };
       }
-    } catch (err) {
-      console.warn('[AuthService] Backend no disponible, usando autenticación demo local:', err.message);
-      // Simulación local con los usuarios de schema_local.sql
-      if (correo === 'admin@cursos.com' && password === '123456') {
-        const mockUser = {
-          id: 'a0000000-0000-0000-0000-000000000001',
-          nombres: 'Admin',
-          apellidos: 'General',
-          dni: '10000001',
-          correo: 'admin@cursos.com',
-          rol: 'ADMIN',
-          whatsapp: '+51999111222'
-        };
-        this.saveSession('mock-jwt-token-admin-session', mockUser);
-        return { success: true, user: mockUser };
-      } else if (password === '123456' || correo.includes('@')) {
-        const mockUser = {
-          id: 'a0000000-0000-0000-0000-000000000003',
-          nombres: 'Carlos',
-          apellidos: 'Alarcón',
-          dni: '30000003',
-          correo: correo,
-          rol: 'ESTUDIANTE',
-          whatsapp: '+51999555666'
-        };
-        this.saveSession('mock-jwt-token-estudiante-session', mockUser);
-        return { success: true, user: mockUser };
-      }
-      throw new Error('Credenciales incorrectas. Verifique su correo y contraseña.');
+      throw new Error('No pudimos conectar con el servidor. Inténtalo en unos segundos.');
+    }
+  },
+
+  DEMO_USERS: {
+    'admin@cursos.com': {
+      id: 'a0000000-0000-0000-0000-000000000001', nombres: 'Admin', apellidos: 'General',
+      dni: '10000001', correo: 'admin@cursos.com', rol: 'ADMIN', whatsapp: '+51999111222'
+    },
+    'estudiante@cursos.com': {
+      id: 'a0000000-0000-0000-0000-000000000003', nombres: 'Carlos', apellidos: 'Alarcón',
+      dni: '30000003', correo: 'estudiante@cursos.com', rol: 'ESTUDIANTE', whatsapp: '+51999555666'
     }
   },
 
@@ -60,17 +69,17 @@ const AuthService = {
    * Registro de nuevo estudiante con DNI y WhatsApp
    */
   async registro(data) {
-    try {
-      const payload = {
-        dni: data.dni,
-        nombres: data.nombres,
-        apellidos: data.apellidos,
-        correo: data.correo,
-        whatsapp: data.whatsapp,
-        password: data.password,
-        rol: 'ESTUDIANTE'
-      };
+    const payload = {
+      dni: data.dni,
+      nombres: data.nombres,
+      apellidos: data.apellidos,
+      correo: (data.correo || '').trim().toLowerCase(),
+      whatsapp: data.whatsapp,
+      password: data.password,
+      rol: 'ESTUDIANTE'
+    };
 
+    try {
       const response = await API.request('/auth/registro', {
         method: 'POST',
         body: JSON.stringify(payload)
@@ -82,39 +91,52 @@ const AuthService = {
           nombres: response.nombres || data.nombres,
           apellidos: response.apellidos || data.apellidos,
           dni: response.dni || data.dni,
-          correo: data.correo,
+          correo: payload.correo,
           rol: 'ESTUDIANTE',
           whatsapp: data.whatsapp
         });
+        return { success: true, user: this.getCurrentUser() };
       }
-      return { success: true };
+
+      // Registro aceptado pero sin token: iniciar sesión con las mismas credenciales
+      await this.login(payload.correo, payload.password);
+      this.updateProfile({ dni: data.dni, whatsapp: data.whatsapp, apellidos: data.apellidos });
+      return { success: true, user: this.getCurrentUser() };
     } catch (err) {
-      console.warn('[AuthService] Usando simulación de registro local:', err.message);
-      const newUser = {
-        id: 'usr-' + Date.now(),
-        nombres: data.nombres,
-        apellidos: data.apellidos,
-        dni: data.dni,
-        correo: data.correo,
-        rol: 'ESTUDIANTE',
-        whatsapp: data.whatsapp
-      };
-      this.saveSession('mock-jwt-token-newuser', newUser);
-      return { success: true, user: newUser };
+      // Errores de validación / correo duplicado deben mostrarse tal cual al usuario
+      if (err.status) {
+        if (err.status === 409) throw new Error('Ya existe una cuenta con ese correo o DNI. Inicia sesión.');
+        throw err;
+      }
+      throw new Error('No pudimos conectar con el servidor para crear tu cuenta. Inténtalo en unos segundos.');
     }
   },
 
   saveSession(token, user) {
     localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, token);
     localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));
+    sessionStorage.removeItem('paid_course_ids');
     this.updateNavbar();
   },
 
-  logout(redirectUrl = 'login.html') {
+  /** Actualiza datos de contacto del perfil (DNI, WhatsApp) sin cerrar la sesión */
+  updateProfile(changes) {
+    const user = this.getCurrentUser();
+    if (!user) return;
+    const clean = {};
+    Object.keys(changes || {}).forEach(k => {
+      if (changes[k]) clean[k] = changes[k];
+    });
+    localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify({ ...user, ...clean }));
+  },
+
+  logout(redirectUrl = 'index.html') {
     localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
     localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
     localStorage.removeItem('app_order_history');
     localStorage.removeItem(CONFIG.STORAGE_KEYS.LAST_ORDER);
+    sessionStorage.removeItem('paid_course_ids');
+    sessionStorage.removeItem('pending_mp_order');
     this.updateNavbar();
     if (redirectUrl) {
       window.location.href = redirectUrl;
@@ -132,12 +154,22 @@ const AuthService = {
   },
 
   isAuthenticated() {
-    return !!localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
+    return !!localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN) && !!this.getCurrentUser();
   },
 
   /**
-   * Actualiza el Navbar en todas las páginas:
-   * "Mis Clases" solo aparece si hay un usuario autenticado.
+   * Devuelve una URL de redirección segura (solo páginas internas .html),
+   * evitando redirecciones abiertas a sitios externos.
+   */
+  getSafeRedirect(fallback = 'index.html') {
+    const raw = new URLSearchParams(window.location.search).get('redirect');
+    if (!raw) return fallback;
+    const ok = /^[a-z0-9\-]+(\.html)?(\?[\w=&%\-.]*)?$/i.test(raw);
+    return ok ? raw : fallback;
+  },
+
+  /**
+   * Actualiza el Navbar en todas las páginas (botones de sesión).
    */
   updateNavbar() {
     const user = this.getCurrentUser();

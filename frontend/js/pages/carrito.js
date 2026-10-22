@@ -1,18 +1,40 @@
 /**
  * carrito.js - Lógica del Carrito de Matrículas (UX Simplificado y Enfocado)
  * Flujo directo: Carrito -> Continuar al Pago (Checkout con Mercado Pago)
+ * Detección automática y prevención de compra de cursos ya matriculados.
  */
 
 let intervalTimer = null;
 
-function initPennCart() {
+async function initPennCart() {
+	// 1. Si el usuario está autenticado, verificar si ya pagó algún curso que esté en el carrito
+	const user = AuthService.getCurrentUser();
+	if (user) {
+		try {
+			const matriculas = await PedidosService.getMisMatriculas(user.id);
+			const paidIds = new Set();
+			(matriculas || []).forEach(m => {
+				if (m.estado === 'PAGADO') {
+					const cid = (m.curso && m.curso.id) ? m.curso.id : (m.cursoId || m.id);
+					if (cid) paidIds.add(cid);
+				}
+			});
+
+			const removidos = CartService.removePaidCourses(paidIds);
+			if (removidos.length > 0) {
+				removidos.forEach(r => {
+					Notifications.showToast(`Ya estás matriculado en "${r.titulo}". Lo retiramos del carrito.`, 'info');
+				});
+			}
+		} catch (_) {}
+	}
+
 	renderCart();
 	actualizarNavbar();
 }
 
 function actualizarNavbar() {
-	const counterEl = document.getElementById('cart-nav-counter');
-	if (counterEl) counterEl.textContent = CartService.getCartCount();
+	CartService.updateBadge();
 	AuthService.updateNavbar();
 }
 
@@ -177,7 +199,6 @@ function renderCart() {
 	`;
 }
 
-
 function procederAlPago() {
 	const cart = CartService.getCart();
 	if (cart.length === 0) {
@@ -224,5 +245,9 @@ function activarTimer() {
 	intervalTimer = setInterval(updateTimerDisplay, 1000);
 }
 
-// Inicialización
+// Inicialización garantizada en todos los navegadores
 $(document).ready(initPennCart);
+window.addEventListener('pageshow', initPennCart);
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+	initPennCart();
+}
