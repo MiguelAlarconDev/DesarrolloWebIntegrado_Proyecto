@@ -1140,16 +1140,11 @@
 /* ==========================================================================
    ESTADO VACÍO ELEGANTE Y MINIMALISTA - MIS CLASES (MC)
    ========================================================================== */
-/* Mis Clases en navbar solo visible cuando el usuario ha iniciado sesión */
+/* Mis Clases siempre visible en el menú principal */
 .nav-item-mis-clases,
 #main-menu li:has(> a[href*="mis-cursos"]),
 .site-navigation li:has(> a[href*="mis-cursos"]) {
-  display: none !important;
-}
-.is-logged-in .nav-item-mis-clases,
-.is-logged-in #main-menu li:has(> a[href*="mis-cursos"]),
-.is-logged-in .site-navigation li:has(> a[href*="mis-cursos"]) {
-  display: list-item !important;
+  display: list-item;
 }
 
 .mc-empty-card {

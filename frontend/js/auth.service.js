@@ -168,15 +168,7 @@ const AuthService = {
       }
     }
 
-    // Regla: "Mis Clases" SOLO aparece en el menú de navegación cuando hay usuario logueado
-    const linksMisClases = document.querySelectorAll('#main-menu a[href*="mis-cursos"], #navigation li a[href*="mis-cursos"]');
-    linksMisClases.forEach(link => {
-      if (link.classList.contains('btn-nav-user')) return;
-      const parentLi = link.closest('li');
-      if (parentLi) {
-        parentLi.style.display = user ? '' : 'none';
-      }
-    });
+    // "Mis Clases" permanece siempre accesible en el menú principal para todos los usuarios
   }
 };
 
