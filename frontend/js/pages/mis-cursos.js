@@ -38,27 +38,23 @@ async function initMisCursos() {
 	// =========================================================================
 	if (!user) {
 		container.innerHTML = `
-			<div class="col-12 text-center py-5">
-				<div style="max-width: 560px; margin: 0 auto; background: #ffffff; padding: 40px 30px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
-					<div style="width: 76px; height: 76px; border-radius: 50%; background: #f8fafc; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-						<i class="ti-lock" style="font-size: 36px; color: #64748b;"></i>
+			<div class="col-12 py-4">
+				<div class="mc-empty-card">
+					<div class="mc-empty-icon">
+						<i class="ti-book"></i>
 					</div>
-					<h3 style="color: #1a2d62; font-weight: 800; font-size: 22px; margin-bottom: 10px;">
-						Inicia sesión para ver tus clases
-					</h3>
-					<p class="text-muted mb-4" style="font-size: 14px; line-height: 1.6;">
-						No hay ninguna cuenta de alumno activa en este momento. Identifícate con tu cuenta para acceder a tus salas virtuales de Zoom/Meet, horarios y aulas presenciales:
-					</p>
-					<div class="d-flex justify-content-center gap-2 flex-wrap">
-						<button type="button" onclick="cargarAlumnoDemoMisCursos()" class="btn_one" style="border-radius: 8px; padding: 10px 22px; border: none; cursor: pointer;">
-							<i class="fa fa-bolt me-1"></i> Cargar Cuenta Alumno (1 Clic)
-						</button>
-						<a href="login.html?redirect=mis-cursos.html" class="btn_two" style="border-radius: 8px; padding: 10px 22px; text-decoration: none;">
-							<i class="fa fa-sign-in me-1"></i> Iniciar Sesión
+					<h3 class="mc-empty-title">Accede a tus clases</h3>
+					<p class="mc-empty-sub">Inicia sesión para entrar a tus salas virtuales de Zoom/Meet y revisar tus horarios.</p>
+					<div class="mc-empty-actions">
+						<a href="login.html?redirect=mis-cursos.html" class="mc-btn-primary">
+							<i class="fa fa-sign-in me-1"></i> Iniciar sesión
 						</a>
-						<a href="registro.html?redirect=mis-cursos.html" style="background: #ffffff; color: #1a2d62; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center;">
-							Crear Cuenta
+						<a href="registro.html?redirect=mis-cursos.html" class="mc-btn-secondary">
+							Crear cuenta
 						</a>
+					</div>
+					<div class="mc-empty-demo">
+						<span>¿Probando el sistema? <button type="button" onclick="cargarAlumnoDemoMisCursos()">Cargar alumno de prueba</button></span>
 					</div>
 				</div>
 			</div>
