@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<title>Mis Clases y Matrículas - - Gestión de Cursos</title>			
+	<title>Mis Clases y Matrículas - Gestión de Cursos</title>			
 	
 	<!-- Latest Bootstrap min CSS -->
 	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">		
@@ -30,7 +30,7 @@
 </head>
 <body>
 	
-		<!-- START NAVBAR -->  
+	<!-- START NAVBAR -->  
 	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
 		<div class="container">
 			<div class="row align-items-center">
@@ -93,11 +93,11 @@
 		<div class="container">
 			<div class="section-title">
 			  <h2>Mis Cursos Matriculados</h2>
-			  <p>Accede directamente a tu <span><u>enlace de Zoom</u></span> o consulta tu <span><u>aula física</u></span></p>
+			  <p>Accede directamente a tu <span><u>enlace de Zoom / Meet</u></span> o consulta tu <span><u>aula física</u></span></p>
 			</div>
 
 			<div class="row" id="mis-cursos-penn-list">
-				<!-- Inyectado con .course-slide de Gestión de Cursos -->
+				<!-- Inyectado dinámicamente según el usuario que ingrese -->
 			</div>
 		</div>
 	</div>
@@ -136,16 +136,16 @@
 	<script src="assets/js/wow.min.js"></script>				
 	<script src="assets/js/scripts.js"></script>
 
-	<!-- Lógica Modular -->
-	<script src="js/config.js"></script>
-	<script src="js/api.js"></script>
-	<script src="js/auth.service.js"></script>
-	<script src="js/cursos.service.js"></script>
-	<script src="js/cart.service.js"></script>
-	<script src="js/pedidos.service.js"></script>
-	<script src="js/notifications.js"></script>
+	<!-- Lógica Modular con control de caché -->
+	<script src="js/config.js?v=3"></script>
+	<script src="js/api.js?v=3"></script>
+	<script src="js/auth.service.js?v=3"></script>
+	<script src="js/cursos.service.js?v=3"></script>
+	<script src="js/cart.service.js?v=3"></script>
+	<script src="js/pedidos.service.js?v=3"></script>
+	<script src="js/notifications.js?v=3"></script>
 
 	<!-- Logica de la pagina: Mis Clases -->
-	<script src="js/pages/mis-cursos.js"></script>
+	<script src="js/pages/mis-cursos.js?v=3"></script>
 </body>
 </html>

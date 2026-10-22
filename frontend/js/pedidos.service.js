@@ -158,51 +158,71 @@ const PedidosService = {
     return raw ? JSON.parse(raw) : null;
   },
 
-  getMisMatriculas() {
-    let raw = JSON.parse(localStorage.getItem('app_order_history') || '[]');
-    if ((!raw || raw.length === 0) && typeof window !== 'undefined' && window.location.search && window.location.search.includes('sample=1')) {
-      return [
-        {
-          id: 'ord-100201',
-          codigoOrden: 'ORD-894210',
-          estado: 'PAGADO',
-          metodoPago: 'Yape (Mercado Pago)',
-          curso: {
-            id: 'b0000000-0000-0000-0000-000000000001',
-            titulo: 'Desarrollo de Microservicios con Spring Boot y Cloud',
-            horario: 'Sábados y Domingos 09:00 - 13:00',
-            modalidad: 'VIRTUAL',
-            enlaceClase: 'https://meet.google.com/abc-defg-hij',
-            imagen: 'assets/images/all-img/c1.png'
-          },
-          comprobante: {
-            tipo: 'BOLETA',
-            correlativo: 'B001-00001042',
-            total: '350.00'
-          }
-        },
-        {
-          id: 'ord-100202',
-          codigoOrden: 'ORD-894211',
-          estado: 'PAGADO',
-          metodoPago: 'Plin (Mercado Pago)',
-          curso: {
-            id: 'b0000000-0000-0000-0000-000000000002',
-            titulo: 'Arquitectura Frontend con React & TypeScript',
-            horario: 'Martes y Jueves 19:00 - 22:00',
-            modalidad: 'PRESENCIAL',
-            direccionClase: 'Sede Central - Av. Universitaria 1234, Lima',
-            aula: 'Laboratorio 302',
-            imagen: 'assets/images/all-img/c2.png'
-          },
-          comprobante: {
-            tipo: 'BOLETA',
-            correlativo: 'B001-00001043',
-            total: '280.00'
-          }
-        }
-      ];
+  getMisMatriculasSync() {
+    const user = AuthService.getCurrentUser();
+    if (!user) return [];
+    return JSON.parse(localStorage.getItem('app_order_history') || '[]');
+  },
+
+  async getMisMatriculas(usuarioId) {
+    const user = AuthService.getCurrentUser();
+    const targetId = usuarioId || (user ? user.id : null);
+
+    // REGLA ESTRICTA: Si no hay usuario autenticado, NO devolver ningún curso
+    if (!targetId && !user) {
+      return [];
     }
-    return raw;
+
+    let matriculas = [];
+
+    // 1. Consultar pedidos del estudiante en tiempo real desde pedidos-service (PostgreSQL)
+    if (targetId) {
+      try {
+        const remoteOrders = await API.request('/pedidos/estudiante/' + targetId);
+        if (Array.isArray(remoteOrders) && remoteOrders.length > 0) {
+          matriculas = remoteOrders.map((p, idx) => {
+            const isPresencial = p.modalidad === 'PRESENCIAL';
+            const imgDefault = isPresencial ? 'assets/images/all-img/c2.png' : 'assets/images/all-img/c1.png';
+
+            return {
+              id: p.id,
+              codigoOrden: p.codigoOrden || `ORD-${100000 + idx}`,
+              estado: p.estado || 'PAGADO',
+              monto: p.monto,
+              metodoPago: p.mpPaymentId ? 'Mercado Pago' : 'Pago Confirmado',
+              curso: {
+                id: p.cursoId,
+                titulo: p.cursoTitulo || 'Desarrollo Web Integrado con Spring Boot',
+                horario: p.horario || 'Lun y Mie 19:00 - 22:00',
+                modalidad: p.modalidad || 'VIRTUAL',
+                enlaceClase: p.enlaceClase || 'https://meet.google.com/abc-defg-hij',
+                direccionClase: p.direccionClase || 'Sede Central - Av. Universitaria 1234, Lima',
+                aula: p.aula || 'Laboratorio 204',
+                imagen: imgDefault
+              },
+              comprobante: {
+                tipo: 'BOLETA',
+                correlativo: 'B001-' + String(p.codigoOrden || '').replace(/\D/g, '').slice(-8).padStart(8, '0'),
+                total: Number(p.monto || 150).toFixed(2)
+              }
+            };
+          });
+        }
+      } catch (err) {
+        console.warn('[PedidosService] No se pudo obtener pedidos remotos:', err.message);
+      }
+    }
+
+    // 2. Fusionar con pedidos guardados localmente para este usuario
+    const localRaw = this.getMisMatriculasSync();
+    if (Array.isArray(localRaw) && localRaw.length > 0) {
+      localRaw.forEach(loc => {
+        if (!matriculas.some(m => m.id === loc.id || m.codigoOrden === loc.codigoOrden)) {
+          matriculas.push(loc);
+        }
+      });
+    }
+
+    return matriculas;
   }
 };

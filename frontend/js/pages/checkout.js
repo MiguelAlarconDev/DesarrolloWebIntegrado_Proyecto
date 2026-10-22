@@ -175,7 +175,7 @@ function renderUserStatusCard() {
 }
 
 function cerrarSesionCheckout() {
-	AuthService.logout();
+	AuthService.logout(null);
 	renderUserStatusCard();
 	actualizarBotonPago();
 	Notifications.showToast('Sesión cerrada. Puedes ingresar con otra cuenta.', 'info');

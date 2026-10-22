@@ -110,16 +110,25 @@ const AuthService = {
     this.updateNavbar();
   },
 
-  logout() {
+  logout(redirectUrl = 'login.html') {
     localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
     localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
+    localStorage.removeItem('app_order_history');
+    localStorage.removeItem(CONFIG.STORAGE_KEYS.LAST_ORDER);
     this.updateNavbar();
-    window.location.href = 'index.html';
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    }
   },
 
   getCurrentUser() {
-    const raw = localStorage.getItem(CONFIG.STORAGE_KEYS.USER);
-    return raw ? JSON.parse(raw) : null;
+    try {
+      const raw = localStorage.getItem(CONFIG.STORAGE_KEYS.USER);
+      if (!raw || raw === 'null' || raw === 'undefined') return null;
+      return JSON.parse(raw);
+    } catch (_) {
+      return null;
+    }
   },
 
   isAuthenticated() {
