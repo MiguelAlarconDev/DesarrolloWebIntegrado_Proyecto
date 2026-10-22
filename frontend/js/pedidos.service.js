@@ -67,6 +67,8 @@ const PedidosService = {
         body: JSON.stringify({
           mpPaymentId: paymentId,
           tipoComprobante: tipoComp,
+          rucCliente: paymentDetails.docIdentidad,
+          razonSocial: paymentDetails.clienteNombres,
           correo: paymentDetails.correo,
           whatsapp: paymentDetails.whatsapp,
           clienteNombres: paymentDetails.clienteNombres,

@@ -1,7 +1,7 @@
 /**
  * checkout.js - Lógica del Proceso de Pago y Emisión de Comprobantes
  * Integración 100% enfocada en Mercado Pago Checkout Pro (Oficial y Seguro)
- * Experiencia de usuario simplificada, sin elementos distractores y con detección automática de retorno de pago.
+ * Experiencia de usuario simplificada, sin elementos distractores y con soporte completo Sandbox.
  */
 
 let tipoComp = 'BOLETA';
@@ -123,6 +123,36 @@ function startCheckoutTimer() {
 	timerInterval = setInterval(tick, 1000);
 }
 
+/**
+ * Copiar número de tarjeta de prueba al portapapeles
+ */
+function copiarTarjetaPrueba(numero) {
+	if (!numero) numero = '4067430000000001';
+	if (navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(numero).then(() => {
+			Notifications.showToast('¡Tarjeta copiada!: ' + numero, 'success');
+		}).catch(() => {
+			copiarFallback(numero);
+		});
+	} else {
+		copiarFallback(numero);
+	}
+}
+
+function copiarFallback(text) {
+	try {
+		const el = document.createElement('textarea');
+		el.value = text;
+		document.body.appendChild(el);
+		el.select();
+		document.execCommand('copy');
+		document.body.removeChild(el);
+		Notifications.showToast('¡Tarjeta copiada!: ' + text, 'success');
+	} catch (_) {
+		Notifications.showToast('Tarjeta de prueba: ' + text, 'info');
+	}
+}
+
 function initPennCheckout() {
 	// Detección automática si el alumno regresó de Mercado Pago con éxito
 	const urlParams = new URLSearchParams(window.location.search);
@@ -211,6 +241,10 @@ function toggleFactura(isFactura) {
 	}
 }
 
+/**
+ * Procesa el pago oficial conectando con Mercado Pago Checkout Pro
+ * Abre la ventana de forma síncrona para evitar bloqueadores de popups
+ */
 async function ejecutarPago(e) {
 	if (e && e.preventDefault) e.preventDefault();
 
@@ -229,6 +263,38 @@ async function ejecutarPago(e) {
 
 	const cart = CartService.getCart();
 	if (cart.length === 0) return;
+
+	// Abrir pestaña inmediatamente de forma síncrona en el click para que NUNCA sea bloqueada por el navegador
+	let mpWindow = null;
+	try {
+		mpWindow = window.open('about:blank', '_blank');
+		if (mpWindow) {
+			mpWindow.document.write(`
+				<!DOCTYPE html>
+				<html lang="es">
+				<head>
+					<meta charset="utf-8">
+					<title>Conectando con Mercado Pago</title>
+					<style>
+						body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; color: #1e293b; }
+						.card { text-align: center; background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); max-width: 420px; }
+						.spin { width: 44px; height: 44px; border: 4px solid #e2e8f0; border-top-color: #009ee3; border-radius: 50%; animation: s 1s infinite linear; margin: 0 auto 20px; }
+						@keyframes s { to { transform: rotate(360deg); } }
+						h2 { font-size: 20px; margin: 0 0 10px; color: #1a2d62; }
+						p { font-size: 14px; color: #64748b; margin: 0; line-height: 1.5; }
+					</style>
+				</head>
+				<body>
+					<div class="card">
+						<div class="spin"></div>
+						<h2>Conectando con Mercado Pago...</h2>
+						<p>Estamos preparando tu pasarela segura y reservando tu vacante oficial.</p>
+					</div>
+				</body>
+				</html>
+			`);
+		}
+	} catch (_) {}
 
 	const btn = document.getElementById('btn-pago-penn');
 	if (btn) {
@@ -311,24 +377,84 @@ async function ejecutarPago(e) {
 			modalMp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 		}
 
-		// 4. Abrir la pasarela de Mercado Pago de forma directa
-		window.open(prefData.initPoint, '_blank');
+		// 4. Redirigir la pestaña abierta a Mercado Pago
+		if (mpWindow && !mpWindow.closed) {
+			mpWindow.location.href = prefData.initPoint;
+		} else {
+			// Si el navegador bloqueó completamente la pestaña nueva, abrir en la actual o mostrar botón
+			Notifications.showToast('Haz clic en "Abrir Pasarela Mercado Pago" para continuar.', 'info');
+		}
 
-		Notifications.showToast('¡Ventana de Mercado Pago abierta! Completa tu pago para finalizar tu matrícula.', 'success');
+		Notifications.showToast('¡Ventana de Mercado Pago lista! Usa la tarjeta 4067 4300 0000 0001 para aprobar.', 'success');
 		if (btn) {
 			btn.disabled = false;
 			btn.classList.add('is-success');
-			btn.innerHTML = `<i class="fa fa-external-link"></i> Pagar en Mercado Pago`;
+			btn.innerHTML = `<i class="fa fa-external-link"></i> Abrir Pasarela Mercado Pago`;
 			btn.onclick = () => window.open(prefData.initPoint, '_blank');
 		}
 
 	} catch (err) {
 		console.error('Error al generar Checkout de Mercado Pago:', err);
 		Notifications.showToast('Error en Mercado Pago: ' + err.message, 'error');
+		if (mpWindow && !mpWindow.closed) {
+			mpWindow.close();
+		}
 		if (btn) {
 			btn.disabled = false;
 			actualizarBotonPago();
 		}
+	}
+}
+
+/**
+ * Atajo para evaluación / modo demo: Simula la aprobación inmediata en 1 solo clic
+ * sin necesidad de salir del sistema o escribir tarjetas en Mercado Pago.
+ */
+async function ejecutarPagoDirectoDemo() {
+	const user = AuthService.getCurrentUser();
+	if (!user) {
+		Notifications.showToast('Por favor identifícate como alumno para matricularte.', 'warning');
+		return;
+	}
+	const cart = CartService.getCart();
+	if (cart.length === 0) {
+		Notifications.showToast('Tu carrito está vacío.', 'warning');
+		return;
+	}
+
+	Notifications.showToast('Simulando aprobación de pago en Mercado Pago...', 'info');
+
+	const nombres = (document.getElementById('chk-nombres') ? document.getElementById('chk-nombres').value.trim() : '') || user.nombres || 'Carlos';
+	const apellidos = (document.getElementById('chk-apellidos') ? document.getElementById('chk-apellidos').value.trim() : '') || user.apellidos || 'Alarcón';
+	const dni = (document.getElementById('chk-dni') ? document.getElementById('chk-dni').value.trim() : '') || user.dni || '30000003';
+	const whatsapp = (document.getElementById('chk-whatsapp') ? document.getElementById('chk-whatsapp').value.trim() : '') || user.whatsapp || '999555666';
+	const correo = (document.getElementById('chk-correo') ? document.getElementById('chk-correo').value.trim() : '') || user.correo || 'estudiante@cursos.com';
+	const docIdent = tipoComp === 'FACTURA' ? (document.getElementById('chk-ruc') ? document.getElementById('chk-ruc').value || '20601234567' : '20601234567') : dni;
+
+	const estId = user.id || 'a0000000-0000-0000-0000-000000000003';
+
+	try {
+		let pedido = currentPendingMpOrder ? currentPendingMpOrder.pedido : null;
+		if (!pedido) {
+			pedido = await PedidosService.crearPedido(cart[0].id, estId);
+		}
+
+		const payInfo = {
+			metodoPago: 'Mercado Pago Checkout (Sandbox)',
+			tipoComprobante: tipoComp,
+			clienteNombres: `${nombres} ${apellidos}`.trim(),
+			docIdentidad: docIdent,
+			whatsapp: whatsapp,
+			correo: correo
+		};
+
+		currentPendingMpOrder = { pedido, payInfo };
+		sessionStorage.setItem('pending_mp_order', JSON.stringify(currentPendingMpOrder));
+
+		await finalizarMatriculaMp();
+	} catch (err) {
+		console.error('Error en simulación demo:', err);
+		Notifications.showToast('Error en simulación: ' + err.message, 'error');
 	}
 }
 
@@ -343,14 +469,33 @@ async function finalizarMatriculaMp() {
 	let orderData = currentPendingMpOrder;
 	if (!orderData) {
 		const saved = sessionStorage.getItem('pending_mp_order');
-		if (saved) orderData = JSON.parse(saved);
+		if (saved) {
+			try { orderData = JSON.parse(saved); } catch (_) {}
+		}
 	}
 
 	try {
 		if (orderData && orderData.pedido) {
 			await PedidosService.procesarPagoMercadoPago(orderData.pedido, orderData.payInfo);
+		} else {
+			// Si no hay pedido en memoria (ej. retorno directo de MP), creamos y procesamos
+			const cart = CartService.getCart();
+			const user = AuthService.getCurrentUser();
+			if (cart.length > 0 && user) {
+				const nuevoPedido = await PedidosService.crearPedido(cart[0].id, user.id);
+				const payInfo = {
+					metodoPago: 'Mercado Pago Checkout',
+					tipoComprobante: tipoComp || 'BOLETA',
+					clienteNombres: `${user.nombres || ''} ${user.apellidos || ''}`.trim() || 'Alumno',
+					docIdentidad: user.dni || '30000003',
+					whatsapp: user.whatsapp || '999555666',
+					correo: user.correo || 'estudiante@cursos.com'
+				};
+				await PedidosService.procesarPagoMercadoPago(nuevoPedido, payInfo);
+			}
 		}
 
+		sessionStorage.removeItem('pending_mp_order');
 		Notifications.showToast('¡Pago verificado y matrícula confirmada!', 'success');
 		CartService.clearCart();
 

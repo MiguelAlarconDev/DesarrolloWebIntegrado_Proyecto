@@ -32,30 +32,18 @@ public class PagoController {
 
     public PagoController(
             @Value("${mercadopago.access-token:TEST-8786075352621630-090217-974d9a4e1da3bffbdc3ec6f5dcdabbf8-3130074680}") String accessToken,
-            @Value("${mercadopago.back-url.success:https://localhost:8080/pago/exito}") String backUrlSuccess,
-            @Value("${mercadopago.back-url.failure:https://localhost:8080/pago/fallo}") String backUrlFailure,
-            @Value("${mercadopago.back-url.pending:https://localhost:8080/pago/pendiente}") String backUrlPending
+            @Value("${mercadopago.back-url.success:http://localhost:3000/checkout.html?status=approved}") String backUrlSuccess,
+            @Value("${mercadopago.back-url.failure:http://localhost:3000/checkout.html?status=failure}") String backUrlFailure,
+            @Value("${mercadopago.back-url.pending:http://localhost:3000/checkout.html?status=pending}") String backUrlPending
     ) {
         this.accessToken = accessToken;
-        // Mercado Pago exige HTTPS en las back_urls cuando auto_return está activo ('approved')
-        this.backUrlSuccess = sanitizeHttps(backUrlSuccess, "https://localhost:8080/pago/exito");
-        this.backUrlFailure = sanitizeHttps(backUrlFailure, "https://localhost:8080/pago/fallo");
-        this.backUrlPending = sanitizeHttps(backUrlPending, "https://localhost:8080/pago/pendiente");
+        this.backUrlSuccess = backUrlSuccess;
+        this.backUrlFailure = backUrlFailure;
+        this.backUrlPending = backUrlPending;
 
         this.restClient = RestClient.builder()
                 .baseUrl("https://api.mercadopago.com")
                 .build();
-    }
-
-    private String sanitizeHttps(String url, String fallback) {
-        if (url == null || url.isBlank()) return fallback;
-        if (url.startsWith("http://localhost")) {
-            return url.replace("http://localhost", "https://localhost");
-        }
-        if (url.startsWith("http://127.0.0.1")) {
-            return url.replace("http://127.0.0.1", "https://127.0.0.1");
-        }
-        return url;
     }
 
     @PostMapping("/crear-preferencia")
@@ -84,8 +72,7 @@ public class PagoController {
                             "success", backUrlSuccess,
                             "failure", backUrlFailure,
                             "pending", backUrlPending
-                    ),
-                    "auto_return", "approved"
+                    )
             );
 
             Map<String, Object> response = restClient.post()
