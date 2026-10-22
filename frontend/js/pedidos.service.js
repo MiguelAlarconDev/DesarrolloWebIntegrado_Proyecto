@@ -177,39 +177,54 @@ const PedidosService = {
 
     // 1. Consultar pedidos del estudiante en tiempo real desde pedidos-service (PostgreSQL)
     if (targetId) {
+      let remoteOrders = null;
       try {
-        const remoteOrders = await API.request('/pedidos/estudiante/' + targetId);
-        if (Array.isArray(remoteOrders) && remoteOrders.length > 0) {
-          matriculas = remoteOrders.map((p, idx) => {
-            const isPresencial = p.modalidad === 'PRESENCIAL';
-            const imgDefault = isPresencial ? 'assets/images/all-img/c2.png' : 'assets/images/all-img/c1.png';
-
-            return {
-              id: p.id,
-              codigoOrden: p.codigoOrden || `ORD-${100000 + idx}`,
-              estado: p.estado || 'PAGADO',
-              monto: p.monto,
-              metodoPago: p.mpPaymentId ? 'Mercado Pago' : 'Pago Confirmado',
-              curso: {
-                id: p.cursoId,
-                titulo: p.cursoTitulo || 'Desarrollo Web Integrado con Spring Boot',
-                horario: p.horario || 'Lun y Mie 19:00 - 22:00',
-                modalidad: p.modalidad || 'VIRTUAL',
-                enlaceClase: p.enlaceClase || 'https://meet.google.com/abc-defg-hij',
-                direccionClase: p.direccionClase || 'Sede Central - Av. Universitaria 1234, Lima',
-                aula: p.aula || 'Laboratorio 204',
-                imagen: imgDefault
-              },
-              comprobante: {
-                tipo: 'BOLETA',
-                correlativo: 'B001-' + String(p.codigoOrden || '').replace(/\D/g, '').slice(-8).padStart(8, '0'),
-                total: Number(p.monto || 150).toFixed(2)
-              }
-            };
-          });
-        }
+        remoteOrders = await API.request('/pedidos/estudiante/' + targetId);
       } catch (err) {
-        console.warn('[PedidosService] No se pudo obtener pedidos remotos:', err.message);
+        console.warn('[PedidosService] Gateway API no disponible o conflicto CORS, intentando directo a pedidos-service (8083)...', err.message);
+      }
+
+      // Fallback directo al microservicio pedidos-service en el puerto 8083
+      if (!remoteOrders || !Array.isArray(remoteOrders)) {
+        try {
+          const directUrl = `${CONFIG.PEDIDOS_SERVICE_URL}/estudiante/${targetId}`;
+          const res = await fetch(directUrl);
+          if (res.ok) {
+            remoteOrders = await res.json();
+          }
+        } catch (directErr) {
+          console.warn('[PedidosService] No se pudo obtener pedidos directos:', directErr.message);
+        }
+      }
+
+      if (Array.isArray(remoteOrders) && remoteOrders.length > 0) {
+        matriculas = remoteOrders.map((p, idx) => {
+          const isPresencial = p.modalidad === 'PRESENCIAL';
+          const imgDefault = isPresencial ? 'assets/images/all-img/c2.png' : 'assets/images/all-img/c1.png';
+
+          return {
+            id: p.id,
+            codigoOrden: p.codigoOrden || `ORD-${100000 + idx}`,
+            estado: p.estado || 'PAGADO',
+            monto: p.monto,
+            metodoPago: p.mpPaymentId ? 'Mercado Pago' : 'Pago Confirmado',
+            curso: {
+              id: p.cursoId,
+              titulo: p.cursoTitulo || 'Desarrollo Web Integrado con Spring Boot',
+              horario: p.horario || 'Lun y Mie 19:00 - 22:00',
+              modalidad: p.modalidad || 'VIRTUAL',
+              enlaceClase: p.enlaceClase || 'https://meet.google.com/abc-defg-hij',
+              direccionClase: p.direccionClase || 'Sede Central - Av. Universitaria 1234, Lima',
+              aula: p.aula || 'Laboratorio 204',
+              imagen: imgDefault
+            },
+            comprobante: {
+              tipo: 'BOLETA',
+              correlativo: 'B001-' + String(p.codigoOrden || '').replace(/\D/g, '').slice(-8).padStart(8, '0'),
+              total: Number(p.monto || 150).toFixed(2)
+            }
+          };
+        });
       }
     }
 

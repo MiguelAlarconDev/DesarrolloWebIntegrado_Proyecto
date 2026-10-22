@@ -1,14 +1,15 @@
 /**
  * mis-cursos.js - Lógica de Mis Clases y Matrículas
- * Control estricto de usuario: si no hay usuario autenticado, NO muestra ningún curso.
- * Si el usuario inicia sesión, muestra ÚNICAMENTE los cursos matriculados de ese usuario.
+ * Conectado en tiempo real con las APIs de base de datos (pedidos-service / PostgreSQL).
+ * - Usuarios no autenticados: Muestra tarjeta amigable para ingresar o registrarse.
+ * - Usuarios autenticados: Muestra sus cursos pagados con enlaces directos a Zoom/Meet y aulas.
  */
 
 async function cargarAlumnoDemoMisCursos() {
 	try {
 		Notifications.showToast('Autenticando alumno en el sistema...', 'info');
 		const res = await AuthService.login('estudiante@cursos.com', '123456');
-		Notifications.showToast(`¡Bienvenido ${res.user.nombres}! Cargando tus clases...`, 'success');
+		Notifications.showToast(`¡Bienvenido, ${res.user.nombres}! Cargando tus clases...`, 'success');
 		AuthService.updateNavbar();
 		await initMisCursos();
 	} catch (err) {
@@ -17,24 +18,16 @@ async function cargarAlumnoDemoMisCursos() {
 }
 
 function cerrarSesionMisCursos() {
-	AuthService.logout('login.html');
+	AuthService.logout(null);
+	initMisCursos();
+	Notifications.showToast('Sesión cerrada. Puedes ingresar con otra cuenta.', 'info');
 }
 
 async function initMisCursos() {
 	const user = AuthService.getCurrentUser();
-
-	// =========================================================================
-	// 1. REGLA ESTRICTA: SI NO HAY USUARIO, REDIRIGIR INMEDIATAMENTE A LOGIN
-	// =========================================================================
-	if (!user) {
-		window.location.replace('login.html?redirect=mis-cursos.html');
-		return;
-	}
-
 	const container = document.getElementById('mis-cursos-penn-list');
 	if (!container) return;
 
-	// Limpiar inmediatamente el contenedor para evitar que queden cursos de sesiones anteriores
 	container.innerHTML = '';
 
 	const counterEl = document.getElementById('cart-nav-counter');
@@ -42,24 +35,61 @@ async function initMisCursos() {
 	AuthService.updateNavbar();
 
 	// =========================================================================
-	// 2. USUARIO AUTENTICADO: CARGAR SUS CURSOS CORRESPONDIENTES
+	// 1. SI NO HA INGRESADO USUARIO: MOSTRAR INVITACIÓN PARA IDENTIFICARSE
+	// =========================================================================
+	if (!user) {
+		container.innerHTML = `
+			<div class="col-12 text-center py-5">
+				<div style="max-width: 500px; margin: 0 auto; background: #ffffff; padding: 42px 32px; border-radius: 16px; border: 1px solid #eef2f6; box-shadow: 0 10px 30px rgba(16, 24, 40, 0.04);">
+					<div style="width: 72px; height: 72px; border-radius: 50%; background: #f0fdf4; color: #2eca7f; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 20px;">
+						<i class="fa fa-graduation-cap"></i>
+					</div>
+					<h3 style="color: #1a2d62; font-weight: 800; font-size: 22px; margin-bottom: 8px;">
+						Accede a tus Clases Matriculadas
+					</h3>
+					<p style="color: #64748b; font-size: 14px; line-height: 1.55; margin-bottom: 24px;">
+						Inicia sesión con tu cuenta de alumno para entrar a tus salas virtuales de Zoom/Meet, consultar tus horarios y revisar tus aulas asignadas.
+					</p>
+					<div class="d-flex justify-content-center gap-2 flex-wrap mb-3">
+						<a href="login.html?redirect=mis-cursos.html" class="btn_one" style="padding: 12px 28px; font-size: 14.5px; font-weight: 800; border-radius: 8px; text-decoration: none;">
+							<i class="fa fa-sign-in me-1"></i> Iniciar Sesión
+						</a>
+						<a href="registro.html?redirect=mis-cursos.html" class="btn_two" style="padding: 12px 24px; font-size: 14px; font-weight: 700; border-radius: 8px; text-decoration: none; background: #f8fafc; border: 1px solid #d7dee8; color: #1a2d62;">
+							<i class="fa fa-user-plus me-1"></i> Crear Cuenta
+						</a>
+					</div>
+					<div class="pt-3 border-top mt-3">
+						<button type="button" onclick="cargarAlumnoDemoMisCursos()" class="btn" style="background: #eef8fc; color: #0284c7; border: 1px dashed #0284c7; font-weight: 700; font-size: 13px; border-radius: 6px; padding: 9px 18px; cursor: pointer;">
+							<i class="fa fa-bolt me-1"></i> Cargar Usuario Estudiante (Carlos Alarcón)
+						</button>
+					</div>
+				</div>
+			</div>
+		`;
+		return;
+	}
+
+	// =========================================================================
+	// 2. USUARIO AUTENTICADO: CARGAR SUS CURSOS PAGADOS DESDE LA BD
 	// =========================================================================
 	container.innerHTML = `
 		<div class="col-12 text-center py-5">
 			<div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
 				<span class="visually-hidden">Cargando tus clases...</span>
 			</div>
-			<p class="mt-3 text-muted">Consultando tus matrículas oficiales en el servidor...</p>
+			<p class="mt-3 text-muted" style="font-size: 14px;">Consultando tus matrículas oficiales en la base de datos...</p>
 		</div>
 	`;
 
-	// Consultar pedidos del usuario autenticado
+	// Consultar pedidos del estudiante directamente desde el microservicio / API Gateway
 	const todasMatriculas = await PedidosService.getMisMatriculas(user.id);
 
-	// Filtrar para mostrar los cursos pagados y deduplicar por cursoId para que no aparezca repetido
+	// Filtrar para mostrar cursos pagados y deduplicar por curso
 	const cursosVistos = new Set();
 	const matriculas = (todasMatriculas || []).filter(item => {
-		const cid = (item.curso && item.curso.id) ? item.curso.id : item.id;
+		const isPagado = item.estado === 'PAGADO';
+		if (!isPagado) return false;
+		const cid = (item.curso && item.curso.id) ? item.curso.id : (item.cursoId || item.id);
 		if (cursosVistos.has(cid)) return false;
 		cursosVistos.add(cid);
 		return true;
@@ -68,7 +98,7 @@ async function initMisCursos() {
 	const nombreAlumno = `${user.nombres || ''} ${user.apellidos || ''}`.trim() || 'Estudiante';
 	const iniciales = ((user.nombres ? user.nombres[0] : 'A') + (user.apellidos ? user.apellidos[0] : 'L')).toUpperCase();
 
-	// Si el usuario autenticado aún no ha comprado ningún curso
+	// Si no tiene cursos pagados
 	if (matriculas.length === 0) {
 		container.innerHTML = `
 			<div class="col-12">
@@ -91,8 +121,8 @@ async function initMisCursos() {
 			<div class="col-12 text-center py-5">
 				<div style="max-width: 520px; margin: 0 auto; background: #fff; padding: 40px 30px; border-radius: 12px; border: 1px solid #eef2f6;">
 					<i class="ti-book text-muted" style="font-size: 54px; color: #94a3b8;"></i>
-					<h3 class="mt-3" style="color: #1a2d62; font-weight: 800; font-size: 22px;">Aún no tienes cursos matriculados</h3>
-					<p class="text-muted mb-4" style="font-size: 14px;">Este usuario aún no tiene inscripciones activas. Explora nuestro catálogo para inscribirte:</p>
+					<h3 class="mt-3" style="color: #1a2d62; font-weight: 800; font-size: 22px;">Aún no tienes cursos pagados</h3>
+					<p class="text-muted mb-4" style="font-size: 14px;">Inscríbete en un curso de nuestro catálogo para acceder a tus salas en vivo y comprobantes:</p>
 					<a href="cursos.html" class="btn_one" style="border-radius: 8px; padding: 10px 24px; text-decoration: none;">
 						<i class="fa fa-graduation-cap me-1"></i> Ver Catálogo de Cursos
 					</a>
@@ -102,7 +132,7 @@ async function initMisCursos() {
 		return;
 	}
 
-	// Renderizar cabecera del alumno con sus cursos
+	// Renderizar cabecera del alumno con sus cursos pagados
 	const headerHtml = `
 		<div class="col-12">
 			<div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
@@ -116,7 +146,7 @@ async function initMisCursos() {
 								<i class="fa fa-check-circle"></i> Alumno Activo
 							</span>
 							<span class="badge bg-light text-dark border" style="font-size: 11px; font-weight: 700;">
-								${matriculas.length} ${matriculas.length === 1 ? 'Curso Matriculado' : 'Cursos Matriculados'}
+								${matriculas.length} ${matriculas.length === 1 ? 'Curso Pagado' : 'Cursos Pagados'}
 							</span>
 						</div>
 						<h4 style="font-size: 18px; font-weight: 800; color: #1a2d62; margin: 4px 0 2px;">${nombreAlumno}</h4>
@@ -143,7 +173,6 @@ async function initMisCursos() {
 		const curso = item.curso || {};
 		const isVirtual = curso.modalidad === 'VIRTUAL';
 		const comp = item.comprobante || {};
-		const isPagado = item.estado === 'PAGADO';
 
 		let accessAction = '';
 		if (isVirtual) {
@@ -177,8 +206,8 @@ async function initMisCursos() {
 				<div class="course-slide" style="margin-bottom: 30px; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
 					<div class="course-img" style="position: relative;">
 						<img src="${curso.imagen || 'assets/images/all-img/c1.png'}" alt="${curso.titulo || 'Curso'}" style="width: 100%; height: 190px; object-fit: cover;">
-						<div class="course-date" style="position: absolute; top: 12px; right: 12px; background: ${isPagado ? '#2eca7f' : '#f59e0b'}; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">
-							<i class="fa ${isPagado ? 'fa-check' : 'fa-clock-o'} me-1"></i>${isPagado ? 'MATRICULADO' : 'PENDIENTE'}
+						<div class="course-date" style="position: absolute; top: 12px; right: 12px; background: #2eca7f; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">
+							<i class="fa fa-check me-1"></i>PAGADO
 						</div>
 					</div>
 					<div class="course-content" style="padding: 20px;">
@@ -219,6 +248,6 @@ async function initMisCursos() {
 	container.innerHTML = headerHtml + cardsHtml;
 }
 
-// Inicialización tanto al cargar como al volver de navegación con caché (pageshow)
+// Inicialización
 $(document).ready(initMisCursos);
 window.addEventListener('pageshow', initMisCursos);
