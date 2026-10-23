@@ -3,6 +3,7 @@ package com.curso.pedidos.controller;
 import com.curso.pedidos.dto.CrearPedidoRequest;
 import com.curso.pedidos.dto.PagarPedidoRequest;
 import com.curso.pedidos.entity.Pedido;
+import com.curso.pedidos.service.NotificacionEmailService;
 import com.curso.pedidos.service.PedidoService;
 import com.curso.pedidos.service.WhatsAppCloudService;
 import jakarta.validation.Valid;
@@ -22,10 +23,14 @@ public class PedidoController {
 
     private final PedidoService pedidoService;
     private final WhatsAppCloudService whatsAppCloudService;
+    private final NotificacionEmailService notificacionEmailService;
 
-    public PedidoController(PedidoService pedidoService, WhatsAppCloudService whatsAppCloudService) {
+    public PedidoController(PedidoService pedidoService,
+                            WhatsAppCloudService whatsAppCloudService,
+                            NotificacionEmailService notificacionEmailService) {
         this.pedidoService = pedidoService;
         this.whatsAppCloudService = whatsAppCloudService;
+        this.notificacionEmailService = notificacionEmailService;
     }
 
     @PostMapping("/webhook")
@@ -145,6 +150,35 @@ public class PedidoController {
                 "reintentoExitoso", ok,
                 "metaConfigurado", whatsAppCloudService.isConfigurado(),
                 "mensaje", "Reintento de despacho WhatsApp procesado."
+        ));
+    }
+
+    // =========================================================================
+    // ENDPOINTS DE SERVICIO SMTP (GMAIL / JAVAMAILSENDER)
+    // =========================================================================
+
+    @GetMapping("/email/status")
+    public ResponseEntity<Map<String, Object>> getEmailStatus() {
+        Map<String, Object> status = new HashMap<>();
+        status.put("proveedor", "Servidor SMTP (Gmail / JavaMailSender)");
+        status.put("configurado", notificacionEmailService.isConfigurado());
+        status.put("remitente", notificacionEmailService.getMailFrom().isBlank() ? "NO_CONFIGURADO" : notificacionEmailService.getMailFrom());
+        status.put("instrucciones", "Para activar envío autónomo, define SPRING_MAIL_USERNAME y SPRING_MAIL_PASSWORD en application.properties.");
+        return ResponseEntity.ok(status);
+    }
+
+    @PostMapping("/email/test")
+    public ResponseEntity<Map<String, Object>> testEmail(@RequestBody Map<String, String> body) {
+        String correo = body.get("correo");
+        if (correo == null || correo.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El campo 'correo' es obligatorio."));
+        }
+        boolean ok = notificacionEmailService.enviarEmailPrueba(correo);
+        return ResponseEntity.ok(Map.of(
+                "enviado", ok,
+                "destinatario", correo,
+                "smtpConfigurado", notificacionEmailService.isConfigurado(),
+                "mensaje", ok ? "Correo de prueba enviado exitosamente a tu bandeja." : "No se pudo enviar. Verifica tus credenciales de Gmail o contraseña de aplicación en application.properties."
         ));
     }
 }
