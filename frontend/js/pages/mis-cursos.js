@@ -24,7 +24,18 @@ function cerrarSesionMisCursos() {
 }
 
 async function initMisCursos() {
-	const user = AuthService.getCurrentUser();
+	let user = AuthService.getCurrentUser();
+	if (!user && typeof window !== 'undefined' && window.location.search && window.location.search.includes('sample=1')) {
+		user = {
+			id: 'a0000000-0000-0000-0000-000000000003',
+			nombres: 'Carlos',
+			apellidos: 'Alarcón',
+			correo: 'estudiante@cursos.com',
+			dni: '30000003',
+			whatsapp: '999555666',
+			rol: 'ESTUDIANTE'
+		};
+	}
 	const container = (document.getElementById('mis-cursos-list'));
 	if (!container) return;
 
@@ -133,108 +144,137 @@ async function initMisCursos() {
 
 	// Renderizar cabecera del alumno con sus cursos pagados
 	const headerHtml = `
-		<div class="col-12">
-			<div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+		<div class="col-12 mb-2">
+			<div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px 26px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 18px rgba(0,0,0,0.03);">
 				<div class="d-flex align-items-center gap-3">
-					<div style="width: 52px; height: 52px; border-radius: 50%; background: #2eca7f; color: #fff; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(46, 202, 127, 0.3);">
+					<div style="width: 54px; height: 54px; border-radius: 50%; background: #2eca7f; color: #ffffff; font-size: 19px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(46, 202, 127, 0.35);">
 						${iniciales}
 					</div>
 					<div>
-						<div class="d-flex align-items-center gap-2">
-							<span style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #15803d; background: #dcfce7; padding: 2px 8px; border-radius: 10px;">
-								<i class="fa fa-check-circle"></i> Alumno Activo
+						<div class="d-flex align-items-center gap-2 mb-1">
+							<span style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #15803d; background: #dcfce7; padding: 3px 9px; border-radius: 999px;">
+								<i class="fa fa-check-circle me-1"></i> Alumno Activo
 							</span>
-							<span class="badge bg-light text-dark border" style="font-size: 11px; font-weight: 700;">
-								${matriculas.length} ${matriculas.length === 1 ? 'Curso Pagado' : 'Cursos Pagados'}
+							<span class="badge bg-light text-dark border" style="font-size: 11px; font-weight: 700; border-radius: 999px;">
+								${matriculas.length} ${matriculas.length === 1 ? 'Curso Matriculado' : 'Cursos Matriculados'}
 							</span>
 						</div>
-						<h4 style="font-size: 18px; font-weight: 800; color: #1a2d62; margin: 4px 0 2px;">${nombreAlumno}</h4>
-						<div style="font-size: 12px; color: #475569;">
+						<h4 style="font-size: 19px; font-weight: 800; color: #0f172a; margin: 0 0 3px;">${nombreAlumno}</h4>
+						<div style="font-size: 12.5px; color: #64748b; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
 							<span><i class="fa fa-envelope text-muted me-1"></i>${user.correo}</span>
-							<span class="ms-2">&bull; <i class="fa fa-id-card text-muted me-1"></i>DNI: <strong>${user.dni || '30000003'}</strong></span>
-							<span class="ms-2">&bull; <i class="fa fa-whatsapp text-success me-1"></i><strong>+51 ${user.whatsapp ? user.whatsapp.replace('+51', '') : '999555666'}</strong></span>
+							<span>&bull; <i class="fa fa-id-card text-muted me-1"></i>DNI: <strong>${user.dni || '30000003'}</strong></span>
+							<span>&bull; <i class="fa fa-whatsapp text-success me-1"></i><strong>+51 ${user.whatsapp ? user.whatsapp.replace('+51', '').trim() : '999555666'}</strong></span>
 						</div>
 					</div>
 				</div>
-				<div class="d-flex gap-2">
-					<a href="index.html" class="btn_one" style="font-size: 12px; padding: 8px 16px; border-radius: 6px; text-decoration: none;">
-						<i class="fa fa-plus me-1"></i> Matricular otro curso
+				<div class="d-flex gap-2 flex-wrap">
+					<a href="cursos.html" class="btn_one" style="font-size: 13px; font-weight: 700; padding: 10px 18px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+						<i class="fa fa-plus"></i> Matricular otro curso
 					</a>
-					<button type="button" onclick="cerrarSesionMisCursos()" style="border: 1px solid #cbd5e1; background: #fff; border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer;">
-						<i class="fa fa-sign-out me-1"></i> Cerrar Sesión
+					<button type="button" onclick="cerrarSesionMisCursos()" style="border: 1px solid #cbd5e1; background: #ffffff; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; color: #475569; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+						<i class="fa fa-sign-out"></i> Cerrar Sesión
 					</button>
 				</div>
 			</div>
 		</div>
 	`;
 
-	const cardsHtml = matriculas.map((item) => {
-		const curso = item.curso || {};
+	const cardsHtml = matriculas.map((item, idx) => {
+		// Soportar tanto formato anidado (localStorage) como formato plano de pedidos-service (PostgreSQL)
+		const cid = (item.curso && item.curso.id) ? item.curso.id : (item.cursoId || item.id);
+		let cursoRef = null;
+		if (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES) {
+			cursoRef = CONFIG.INITIAL_COURSES.find(c => c.id === cid);
+		}
+
+		const curso = {
+			id: cid,
+			titulo: (item.curso && item.curso.titulo) || item.cursoTitulo || (cursoRef ? cursoRef.titulo : 'Curso Profesional'),
+			modalidad: (item.curso && item.curso.modalidad) || item.modalidad || (cursoRef ? cursoRef.modalidad : 'VIRTUAL'),
+			horario: (item.curso && item.curso.horario) || item.horario || (cursoRef ? cursoRef.horario : 'Horario flexible'),
+			enlaceClase: (item.curso && item.curso.enlaceClase) || item.enlaceClase || (cursoRef ? cursoRef.enlaceClase : 'https://meet.google.com/abc-defg-hij'),
+			direccionClase: (item.curso && item.curso.direccionClase) || item.direccionClase || (cursoRef ? cursoRef.direccionClase : 'Sede Central - Av. Universitaria 1234, Lima'),
+			aula: (item.curso && item.curso.aula) || item.aula || (cursoRef ? cursoRef.aula : 'Laboratorio 302'),
+			imagen: (item.curso && item.curso.imagen) || (cursoRef ? cursoRef.imagen : `assets/images/all-img/c${(idx % 3) + 1}.png`)
+		};
+
 		const isVirtual = curso.modalidad === 'VIRTUAL';
-		const comp = item.comprobante || {};
+		const comp = item.comprobante || {
+			correlativo: 'B001-' + (item.codigoOrden ? item.codigoOrden.replace(/\D/g, '').slice(-8) : '00001042')
+		};
 
 		let accessAction = '';
 		if (isVirtual) {
 			accessAction = `
-				<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-top: 14px;">
-					<strong class="d-block mb-1" style="color: #0284c7; font-size: 13px;">
-						<i class="fa fa-video-camera me-1"></i> Sala Virtual en Vivo (Google Meet / Zoom)
-					</strong>
-					<p style="font-size: 12px; color: #64748b; margin-bottom: 10px; line-height: 1.4;">
-						Tus clases se transmiten en tiempo real con interacción docente.
-					</p>
-					<a href="${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}" target="_blank" rel="noopener noreferrer" class="btn_one d-inline-flex align-items-center gap-2" style="font-size: 13px; padding: 8px 16px; border-radius: 6px; text-decoration: none;">
+				<div class="access-box-fixed">
+					<div>
+						<strong class="d-block mb-1" style="color: #0284c7; font-size: 13px;">
+							<i class="fa fa-video-camera me-1"></i> Sala Virtual en Vivo (Meet / Zoom)
+						</strong>
+						<p style="font-size: 12px; color: #64748b; margin-bottom: 0; line-height: 1.4;">
+							Clases online en tiempo real con interacción docente.
+						</p>
+					</div>
+					<a href="${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}" target="_blank" rel="noopener noreferrer" class="btn_one w-100 text-center d-flex align-items-center justify-content-center gap-2" style="font-size: 12.5px; padding: 9px 14px; border-radius: 8px; text-decoration: none; font-weight: 700;">
 						<i class="fa fa-external-link"></i> Entrar a la Sala Virtual
 					</a>
 				</div>
 			`;
 		} else {
 			accessAction = `
-				<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-top: 14px;">
-					<strong class="d-block mb-1" style="color: #166534; font-size: 13px;">
-						<i class="fa fa-building me-1"></i> Clase Presencial con Asiento Asignado
-					</strong>
-					<small class="d-block text-muted" style="font-size: 12px;"><strong>Sede:</strong> ${curso.direccionClase || 'Sede Central - Av. Universitaria 1234, Lima'}</small>
-					<small class="d-block text-muted mt-1" style="font-size: 12px;"><strong>Aula:</strong> <span class="badge bg-dark">${curso.aula || 'Laboratorio 204'}</span></small>
+				<div class="access-box-fixed">
+					<div>
+						<strong class="d-block mb-1" style="color: #166534; font-size: 13px;">
+							<i class="fa fa-building me-1"></i> Clase Presencial con Asiento Asignado
+						</strong>
+						<p style="font-size: 12px; color: #64748b; margin-bottom: 0; line-height: 1.4;">
+							<i class="fa fa-map-marker text-danger me-1"></i>${curso.direccionClase || 'Sede Central - Av. Universitaria 1234'} &bull; <strong>Aula: ${curso.aula || 'Lab 302'}</strong>
+						</p>
+					</div>
+					<a href="https://maps.google.com/?q=${encodeURIComponent(curso.direccionClase || 'Av. Universitaria 1234, Lima')}" target="_blank" rel="noopener noreferrer" class="btn_two w-100 text-center d-flex align-items-center justify-content-center gap-2" style="font-size: 12.5px; padding: 9px 14px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+						<i class="fa fa-map-marker"></i> Ver Ubicación de Sede
+					</a>
 				</div>
 			`;
 		}
 
 		return `
-			<div class="col-lg-4 col-sm-6 col-xs-12">
-				<div class="course-slide" style="margin-bottom: 30px; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-					<div class="course-img" style="position: relative;">
-						<img src="${curso.imagen || 'assets/images/all-img/c1.png'}" alt="${curso.titulo || 'Curso'}" style="width: 100%; height: 190px; object-fit: cover;">
-						<div class="course-date" style="position: absolute; top: 12px; right: 12px; background: #2eca7f; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">
-							<i class="fa fa-check me-1"></i>PAGADO
+			<div class="col-lg-4 col-md-6 col-12 mis-cursos-col">
+				<div class="course-slide mis-cursos-card">
+					<div class="course-img">
+						<img src="${curso.imagen || 'assets/images/all-img/c1.png'}" alt="${curso.titulo || 'Curso'}">
+						<div class="course-date" style="position: absolute; top: 12px; right: 12px; background: #16a34a; color: #fff; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+							<i class="fa fa-check-circle me-1"></i>PAGADO
 						</div>
 					</div>
-					<div class="course-content" style="padding: 20px;">
-						<div class="d-flex align-items-center justify-content-between mb-2">
-							<span class="${isVirtual ? 'badge-mod-virtual' : 'badge-mod-presencial'}">
-								<i class="fa ${isVirtual ? 'fa-video-camera' : 'fa-building'} me-1"></i>${curso.modalidad || 'VIRTUAL'}
-							</span>
-							<span style="font-size: 11px; font-weight: 700; color: #64748b;">
-								<i class="fa fa-barcode me-1"></i>${item.codigoOrden || 'ORD-000000'}
-							</span>
-						</div>
-						<h3 style="font-size: 16px; font-weight: 800; color: #1a2d62; line-height: 1.35; margin-bottom: 8px;">
-							<a href="curso-detalle.html?id=${curso.id || ''}" style="color: inherit; text-decoration: none;">${curso.titulo || 'Curso'}</a>
-						</h3>
-						<div style="font-size: 12.5px; color: #475569; margin-bottom: 4px;">
-							<i class="fa fa-calendar text-primary me-1"></i> ${curso.horario || 'Horario flexible'}
-						</div>
-						<div style="font-size: 12px; color: #64748b;">
-							<i class="fa fa-file-text-o text-muted me-1"></i> Comprobante: <strong>${comp.correlativo || 'B001-00000000'}</strong>
+					<div class="course-content">
+						<div class="card-main-info">
+							<div class="d-flex align-items-center justify-content-between mb-2">
+								<span class="${isVirtual ? 'badge-mod-virtual' : 'badge-mod-presencial'}">
+									<i class="fa ${isVirtual ? 'fa-video-camera' : 'fa-building'} me-1"></i>${curso.modalidad || 'VIRTUAL'}
+								</span>
+								<span style="font-size: 11px; font-weight: 700; color: #64748b;">
+									<i class="fa fa-barcode me-1"></i>${item.codigoOrden || 'ORD-000000'}
+								</span>
+							</div>
+							<h3 class="course-title-fixed">
+								<a href="curso-detalle.html?id=${curso.id || ''}" style="color: inherit; text-decoration: none;">${curso.titulo || 'Curso'}</a>
+							</h3>
+							<div style="font-size: 12.5px; color: #475569; margin-bottom: 4px; height: 20px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+								<i class="fa fa-calendar text-primary me-1"></i> ${curso.horario || 'Horario flexible'}
+							</div>
+							<div style="font-size: 12px; color: #64748b; height: 20px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+								<i class="fa fa-file-text-o text-muted me-1"></i> Comprobante: <strong>${comp.correlativo || 'B001-00000000'}</strong>
+							</div>
 						</div>
 						
 						${accessAction}
 
-						<div class="border-top pt-3 mt-3 d-flex justify-content-between align-items-center">
+						<div class="card-footer-fixed">
 							<a href="curso-detalle.html?id=${curso.id || ''}" class="c_btn" style="text-decoration: none; font-size: 12px;">
 								<i class="fa fa-book me-1"></i> Ver Temario
 							</a>
-							<span style="font-size: 11px; color: #166534; font-weight: 700;">
+							<span style="font-size: 11px; color: #16a34a; font-weight: 700;">
 								<i class="fa fa-shield me-1"></i> Matrícula Oficial
 							</span>
 						</div>

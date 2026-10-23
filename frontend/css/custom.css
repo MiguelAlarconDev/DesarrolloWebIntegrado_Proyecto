@@ -1640,3 +1640,101 @@ html {
   color: #15803d;
 }
 
+
+/* ==========================================================================
+   TARJETAS UNIFORMES Y ORGANIZADAS EN MIS CURSOS (MISMO TAMAÑO Y ALINEACIÓN)
+   ========================================================================== */
+
+.mis-cursos-col {
+  display: flex !important;
+  margin-bottom: 30px !important;
+}
+
+.mis-cursos-card {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.mis-cursos-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+  border-color: #cbd5e1 !important;
+}
+
+.mis-cursos-card .course-img {
+  position: relative !important;
+  height: 190px !important;
+  min-height: 190px !important;
+  max-height: 190px !important;
+  overflow: hidden !important;
+}
+
+.mis-cursos-card .course-img img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  transition: transform 0.3s ease !important;
+}
+
+.mis-cursos-card:hover .course-img img {
+  transform: scale(1.03) !important;
+}
+
+.mis-cursos-card .course-content {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 22px !important;
+}
+
+.mis-cursos-card .card-main-info {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.mis-cursos-card .course-title-fixed {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: #1a2d62 !important;
+  line-height: 1.35 !important;
+  margin-bottom: 8px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.mis-cursos-card .access-box-fixed {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  padding: 14px !important;
+  margin-top: 14px !important;
+  margin-bottom: 14px !important;
+  min-height: 128px !important;
+  max-height: 128px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+.mis-cursos-card .card-footer-fixed {
+  border-top: 1px solid #f1f5f9 !important;
+  padding-top: 14px !important;
+  margin-top: auto !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
