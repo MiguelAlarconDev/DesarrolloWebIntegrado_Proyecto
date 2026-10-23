@@ -23,7 +23,7 @@ const CursosService = {
    */
   enrichCurso(curso, index = 0) {
     if (!curso) return null;
-    const imgNumber = (index % 6) + 1;
+    const imgNumber = (index % 3) + 1;
     return {
       ...curso,
       id: curso.id,
