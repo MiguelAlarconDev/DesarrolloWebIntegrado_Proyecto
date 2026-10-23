@@ -59,7 +59,7 @@ public class NotificacionEmailService {
             System.out.printf("[EMAIL NOTIFICACION] Servidor SMTP no configurado (definir SPRING_MAIL_USERNAME y SPRING_MAIL_PASSWORD en application.properties para envío autónomo desde el servidor). Mensaje preparado para: %s%n",
                     estudiante.getCorreo());
             if (comprobante != null) {
-                comprobante.setEstadoEmail("PREPARADO_WEB");
+                comprobante.setEstadoEmail("PENDIENTE");
             }
             return false;
         }
@@ -86,7 +86,7 @@ public class NotificacionEmailService {
         } catch (Exception ex) {
             System.err.printf("[EMAIL NOTIFICACION] Error al enviar correo a %s: %s%n", estudiante.getCorreo(), ex.getMessage());
             if (comprobante != null) {
-                comprobante.setEstadoEmail("ERROR_ENVIO");
+                comprobante.setEstadoEmail("FALLIDO");
             }
             return false;
         }

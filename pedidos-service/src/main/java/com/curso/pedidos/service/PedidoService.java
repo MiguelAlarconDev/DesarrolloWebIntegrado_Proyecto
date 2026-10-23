@@ -253,7 +253,7 @@ public class PedidoService {
         comprobante.setMontoIgv(montoIgv);
         comprobante.setMontoTotal(montoTotal);
         comprobante.setPdfUrl("/api/comprobantes/descargar/" + pedido.getId());
-        comprobante.setEstadoEmail("PREPARADO_WEB");
+        comprobante.setEstadoEmail("PENDIENTE");
 
         if (tipo == TipoComprobante.FACTURA && request != null) {
             comprobante.setRucCliente(request.getRucCliente());
