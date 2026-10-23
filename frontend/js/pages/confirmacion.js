@@ -60,7 +60,7 @@ async function initConfirmacion() {
 							<p style="color: #64748b; font-size: 14px; margin-bottom: 24px;">No se encontró una orden reciente en esta sesión. Puedes ingresar a tus clases matriculadas o explorar nuevos cursos.</p>
 							<div class="d-flex justify-content-center gap-2 flex-wrap">
 								<a href="mis-cursos.html" class="btn_one" style="text-decoration: none;"><i class="fa fa-book me-1"></i> Ir a Mis Clases</a>
-								<a href="cursos.html" class="btn_two" style="text-decoration: none;"><i class="fa fa-graduation-cap me-1"></i> Ver Catálogo</a>
+								<a href="index.html" class="btn_two" style="text-decoration: none;"><i class="fa fa-graduation-cap me-1"></i> Ver Catálogo</a>
 							</div>
 						</div>
 					</div>
@@ -195,3 +195,4 @@ async function initConfirmacion() {
 
 // Inicialización
 $(document).ready(initConfirmacion);
+

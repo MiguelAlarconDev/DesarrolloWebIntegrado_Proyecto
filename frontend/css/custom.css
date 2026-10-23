@@ -8,17 +8,34 @@ html {
    (LOGO, MENÚ DE NAVEGACIÓN, ÍCONO DEL CARRITO Y BOTONES DE AUTENTICACIÓN)
    ========================================================================== */
 
-/* Barra de navegación principal fija */
-#navigation.site-navigation,
-#navigation.navbar-fixed,
+/* Barra de navegación principal fija - Limpia, normal y sin saltos */
 #navigation,
 .site-navigation {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 1040 !important;
   background: #ffffff !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
-  padding: 10px 0 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+  padding: 12px 0 !important;
   min-height: 68px !important;
   display: flex !important;
   align-items: center !important;
+  transition: box-shadow 0.25s ease, background-color 0.25s ease, padding 0.25s ease !important;
+  animation: none !important;
+}
+
+#navigation.navbar-scrolled,
+#navigation.navbar-fixed,
+.site-navigation.navbar-fixed {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  padding: 10px 0 !important;
+  animation: none !important;
 }
 
 #navigation .container {
@@ -42,7 +59,7 @@ html {
   align-items: center !important;
   margin: 0 !important;
   padding: 0 !important;
-  min-height: 48px !important;
+  min-height: 44px !important;
 }
 
 .site-logo a,
@@ -81,7 +98,7 @@ html {
   line-height: 1 !important;
 }
 
-/* Columna 2: Menú Principal centrado verticalmente */
+/* Columna 2: Menú Principal centrado y moderno */
 .header_right {
   display: flex !important;
   align-items: center !important;
@@ -104,7 +121,7 @@ html {
   list-style: none !important;
   margin: 0 !important;
   padding: 0 !important;
-  gap: 6px !important;
+  gap: 4px !important;
 }
 
 #main-menu ul li {
@@ -121,10 +138,10 @@ html {
   align-items: center !important;
   justify-content: center !important;
   height: 38px !important;
-  padding: 0 14px !important;
+  padding: 0 16px !important;
   margin: 0 !important;
   line-height: 38px !important;
-  font-size: 14px !important;
+  font-size: 14.5px !important;
   font-weight: 700 !important;
   color: #1a2d62 !important;
   text-decoration: none !important;
@@ -136,8 +153,85 @@ html {
 #main-menu ul li a:hover,
 #main-menu ul li a:focus,
 #main-menu ul li a.active {
+  color: #16a34a !important;
+  background-color: rgba(46, 202, 127, 0.12) !important;
+}
+
+/* Responsive del menú navegación */
+@media (min-width: 992px) {
+  #main-menu {
+    display: flex !important;
+  }
+  #mobile_menu,
+  .slicknav_menu {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #main-menu {
+    display: none !important;
+  }
+  #mobile_menu,
+  .slicknav_menu {
+    display: block !important;
+  }
+  .header_right {
+    justify-content: flex-end !important;
+  }
+}
+
+/* Estilos limpios para SlickNav móvil */
+.slicknav_menu {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.slicknav_btn {
+  background: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.slicknav_btn:hover {
+  background: #f1f5f9 !important;
+}
+
+.slicknav_icon-bar {
+  background-color: #1a2d62 !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+}
+
+.slicknav_nav {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+  padding: 10px !important;
+  margin-top: 10px !important;
+}
+
+.slicknav_nav li a {
+  color: #1a2d62 !important;
+  font-weight: 700 !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+.slicknav_nav li a:hover {
+  background: rgba(46, 202, 127, 0.1) !important;
   color: #2eca7f !important;
-  background-color: rgba(46, 202, 127, 0.08) !important;
+}
+
+.slicknav_arrow {
+  display: none !important;
 }
 
 /* Columna 3: Carrito y Botones Auth perfectamente alineados y cuadrados */
@@ -170,21 +264,20 @@ html {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 38px !important;
-  height: 38px !important;
-  min-width: 38px !important;
-  min-height: 38px !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
   color: #1a2d62 !important;
   background: #f1f5f9 !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 8px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 9px !important;
   text-decoration: none !important;
   position: relative !important;
   margin: 0 !important;
-  margin-right: 0 !important;
   padding: 0 !important;
   box-sizing: border-box !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.25s ease !important;
 }
 
 .hlc:hover,
@@ -194,8 +287,22 @@ html {
   border-color: #2eca7f !important;
 }
 
+/* Estado activo cuando hay productos en el carrito (el logo sabe que tiene items) */
+.hlc.has-items,
+.home_lc a.hlc.has-items {
+  background: #f0fdf4 !important;
+  border: 1.5px solid #2eca7f !important;
+  color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(46, 202, 127, 0.2) !important;
+}
+
+.hlc.has-items i,
+.home_lc a.hlc.has-items i {
+  color: #16a34a !important;
+}
+
 .home_lc a i {
-  font-size: 18px !important;
+  font-size: 19px !important;
   line-height: 1 !important;
   display: flex !important;
   align-items: center !important;
@@ -203,43 +310,53 @@ html {
   color: #1a2d62 !important;
   margin: 0 !important;
   padding: 0 !important;
+  transition: color 0.2s ease !important;
 }
 
 /* Contador flotante de cursos en carrito */
 .home_lc a .gactive {
   position: absolute !important;
-  top: -5px !important;
-  right: -5px !important;
-  width: 20px !important;
+  top: -6px !important;
+  right: -6px !important;
+  min-width: 20px !important;
   height: 20px !important;
+  padding: 0 5px !important;
   font-size: 11px !important;
   font-weight: 800 !important;
   background: #2eca7f !important;
   color: #ffffff !important;
-  border-radius: 50% !important;
+  border-radius: 10px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   line-height: 1 !important;
-  box-shadow: 0 2px 6px rgba(46, 202, 127, 0.4) !important;
+  box-shadow: 0 2px 6px rgba(46, 202, 127, 0.5) !important;
   margin: 0 !important;
-  padding: 0 !important;
-  transition: all 0.25s ease !important;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
-/* Estado cuando el carrito no tiene cursos */
+/* Estado destacado cuando hay productos en el carrito */
+.home_lc a .gactive.has-items {
+  background: #16a34a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.55) !important;
+  transform: scale(1) !important;
+}
+
+/* Estado sutil cuando el carrito está vacío */
 .home_lc a .gactive.is-empty {
   background: #94a3b8 !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: none !important;
+  opacity: 0.7 !important;
 }
 
 /* Animaciones reactivas al agregar items al carrito */
 @keyframes cart-bump {
   0% { transform: scale(1); }
-  25% { transform: scale(1.25) rotate(-6deg); }
-  50% { transform: scale(1.15) rotate(6deg); }
-  75% { transform: scale(1.2) rotate(0deg); }
+  25% { transform: scale(1.22) rotate(-5deg); }
+  50% { transform: scale(1.15) rotate(5deg); }
+  75% { transform: scale(1.18) rotate(0deg); }
   100% { transform: scale(1); }
 }
 
@@ -251,12 +368,12 @@ html {
 
 .cart-bump,
 .home_lc a.cart-bump {
-  animation: cart-bump 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  animation: cart-bump 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 .cart-bump .gactive,
 .home_lc a.cart-bump .gactive {
-  animation: cart-badge-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  animation: cart-badge-pop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 /* Reset de float y alineación para call_to_action */

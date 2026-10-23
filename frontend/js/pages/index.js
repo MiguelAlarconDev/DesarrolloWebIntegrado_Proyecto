@@ -131,20 +131,14 @@ function renderCursos(list) {
 			seatsText = `<i class="fa fa-exclamation-circle"></i> <strong>¡Últimas ${libres} Vacantes!</strong>`;
 		}
 
-		const imgUrl = c.imagen || `assets/images/all-img/c${(i % 6) + 1}.png`;
+		const imgUrl = c.imagen || `assets/images/all-img/c${(i % 3) + 1}.png`;
 		const docenteNombre = c.docente || (isVirtual ? 'Ing. Roberto Docente' : 'Ing. Carlos Mendoza');
 
 		const isPaid = paidCourseIdsHome.has(c.id);
 		const inCart = CartService.isInCart(c.id);
 
 		let actionBtnHtml = '';
-		if (isPaid) {
-			actionBtnHtml = `
-				<a href="mis-cursos.html" class="btn_one" style="padding: 8px 16px; font-size: 13px; border-radius: 6px; text-decoration: none; background: #16a34a;">
-					<i class="fa fa-graduation-cap me-1"></i> Ir a mi Clase
-				</a>
-			`;
-		} else if (inCart) {
+		if (inCart) {
 			actionBtnHtml = `
 				<a href="carrito.html" class="btn_one" style="padding: 8px 16px; font-size: 13px; border-radius: 6px; text-decoration: none; background: #0284c7;">
 					<i class="fa fa-shopping-cart me-1"></i> En el Carrito
@@ -214,26 +208,20 @@ function reservar(cursoId) {
 		return;
 	}
 
-	if (paidCourseIdsHome.has(cursoId)) {
-		Notifications.showToast('Ya estás matriculado en este curso. Te llevamos a tus clases...', 'info');
-		setTimeout(() => {
-			window.location.href = 'mis-cursos.html';
-		}, 400);
-		return;
-	}
-
 	const res = CartService.addToCart(c);
 	actualizarEstadoNavbar();
+	CartService.bumpBadge();
 	applyFilterHome();
 
 	Notifications.showToast(res.message || '¡Curso agregado a tu carrito!', 'success');
 	setTimeout(() => {
 		window.location.href = 'carrito.html';
-	}, 350);
+	}, 500);
 }
 
 // Reactividad ante cambios del carrito
 window.addEventListener('cartUpdated', () => {
+	actualizarEstadoNavbar();
 	applyFilterHome();
 });
 

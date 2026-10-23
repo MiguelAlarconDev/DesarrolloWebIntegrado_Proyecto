@@ -175,7 +175,7 @@ function initCheckout() {
 						<h3 class="ck-card-title mb-2" style="font-size: 22px;">Tu carrito de matrícula está vacío</h3>
 						<p class="ck-card-sub mb-4" style="font-size: 14px;">Elige un curso de nuestro catálogo para inscribirte y pagar con Mercado Pago.</p>
 						<div class="d-flex justify-content-center gap-2 flex-wrap">
-							<a href="cursos.html" class="ck-btn ck-btn-dark" style="text-decoration: none;"><i class="fa fa-graduation-cap"></i> Explorar Catálogo</a>
+							<a href="index.html" class="ck-btn ck-btn-dark" style="text-decoration: none;"><i class="fa fa-graduation-cap"></i> Explorar Catálogo</a>
 						</div>
 					</div>
 				</div>
@@ -524,3 +524,4 @@ async function finalizarMatriculaMp() {
 
 // Inicialización al cargar la página
 $(document).ready(initCheckout);
+

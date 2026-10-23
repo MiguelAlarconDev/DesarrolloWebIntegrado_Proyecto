@@ -55,6 +55,7 @@ const CartService = {
 
     if (cart.some(item => item.id === curso.id)) {
       this.startReservationTimer();
+      this.bumpBadge();
       return { success: true, alreadyInCart: true, message: 'Este curso ya está en tu carrito.' };
     }
 
@@ -110,7 +111,7 @@ const CartService = {
   },
 
   /* ------------------------------------------------------------------
-   * Contador del icono del carrito en el navbar
+   * Contador del icono del carrito en el navbar (Actualización en vivo)
    * ------------------------------------------------------------------ */
   notifyChange() {
     this.updateBadge();
@@ -123,8 +124,11 @@ const CartService = {
     document.querySelectorAll('#cart-nav-counter, .cart-nav-counter').forEach(el => {
       el.textContent = count > 9 ? '9+' : String(count);
       el.classList.toggle('is-empty', count === 0);
+      el.classList.toggle('has-items', count > 0);
       const link = el.closest('a');
       if (link) {
+        link.classList.toggle('has-items', count > 0);
+        link.classList.toggle('is-empty', count === 0);
         const label = count === 0
           ? 'Tu carrito está vacío'
           : `Ver carrito (${count} ${count === 1 ? 'curso' : 'cursos'})`;
@@ -134,30 +138,23 @@ const CartService = {
     });
   },
 
-  /** Pequeña animación del icono para confirmar visualmente que se agregó un curso */
+  /** Animación destacada del logo y badge para confirmar cuando se agrega un curso */
   bumpBadge() {
     if (typeof document === 'undefined') return;
-    document.querySelectorAll('#cart-nav-counter, .cart-nav-counter').forEach(el => {
-      const link = el.closest('a') || el;
-      link.classList.remove('cart-bump');
-      void link.offsetWidth; // reiniciar animación
-      link.classList.add('cart-bump');
-      setTimeout(() => link.classList.remove('cart-bump'), 700);
+    document.querySelectorAll('#cart-nav-counter, .cart-nav-counter, .home_lc a, .hlc').forEach(el => {
+      el.classList.remove('cart-bump');
+      void el.offsetWidth; // reiniciar animación
+      el.classList.add('cart-bump');
+      setTimeout(() => el.classList.remove('cart-bump'), 800);
     });
   },
 
   /**
-   * Quita del carrito los cursos que el alumno ya tiene pagados (evita pagar dos veces).
-   * Devuelve la lista de cursos removidos.
+   * Identifica cursos ya matriculados si se requiere en UI
    */
-  removePaidCourses(paidIds) {
+  checkPaidCourses(paidIds) {
     if (!paidIds || paidIds.size === 0) return [];
-    const cart = this.getCart();
-    const removed = cart.filter(item => paidIds.has(item.id));
-    if (removed.length > 0) {
-      this.saveCart(cart.filter(item => !paidIds.has(item.id)));
-    }
-    return removed;
+    return this.getCart().filter(item => paidIds.has(item.id));
   },
 
   /* ------------------------------------------------------------------

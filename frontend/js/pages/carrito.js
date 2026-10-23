@@ -1,34 +1,11 @@
 /**
  * carrito.js - Lógica del Carrito de Matrículas (UX Simplificado y Enfocado)
  * Flujo directo: Carrito -> Continuar al Pago (Checkout con Mercado Pago)
- * Detección automática y prevención de compra de cursos ya matriculados.
  */
 
 let intervalTimer = null;
 
 async function initCart() {
-	// 1. Si el usuario está autenticado, verificar si ya pagó algún curso que esté en el carrito
-	const user = AuthService.getCurrentUser();
-	if (user) {
-		try {
-			const matriculas = await PedidosService.getMisMatriculas(user.id);
-			const paidIds = new Set();
-			(matriculas || []).forEach(m => {
-				if (m.estado === 'PAGADO') {
-					const cid = (m.curso && m.curso.id) ? m.curso.id : (m.cursoId || m.id);
-					if (cid) paidIds.add(cid);
-				}
-			});
-
-			const removidos = CartService.removePaidCourses(paidIds);
-			if (removidos.length > 0) {
-				removidos.forEach(r => {
-					Notifications.showToast(`Ya estás matriculado en "${r.titulo}". Lo retiramos del carrito.`, 'info');
-				});
-			}
-		} catch (_) {}
-	}
-
 	renderCart();
 	actualizarNavbar();
 }
@@ -72,7 +49,7 @@ function renderCart() {
 						<h3 style="color: #1a2d62; font-weight: 800; font-size: 22px; margin-bottom: 8px;">Tu carrito de matrícula está vacío</h3>
 						<p class="text-muted mb-4" style="font-size: 14px;">Elige un curso de nuestro catálogo para inscribirte y pagar con Mercado Pago.</p>
 						<div class="d-flex justify-content-center gap-2 flex-wrap">
-							<a href="cursos.html" class="btn_one" style="border-radius: 8px; padding: 11px 24px; text-decoration: none;">
+							<a href="index.html" class="btn_one" style="border-radius: 8px; padding: 11px 24px; text-decoration: none;">
 								<i class="fa fa-graduation-cap me-1"></i> Explorar Catálogo
 							</a>
 							<button type="button" onclick="agregarCursoDemoCarrito()" class="btn_two" style="border-radius: 8px; padding: 11px 20px; cursor: pointer; background: #f8fafc;">
@@ -177,7 +154,7 @@ function renderCart() {
 						Continuar al Pago con Mercado Pago <i class="fa fa-arrow-right"></i>
 					</button>
 
-					<a href="cursos.html" class="d-block text-center mt-3 text-muted" style="font-size: 13px; text-decoration: none;">
+					<a href="index.html" class="d-block text-center mt-3 text-muted" style="font-size: 13px; text-decoration: none;">
 						<i class="fa fa-arrow-left me-1"></i> Seguir explorando cursos
 					</a>
 

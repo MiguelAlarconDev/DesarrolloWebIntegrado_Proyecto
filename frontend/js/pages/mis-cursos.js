@@ -123,7 +123,7 @@ async function initMisCursos() {
 					<i class="ti-book text-muted" style="font-size: 54px; color: #94a3b8;"></i>
 					<h3 class="mt-3" style="color: #1a2d62; font-weight: 800; font-size: 22px;">Aún no tienes cursos pagados</h3>
 					<p class="text-muted mb-4" style="font-size: 14px;">Inscríbete en un curso de nuestro catálogo para acceder a tus salas en vivo y comprobantes:</p>
-					<a href="cursos.html" class="btn_one" style="border-radius: 8px; padding: 10px 24px; text-decoration: none;">
+					<a href="index.html" class="btn_one" style="border-radius: 8px; padding: 10px 24px; text-decoration: none;">
 						<i class="fa fa-graduation-cap me-1"></i> Ver Catálogo de Cursos
 					</a>
 				</div>
@@ -158,7 +158,7 @@ async function initMisCursos() {
 					</div>
 				</div>
 				<div class="d-flex gap-2">
-					<a href="cursos.html" class="btn_one" style="font-size: 12px; padding: 8px 16px; border-radius: 6px; text-decoration: none;">
+					<a href="index.html" class="btn_one" style="font-size: 12px; padding: 8px 16px; border-radius: 6px; text-decoration: none;">
 						<i class="fa fa-plus me-1"></i> Matricular otro curso
 					</a>
 					<button type="button" onclick="cerrarSesionMisCursos()" style="border: 1px solid #cbd5e1; background: #fff; border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer;">
@@ -251,3 +251,4 @@ async function initMisCursos() {
 // Inicialización
 $(document).ready(initMisCursos);
 window.addEventListener('pageshow', initMisCursos);
+

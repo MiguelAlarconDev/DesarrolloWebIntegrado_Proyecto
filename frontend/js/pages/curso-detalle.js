@@ -117,6 +117,7 @@ async function initDetalle() {
 			}
 			btnAction.onclick = () => {
 				const res = CartService.addToCart(activeCurso);
+				CartService.bumpBadge();
 				Notifications.showToast(res.message || '¡Curso agregado al carrito!', 'success');
 				setTimeout(() => {
 					window.location.href = 'carrito.html';

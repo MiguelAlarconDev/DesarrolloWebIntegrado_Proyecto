@@ -1,7 +1,7 @@
 /*
 Author       : theme_ocean 
 Template Name: Gestión de Cursos - Plataforma de Capacitación
-Version      : 2.0 (Optimizado)
+Version      : 2.1 (Menu Limpio y Normalizado)
 */
 (function($) {
 	'use strict';
@@ -11,25 +11,22 @@ Version      : 2.0 (Optimizado)
 	$(document).ready(function() {
 		$('body').addClass('loaded');
 
-		/* START MENU JS */
+		/* START MENU JS - Limpio, normal y sin flechas rotas */
 		if ($.fn.slicknav && $('#main-menu').length) {
 			$('#main-menu').slicknav({
 				label: '',
-				duration: 500,
+				duration: 250,
 				prependTo: '#mobile_menu',
 				closeOnClick: true,
-				openedSymbol: "&#9660;",
-				closedSymbol: "&#9658;"
+				openedSymbol: '',
+				closedSymbol: ''
 			});
 		}
 
-		/* NAVBAR SCROLL BACKGROUND */
+		/* NAVBAR SCROLL - Transicion normal y suave sin parpadeos ni fadeInDown */
 		var updateNavbarBg = function() {
-			if ($(window).scrollTop() > 100) {
-				$('.site-navigation, .fixed-top').addClass('menu-bg navbar-fixed');
-			} else {
-				$('.site-navigation, .fixed-top').removeClass('menu-bg navbar-fixed');
-			}
+			var isScrolled = $(window).scrollTop() > 20;
+			$('#navigation, .site-navigation').toggleClass('navbar-scrolled', isScrolled);
 		};
 
 		updateNavbarBg();
