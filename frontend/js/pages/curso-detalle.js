@@ -217,4 +217,13 @@ async function initDetalle() {
 }
 
 // Inicialización
-$(document).ready(initDetalle);
+// Inicialización garantizada (inmediata o en evento)
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', initDetalle);
+} else {
+	initDetalle();
+}
+window.addEventListener('pageshow', initDetalle);
+if (typeof $ !== 'undefined') {
+	$(document).ready(initDetalle);
+}

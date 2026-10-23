@@ -179,7 +179,20 @@
 	</section>
 	<!-- END ABOUT US -->
 
-	<!-- START COURSE SECTION  -->
+	<script>
+window.reservar = window.reservar || function(cursoId) {
+	try {
+		if (typeof CartService !== 'undefined') {
+			var c = (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES)
+				? CONFIG.INITIAL_COURSES.find(function(item) { return item.id === cursoId; }) : null;
+			if (c) CartService.addToCart(c);
+		}
+	} catch (_) {}
+	window.location.href = 'carrito.html?cursoId=' + encodeURIComponent(cursoId);
+};
+</script>
+
+<!-- START COURSE SECTION  -->
 	<div class="best-cpurse section-padding" id="cursos-section">
 		<div class="container">
 			<div class="section-title">

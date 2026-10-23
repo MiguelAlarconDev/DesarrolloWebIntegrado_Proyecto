@@ -194,5 +194,14 @@ async function initConfirmacion() {
 }
 
 // Inicialización
-$(document).ready(initConfirmacion);
+// Inicialización garantizada (inmediata o en evento)
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', initConfirmacion);
+} else {
+	initConfirmacion();
+}
+window.addEventListener('pageshow', initConfirmacion);
+if (typeof $ !== 'undefined') {
+	$(document).ready(initConfirmacion);
+}
 

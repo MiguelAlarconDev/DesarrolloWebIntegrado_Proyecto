@@ -219,11 +219,22 @@ function reservar(cursoId) {
 	}, 500);
 }
 
-// Reactividad ante cambios del carrito
+// Exportar globalmente a window para que los botones onclick siempre funcionen
+window.reservar = reservar;
+window.buscarCursos = buscarCursos;
+window.filtrarCursos = filtrarCursos;
+
+// Inicialización garantizada (inmediata o en evento)
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', initHome);
+} else {
+	initHome();
+}
+window.addEventListener('pageshow', initHome);
 window.addEventListener('cartUpdated', () => {
 	actualizarEstadoNavbar();
 	applyFilterHome();
 });
-
-// Inicialización
-$(document).ready(initHome);
+if (typeof $ !== 'undefined') {
+	$(document).ready(initHome);
+}

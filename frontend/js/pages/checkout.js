@@ -523,5 +523,14 @@ async function finalizarMatriculaMp() {
 }
 
 // Inicialización al cargar la página
-$(document).ready(initCheckout);
+// Inicialización garantizada (inmediata o en evento)
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', initCheckout);
+} else {
+	initCheckout();
+}
+window.addEventListener('pageshow', initCheckout);
+if (typeof $ !== 'undefined') {
+	$(document).ready(initCheckout);
+}
 

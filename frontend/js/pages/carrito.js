@@ -6,16 +6,65 @@
 let intervalTimer = null;
 
 async function initCart() {
+	// 1. Soporte de cursoId desde URL (ej. carrito.html?cursoId=b0000000-0000-0000-0000-000000000001)
+	try {
+		const params = new URLSearchParams(window.location.search);
+		const cid = params.get('cursoId') || params.get('id');
+		if (cid) {
+			let c = (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES) ? CONFIG.INITIAL_COURSES.find(x => x.id === cid) : null;
+			if (!c) {
+				const cached = JSON.parse(localStorage.getItem('app_cursos_cache') || '[]');
+				c = cached.find(x => x.id === cid);
+			}
+			if (c) {
+				CartService.addToCart(c);
+			}
+		}
+	} catch (_) {}
+
+	// 2. Si el carrito está vacío al ingresar directamente a carrito.html,
+	// precargar el curso oficial para que siempre esté listo para proceder al pago
+	const cartItems = CartService.getCart();
+	if (cartItems.length === 0 && typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES && CONFIG.INITIAL_COURSES.length > 0) {
+		CartService.addToCart(CONFIG.INITIAL_COURSES[0]);
+	}
+
 	renderCart();
 	actualizarNavbar();
 }
 
 function actualizarNavbar() {
 	CartService.updateBadge();
-	AuthService.updateNavbar();
+	if (typeof AuthService !== 'undefined' && AuthService.updateNavbar) {
+		AuthService.updateNavbar();
+	}
+}
+
+async function agregarCursoPorId(cursoId) {
+	let c = null;
+	if (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES) {
+		c = CONFIG.INITIAL_COURSES.find(x => x.id === cursoId);
+	}
+	if (!c) {
+		const cached = JSON.parse(localStorage.getItem('app_cursos_cache') || '[]');
+		c = cached.find(x => x.id === cursoId);
+	}
+	if (c) {
+		CartService.addToCart(c);
+		Notifications.showToast(`Curso "${c.titulo}" agregado al carrito.`, 'success');
+		renderCart();
+		actualizarNavbar();
+	}
 }
 
 async function agregarCursoDemoCarrito() {
+	if (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES && CONFIG.INITIAL_COURSES.length > 0) {
+		CartService.addToCart(CONFIG.INITIAL_COURSES[0]);
+		Notifications.showToast(`Curso agregado al carrito.`, 'success');
+		renderCart();
+		actualizarNavbar();
+		return;
+	}
 	try {
 		const cursos = await CursosService.getCursos();
 		if (cursos && cursos.length > 0) {
@@ -42,19 +91,24 @@ function renderCart() {
 		area.innerHTML = `
 			<div class="row">
 				<div class="col-12 text-center py-5">
-					<div style="max-width: 480px; margin: 0 auto; background: #ffffff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); border: 1px solid #eef2f6;">
+					<div style="max-width: 540px; margin: 0 auto; background: #ffffff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); border: 1px solid #eef2f6;">
 						<div style="width: 76px; height: 76px; border-radius: 50%; background: #f0fdf4; color: #2eca7f; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 32px;">
 							<i class="ti-shopping-cart"></i>
 						</div>
 						<h3 style="color: #1a2d62; font-weight: 800; font-size: 22px; margin-bottom: 8px;">Tu carrito de matrícula está vacío</h3>
-						<p class="text-muted mb-4" style="font-size: 14px;">Elige un curso de nuestro catálogo para inscribirte y pagar con Mercado Pago.</p>
-						<div class="d-flex justify-content-center gap-2 flex-wrap">
-							<a href="index.html" class="btn_one" style="border-radius: 8px; padding: 11px 24px; text-decoration: none;">
-								<i class="fa fa-graduation-cap me-1"></i> Explorar Catálogo
-							</a>
-							<button type="button" onclick="agregarCursoDemoCarrito()" class="btn_two" style="border-radius: 8px; padding: 11px 20px; cursor: pointer; background: #f8fafc;">
-								<i class="fa fa-bolt me-1"></i> Cargar Curso Demo
+						<p class="text-muted mb-4" style="font-size: 14px;">Elige uno de los cursos disponibles para inscribirte y pagar con Mercado Pago:</p>
+						<div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
+							<button type="button" onclick="agregarCursoPorId('b0000000-0000-0000-0000-000000000001')" class="btn_one" style="border-radius: 8px; padding: 10px 18px; font-size: 13px; cursor: pointer;">
+								<i class="fa fa-plus me-1"></i> Desarrollo Web Spring Boot (S/ 150)
 							</button>
+							<button type="button" onclick="agregarCursoPorId('b0000000-0000-0000-0000-000000000002')" class="btn_two" style="border-radius: 8px; padding: 10px 18px; font-size: 13px; cursor: pointer;">
+								<i class="fa fa-plus me-1"></i> Arquitectura Cloud (S/ 180)
+							</button>
+						</div>
+						<div>
+							<a href="index.html" class="text-muted" style="font-size: 13px; text-decoration: none;">
+								<i class="fa fa-arrow-left me-1"></i> Volver al Catálogo Principal
+							</a>
 						</div>
 					</div>
 				</div>
@@ -222,5 +276,14 @@ function activarTimer() {
 	intervalTimer = setInterval(updateTimerDisplay, 1000);
 }
 
-// Inicialización única al cargar el DOM
-$(document).ready(initCart);
+// Inicialización garantizada (inmediata o en evento)
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', initCart);
+} else {
+	initCart();
+}
+window.addEventListener('pageshow', initCart);
+window.addEventListener('cartUpdated', initCart);
+if (typeof $ !== 'undefined') {
+	$(document).ready(initCart);
+}
