@@ -16,7 +16,7 @@ function selectMetodoPago(metodo) {
 
 function actualizarBotonPago() {
 	const totals = CartService.getTotals();
-	const btn = document.getElementById('btn-pago-penn');
+	const btn = (document.getElementById('btn-pago') || document.getElementById('btn-pago-penn'));
 	if (!btn) return;
 
 	btn.setAttribute('data-method', 'TARJETA');
@@ -199,7 +199,7 @@ function initPennCheckout() {
 	if (elTot) elTot.textContent = `S/ ${totals.total}`;
 
 	// Renderizar cursos en el resumen con formato .ck-item
-	const list = document.getElementById('penn-order-items-list');
+	const list = (document.getElementById('order-items-list') || document.getElementById('penn-order-items-list'));
 	if (list) {
 		list.innerHTML = cart.map(c => `
 			<li class="ck-item">
@@ -223,7 +223,7 @@ function initPennCheckout() {
 	AuthService.updateNavbar();
 
 	// Conectar el formulario de pago
-	const form = document.getElementById('penn-checkout-form');
+	const form = (document.getElementById('checkout-form') || document.getElementById('penn-checkout-form'));
 	if (form) {
 		form.addEventListener('submit', ejecutarPago);
 	}
@@ -306,7 +306,7 @@ async function ejecutarPago(e) {
 		}
 	} catch (_) {}
 
-	const btn = document.getElementById('btn-pago-penn');
+	const btn = (document.getElementById('btn-pago') || document.getElementById('btn-pago-penn'));
 	if (btn) {
 		btn.disabled = true;
 		btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Conectando con Mercado Pago...`;

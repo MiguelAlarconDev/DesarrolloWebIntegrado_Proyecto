@@ -71,7 +71,7 @@ function filtrarCursos(mod, btn) {
 }
 
 function renderPennCourses(list) {
-	const container = document.getElementById('penn-courses-container');
+	const container = (document.getElementById('cursos-container') || document.getElementById('penn-courses-container'));
 	if (!container) return;
 
 	if (!list || list.length === 0) {

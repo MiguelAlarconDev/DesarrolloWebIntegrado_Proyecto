@@ -5,7 +5,7 @@
 
 async function hacerRegistro(e) {
 	if (e && e.preventDefault) e.preventDefault();
-	const btn = document.getElementById('btn-reg-penn');
+	const btn = (document.getElementById('btn-reg') || document.getElementById('btn-reg-penn'));
 	if (btn) {
 		btn.disabled = true;
 		btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Registrando en Backend...`;
