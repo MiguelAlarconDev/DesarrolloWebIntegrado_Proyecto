@@ -7,11 +7,20 @@
 
 let currentOrder = null;
 
-function initConfirmacion() {
+async function initConfirmacion() {
 	let order = PedidosService.getLastOrder();
 	if (!order) {
-		const history = PedidosService.getMisMatriculas();
-		if (history && history.length > 0) order = history[0];
+		const history = PedidosService.getMisMatriculasSync();
+		if (history && history.length > 0) {
+			order = history[0];
+		} else {
+			try {
+				const remoteHistory = await PedidosService.getMisMatriculas();
+				if (remoteHistory && remoteHistory.length > 0) {
+					order = remoteHistory[0];
+				}
+			} catch (_) {}
+		}
 	}
 	if (!order && typeof window !== 'undefined' && window.location.search && window.location.search.includes('sample=1')) {
 		order = {
