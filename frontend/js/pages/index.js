@@ -135,16 +135,9 @@ function renderCursos(list) {
 		const docenteNombre = c.docente || (isVirtual ? 'Ing. Roberto Docente' : 'Ing. Carlos Mendoza');
 
 		const isPaid = paidCourseIdsHome.has(c.id);
-		const inCart = CartService.isInCart(c.id);
 
 		let actionBtnHtml = '';
-		if (inCart) {
-			actionBtnHtml = `
-				<a href="carrito.html" class="btn_one" style="padding: 8px 16px; font-size: 13px; border-radius: 6px; text-decoration: none; background: #0284c7;">
-					<i class="fa fa-shopping-cart me-1"></i> En el Carrito
-				</a>
-			`;
-		} else if (libres > 0) {
+		if (libres > 0) {
 			actionBtnHtml = `
 				<button onclick="reservar('${c.id}')" class="btn_two btn-card-inscribir" style="cursor: pointer;">
 					<i class="fa fa-shopping-cart"></i> Inscribirme

@@ -98,23 +98,23 @@ async function initDetalle() {
 			btnAction.style.background = '#16a34a';
 			btnAction.innerHTML = `<i class="fa fa-graduation-cap me-1"></i> Ir a Mis Clases`;
 			btnAction.onclick = () => window.location.href = 'mis-cursos.html';
-		} else if (inCart) {
-			seatsBox.innerHTML = `<span class="seats-live-badge" style="background: #f0f9ff; color: #0369a1; border-color: #bae6fd;"><i class="fa fa-shopping-cart"></i> <strong>Curso reservado en tu carrito</strong></span>`;
-			btnAction.className = 'btn btn_one';
-			btnAction.style.background = '#0284c7';
-			btnAction.innerHTML = `<i class="fa fa-arrow-right me-1"></i> Continuar al Pago`;
-			btnAction.onclick = () => window.location.href = 'carrito.html';
 		} else if (libres <= 0) {
 			seatsBox.innerHTML = `<span class="seats-live-badge soldout"><i class="fa fa-times-circle"></i> Aforo Completo (0 vacantes disponibles)</span>`;
 			btnAction.disabled = true;
 			btnAction.textContent = 'Vacantes Agotadas';
 			btnAction.className = 'btn btn-secondary';
 		} else {
-			if (libres <= 3) {
+			if (inCart) {
+				seatsBox.innerHTML = `<span class="seats-live-badge" style="background: #f0f9ff; color: #0369a1; border-color: #bae6fd;"><i class="fa fa-shopping-cart"></i> <strong>Curso en tu carrito - Quedan ${libres} vacantes</strong></span>`;
+			} else if (libres <= 3) {
 				seatsBox.innerHTML = `<span class="seats-live-badge urgent"><i class="fa fa-bolt"></i> ¡ALERTA! Solo quedan ${libres} vacantes de ${total}</span>`;
 			} else {
 				seatsBox.innerHTML = `<span class="seats-live-badge"><i class="fa fa-table"></i> Quedan ${libres} vacantes libres de ${total}</span>`;
 			}
+			btnAction.disabled = false;
+			btnAction.className = 'btn btn-default acc_btn';
+			btnAction.style.background = '';
+			btnAction.innerHTML = `<i class="fa fa-shopping-cart me-1"></i> Inscribirme`;
 			btnAction.onclick = () => {
 				const res = CartService.addToCart(activeCurso);
 				CartService.bumpBadge();
