@@ -174,6 +174,29 @@ async function initConfirmacion() {
 		if (btnLink) btnLink.href = curso.enlaceClase || 'https://meet.google.com';
 	}
 
+	// Configurar enlaces interactivos para abrir directamente en WhatsApp y Correo
+	const waBtn = document.getElementById('btn-open-wa-direct');
+	if (waBtn) {
+		const waTexto = `¡Hola ${comp.cliente || 'Alumno'}! 🎉 Tu matrícula en el curso "${curso.titulo}" (Código: ${order.codigoOrden}) ha sido confirmada con éxito.\n\n` +
+			`📅 Horario: ${curso.horario}\n` +
+			(curso.modalidad === 'VIRTUAL' ? `🎥 Enlace de clase en vivo: ${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}\n\n` : `🏛️ Sede: ${curso.direccionClase || 'Sede Central'} (Aula: ${curso.aula || 'Lab 302'})\n\n`) +
+			`📄 Comprobante: ${comp.correlativo || 'B001-00001042'} emitido por S/ ${comp.total}\n\n` +
+			`¡Bienvenido a Gestión de Cursos! 🚀`;
+
+		let numWa = telAlumno.replace(/\D/g, '');
+		if (numWa.length === 9) numWa = '51' + numWa;
+		waBtn.href = `https://api.whatsapp.com/send?phone=${numWa}&text=${encodeURIComponent(waTexto)}`;
+	}
+
+	const mailBtn = document.getElementById('btn-open-mail-direct');
+	if (mailBtn) {
+		const mailSubject = `Confirmación de Matrícula - ${curso.titulo} (${order.codigoOrden})`;
+		const mailBody = `Hola ${comp.cliente || 'Alumno'},\n\nTu matrícula en el curso "${curso.titulo}" fue confirmada con éxito.\n\nCódigo de Orden: ${order.codigoOrden}\nComprobante: ${comp.correlativo || 'B001-00001042'}\nTotal Pagado: S/ ${comp.total}\nHorario: ${curso.horario}\n` +
+			(curso.modalidad === 'VIRTUAL' ? `Enlace de acceso a clases: ${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}\n\n` : `Sede: ${curso.direccionClase || 'Sede Central'} - Aula: ${curso.aula || 'Lab 302'}\n\n`) +
+			`Saludos cordiales,\nGestión de Cursos S.A.C.`;
+		mailBtn.href = `mailto:${correoAlumno}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+	}
+
 	// Limpiar y sincronizar contador minimalista del carrito
 	CartService.updateBadge();
 	AuthService.updateNavbar();
