@@ -12,7 +12,10 @@ async function initDetalle() {
 	activeCurso = await CursosService.getCursoById(id);
 
 	if (!activeCurso) {
-		window.location.href = 'cursos.html';
+		const fallbackCursos = (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES) ? CONFIG.INITIAL_COURSES : [];
+		activeCurso = fallbackCursos.length > 0 ? fallbackCursos[0] : null;
+	}
+	if (!activeCurso) {
 		return;
 	}
 

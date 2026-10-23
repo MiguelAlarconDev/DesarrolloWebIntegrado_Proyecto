@@ -5,7 +5,14 @@
 const CursosService = {
   // Inicialización de la persistencia local de cursos como fallback
   initStorage() {
-    if (!localStorage.getItem('app_cursos_cache')) {
+    try {
+      const raw = localStorage.getItem('app_cursos_cache');
+      const list = raw ? JSON.parse(raw) : [];
+      // Si no existe caché o contenía cursos obsoletos distintos al catálogo oficial, sincronizar con CONFIG
+      if (!raw || !Array.isArray(list) || list.length !== (CONFIG.INITIAL_COURSES || []).length) {
+        localStorage.setItem('app_cursos_cache', JSON.stringify(CONFIG.INITIAL_COURSES));
+      }
+    } catch (_) {
       localStorage.setItem('app_cursos_cache', JSON.stringify(CONFIG.INITIAL_COURSES));
     }
   },

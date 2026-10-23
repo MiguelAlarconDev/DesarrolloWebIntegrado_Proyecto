@@ -49,7 +49,25 @@ async function initConfirmacion() {
 		};
 	}
 	if (!order) {
-		window.location.href = 'cursos.html';
+		const box = document.querySelector('.section-padding .container') || document.querySelector('.container');
+		if (box) {
+			box.innerHTML = `
+				<div class="row">
+					<div class="col-12 text-center py-5">
+						<div style="max-width: 520px; margin: 0 auto; background: #ffffff; padding: 42px 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #eef2f6;">
+							<div style="font-size: 46px; color: #2eca7f; margin-bottom: 16px;"><i class="fa fa-graduation-cap"></i></div>
+							<h3 style="color: #1a2d62; font-weight: 800; font-size: 22px; margin-bottom: 10px;">Comprobante de Matrícula</h3>
+							<p style="color: #64748b; font-size: 14px; margin-bottom: 24px;">No se encontró una orden reciente en esta sesión. Puedes ingresar a tus clases matriculadas o explorar nuevos cursos.</p>
+							<div class="d-flex justify-content-center gap-2 flex-wrap">
+								<a href="mis-cursos.html" class="btn_one" style="text-decoration: none;"><i class="fa fa-book me-1"></i> Ir a Mis Clases</a>
+								<a href="cursos.html" class="btn_two" style="text-decoration: none;"><i class="fa fa-graduation-cap me-1"></i> Ver Catálogo</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+		}
+		AuthService.updateNavbar();
 		return;
 	}
 

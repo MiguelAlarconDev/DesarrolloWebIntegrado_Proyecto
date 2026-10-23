@@ -163,20 +163,30 @@ function initPennCheckout() {
 		return;
 	}
 
-	const cart = CartService.getCart();
+	let cart = CartService.getCart();
 	if (cart.length === 0) {
-		Notifications.showToast('No tienes cursos en el carrito.', 'warning');
-		setTimeout(() => window.location.href = 'cursos.html', 800);
+		// Mostrar estado vacío amigable dentro de checkout.html sin redirigir al usuario
+		const row = document.querySelector('.ck-page .row.g-4') || document.querySelector('.ck-page .container');
+		if (row) {
+			row.innerHTML = `
+				<div class="col-12 text-center py-5">
+					<div class="ck-card" style="max-width: 520px; margin: 0 auto; padding: 42px 30px; text-align: center;">
+						<div style="font-size: 46px; color: #2eca7f; margin-bottom: 16px;"><i class="fa fa-shopping-cart"></i></div>
+						<h3 class="ck-card-title mb-2" style="font-size: 22px;">Tu carrito de matrícula está vacío</h3>
+						<p class="ck-card-sub mb-4" style="font-size: 14px;">Elige un curso de nuestro catálogo para inscribirte y pagar con Mercado Pago.</p>
+						<div class="d-flex justify-content-center gap-2 flex-wrap">
+							<a href="cursos.html" class="ck-btn ck-btn-dark" style="text-decoration: none;"><i class="fa fa-graduation-cap"></i> Explorar Catálogo</a>
+						</div>
+					</div>
+				</div>
+			`;
+		}
+		CartService.updateBadge();
+		AuthService.updateNavbar();
 		return;
 	}
 
-	// Si no tiene sesión activa, redirigir inmediatamente a ingresar usuario
-	if (!AuthService.isAuthenticated()) {
-		window.location.replace('login.html?redirect=checkout.html');
-		return;
-	}
-
-	// Renderizar estado del usuario
+	// Renderizar estado del usuario directamente en la tarjeta de checkout
 	renderUserStatusCard();
 
 	// Totales del carrito
