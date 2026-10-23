@@ -47,6 +47,7 @@ const PedidosService = {
       monto: precio,
       estado: 'PENDIENTE_PAGO',
       mpPreferenceId: 'pref_mp_' + Math.random().toString(36).substring(7),
+      initPoint: 'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=demo',
       fechaRegistro: new Date().toISOString()
     };
 

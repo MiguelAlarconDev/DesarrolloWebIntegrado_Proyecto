@@ -15,7 +15,7 @@ async function hacerRegistro(e) {
 		nombres: document.getElementById('reg-nom') ? document.getElementById('reg-nom').value.trim() : '',
 		apellidos: document.getElementById('reg-ape') ? document.getElementById('reg-ape').value.trim() : '',
 		dni: document.getElementById('reg-dni') ? document.getElementById('reg-dni').value.trim() : '',
-		whatsapp: '+51' + (document.getElementById('reg-wa') ? document.getElementById('reg-wa').value.trim() : ''),
+		whatsapp: '+51' + (document.getElementById('reg-wa') ? document.getElementById('reg-wa').value.replace(/^\+?51/, '').trim() : ''),
 		correo: document.getElementById('reg-mail') ? document.getElementById('reg-mail').value.trim() : '',
 		password: document.getElementById('reg-pwd') ? document.getElementById('reg-pwd').value.trim() : ''
 	};
