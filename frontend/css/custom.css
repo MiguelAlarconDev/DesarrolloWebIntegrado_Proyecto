@@ -433,7 +433,7 @@
 }
 
 /* Temporizador de Reserva de 15 Minutos en Carrito */
-.cart-timer-box, .penn-timer-box {
+.cart-timer-box {
   background: #fff8e1;
   border: 2px dashed #ffb300;
   border-radius: 8px;
@@ -445,7 +445,7 @@
   color: #b78103;
 }
 
-.timer-digits, .penn-timer-digits {
+.timer-digits {
   font-size: 22px;
   font-weight: 800;
   font-family: monospace;
@@ -459,7 +459,7 @@
 
 
 /* Tarjetas de Confirmación Estilo Gestión de Cursos */
-.confirm-box, .penn-confirm-box {
+.confirm-box {
   background: #ffffff;
   border: 1px solid #ebebeb;
   border-radius: 6px;
@@ -469,7 +469,7 @@
   height: 100%;
 }
 
-.confirm-box, .penn-confirm-box h3 {
+.confirm-box {
   font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
@@ -479,7 +479,7 @@
   padding-bottom: 8px;
 }
 
-.confirm-box, .penn-confirm-box h3::after {
+.confirm-box {
   content: "";
   position: absolute;
   left: 0;
@@ -489,7 +489,7 @@
   background: #2eca7f;
 }
 
-.channel-card, .penn-channel-card {
+.channel-card {
   background: #F6F7FB;
   border: 1px solid #ebebeb;
   border-radius: 6px;
@@ -499,12 +499,12 @@
   height: 100%;
 }
 
-.channel-card, .penn-channel-card:hover {
+.channel-card {
   border-color: #2eca7f;
   box-shadow: 0 5px 15px rgba(46, 202, 127, 0.08);
 }
 
-.channel-card, .penn-channel-card .channel-icon {
+.channel-card {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -516,7 +516,7 @@
 }
 
 /* Comprobante Oficial SUNAT */
-.penn-sunat-receipt {
+.sunat-receipt {
   background: #ffffff;
   border: 1px solid #dee2e6;
   border-radius: 6px;
@@ -541,7 +541,7 @@
   gap: 10px;
 }
 
-.penn-toast {
+.app-toast {
   background: #ffffff;
   padding: 12px 18px;
   border-radius: 8px;
@@ -558,7 +558,7 @@
   #navigation,
   .section-top,
   .footer,
-  .channel-card, .penn-channel-card,
+  .channel-card,
   button,
   .btn_one,
   .btn_two,
@@ -571,7 +571,7 @@
   body {
     background: #ffffff !important;
   }
-  .confirm-box, .penn-confirm-box {
+  .confirm-box {
     border: 1px solid #ccc !important;
     box-shadow: none !important;
     padding: 15px !important;

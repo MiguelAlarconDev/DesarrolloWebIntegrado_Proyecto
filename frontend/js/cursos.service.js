@@ -60,6 +60,7 @@ const CursosService = {
       }
       if (Array.isArray(remote) && remote.length > 0) {
         console.log(`[CursosService] ¡Éxito! Se obtuvieron ${remote.length} cursos desde PostgreSQL.`);
+        remote.sort((a, b) => (a.id || '').localeCompare(b.id || ''));
         const enriched = remote.map((c, i) => this.enrichCurso(c, i));
         localStorage.setItem('app_cursos_cache', JSON.stringify(enriched));
         return this.filterByModalidad(enriched, modalidad);

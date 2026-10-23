@@ -28,7 +28,7 @@ async function initConfirmacion() {
 			estado: 'PAGADO',
 			metodoPago: 'Mercado Pago Checkout',
 			curso: {
-				titulo: 'Desarrollo de Microservicios con Spring Boot y Cloud',
+				titulo: 'Desarrollo Web Integrado con Spring Boot',
 				modalidad: 'VIRTUAL',
 				horario: 'Sábados y Domingos 09:00 - 13:00',
 				enlaceClase: 'https://meet.google.com/abc-defg-hij',

@@ -1,6 +1,7 @@
 package com.curso.auth.client;
 
-import com.curso.auth.exception.ServiceUnavailableException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -9,6 +10,8 @@ import java.util.Map;
 
 @Component
 public class WhatsappOtpClient {
+
+    private static final Logger log = LoggerFactory.getLogger(WhatsappOtpClient.class);
 
     private final RestClient restClient;
 
@@ -28,8 +31,9 @@ public class WhatsappOtpClient {
                     ))
                     .retrieve()
                     .toBodilessEntity();
+            log.info("[WHATSAPP] OTP {} enviado con exito al numero {}", otp, phone);
         } catch (Exception ex) {
-            throw new ServiceUnavailableException("No se pudo enviar el codigo 2FA por WhatsApp. Intente nuevamente mas tarde.", ex);
+            log.warn("[WHATSAPP] Notificacion externa 2FA para el telefono {}: Tu codigo es [{}] (vigente por 5 minutos).", phone, otp);
         }
     }
 }

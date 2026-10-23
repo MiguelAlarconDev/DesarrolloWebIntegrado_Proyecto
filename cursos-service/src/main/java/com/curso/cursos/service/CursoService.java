@@ -24,15 +24,15 @@ public class CursoService {
     }
 
     public List<Curso> listarPublicos() {
-        return cursoRepository.findByEstado(EstadoCurso.PUBLICADO);
+        return cursoRepository.findByEstadoOrderByIdAsc(EstadoCurso.PUBLICADO);
     }
 
     public List<Curso> listarTodos() {
-        return cursoRepository.findAll();
+        return cursoRepository.findAllByOrderByIdAsc();
     }
 
     public List<Curso> listarPorDocente(UUID docenteId) {
-        return cursoRepository.findByDocenteId(docenteId);
+        return cursoRepository.findByDocenteIdOrderByIdAsc(docenteId);
     }
 
     public Curso buscarPorId(UUID id) {

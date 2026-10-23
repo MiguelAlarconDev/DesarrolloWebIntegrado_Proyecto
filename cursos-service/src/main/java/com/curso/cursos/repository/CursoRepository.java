@@ -11,7 +11,9 @@ import java.util.UUID;
 @Repository
 public interface CursoRepository extends JpaRepository<Curso, UUID> {
 
-    List<Curso> findByEstado(EstadoCurso estado);
+    List<Curso> findByEstadoOrderByIdAsc(EstadoCurso estado);
 
-    List<Curso> findByDocenteId(UUID docenteId);
+    List<Curso> findAllByOrderByIdAsc();
+
+    List<Curso> findByDocenteIdOrderByIdAsc(UUID docenteId);
 }

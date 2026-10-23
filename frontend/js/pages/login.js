@@ -8,7 +8,7 @@ async function hacerLogin(e) {
 	if (e && e.preventDefault) e.preventDefault();
 	const emailEl = document.getElementById('login-email');
 	const pwdEl = document.getElementById('login-pwd');
-	const btn = (document.getElementById('btn-login') || document.getElementById('btn-login-penn'));
+	const btn = (document.getElementById('btn-login'));
 
 	const email = emailEl ? emailEl.value.trim() : '';
 	const pwd = pwdEl ? pwdEl.value.trim() : '';

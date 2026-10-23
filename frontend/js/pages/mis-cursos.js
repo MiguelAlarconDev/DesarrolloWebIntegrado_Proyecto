@@ -25,7 +25,7 @@ function cerrarSesionMisCursos() {
 
 async function initMisCursos() {
 	const user = AuthService.getCurrentUser();
-	const container = (document.getElementById('mis-cursos-list') || document.getElementById('mis-cursos-penn-list'));
+	const container = (document.getElementById('mis-cursos-list'));
 	if (!container) return;
 
 	container.innerHTML = '';
