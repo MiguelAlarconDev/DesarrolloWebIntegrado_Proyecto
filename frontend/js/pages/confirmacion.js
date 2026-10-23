@@ -182,9 +182,8 @@ async function initConfirmacion() {
 		if (btnLink) btnLink.href = curso.enlaceClase || 'https://meet.google.com';
 	}
 
-	// Limpiar contador del carrito
-	const cartCountEl = document.getElementById('cart-nav-counter');
-	if (cartCountEl) cartCountEl.textContent = '0';
+	// Limpiar y sincronizar contador minimalista del carrito
+	CartService.updateBadge();
 	AuthService.updateNavbar();
 
 	// Notificación sutil y elegante de confirmación

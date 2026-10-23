@@ -125,12 +125,14 @@ const CartService = {
       el.textContent = count > 9 ? '9+' : String(count);
       el.classList.toggle('is-empty', count === 0);
       el.classList.toggle('has-items', count > 0);
+      // Look minimalista: solo mostrar el badge numérico si hay cursos en el carrito
+      el.style.display = count > 0 ? 'inline-flex' : 'none';
       const link = el.closest('a');
       if (link) {
         link.classList.toggle('has-items', count > 0);
         link.classList.toggle('is-empty', count === 0);
         const label = count === 0
-          ? 'Tu carrito está vacío'
+          ? 'Ver carrito de cursos'
           : `Ver carrito (${count} ${count === 1 ? 'curso' : 'cursos'})`;
         link.setAttribute('title', label);
         link.setAttribute('aria-label', label);
@@ -138,14 +140,14 @@ const CartService = {
     });
   },
 
-  /** Animación destacada del logo y badge para confirmar cuando se agrega un curso */
+  /** Animación sutil y minimalista para confirmar cuando se agrega un curso */
   bumpBadge() {
     if (typeof document === 'undefined') return;
     document.querySelectorAll('#cart-nav-counter, .cart-nav-counter, .home_lc a, .hlc').forEach(el => {
       el.classList.remove('cart-bump');
-      void el.offsetWidth; // reiniciar animación
+      void el.offsetWidth; // reiniciar micro-animación
       el.classList.add('cart-bump');
-      setTimeout(() => el.classList.remove('cart-bump'), 800);
+      setTimeout(() => el.classList.remove('cart-bump'), 320);
     });
   },
 

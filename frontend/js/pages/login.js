@@ -51,8 +51,7 @@ async function cargarAlumnoDemo() {
 // Inicialización
 $(document).ready(() => {
 	AuthService.updateNavbar();
-	const counterEl = document.getElementById('cart-nav-counter');
-	if (counterEl) counterEl.textContent = CartService.getCartCount();
+	CartService.updateBadge();
 
 	const params = new URLSearchParams(window.location.search);
 	const redirectUrl = params.get('redirect');

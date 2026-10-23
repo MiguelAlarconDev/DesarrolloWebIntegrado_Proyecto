@@ -30,8 +30,7 @@ async function initMisCursos() {
 
 	container.innerHTML = '';
 
-	const counterEl = document.getElementById('cart-nav-counter');
-	if (counterEl) counterEl.textContent = CartService.getCartCount();
+	CartService.updateBadge();
 	AuthService.updateNavbar();
 
 	// =========================================================================
