@@ -366,7 +366,7 @@
 
 /* ==========================================================================
    CUSTOM.CSS - Extensiones Específicas del Negocio
-   Complementa style.css y shop.css de la plantilla Penn sin alterarlos
+   Complementa style.css y shop.css de la Gestión de Cursos sin alterarlos
    ========================================================================== */
 
 /* Prevenir que el preloader bloquee la pantalla con fondo blanco */
@@ -378,7 +378,7 @@
   pointer-events: none !important;
 }
 
-/* Insignias de Modalidad sobre las tarjetas de cursos de Penn */
+/* Insignias de Modalidad sobre las tarjetas de cursos de Gestión de Cursos */
 .badge-mod-virtual {
   background-color: #007bff !important;
   color: #ffffff !important;
@@ -405,7 +405,7 @@
   gap: 5px;
 }
 
-/* Indicador de Aforo en Tiempo Real en la tarjeta Penn */
+/* Indicador de Aforo en Tiempo Real en la tarjeta Gestión de Cursos */
 .seats-live-badge {
   display: inline-block;
   font-weight: 700;
@@ -433,7 +433,7 @@
 }
 
 /* Temporizador de Reserva de 15 Minutos en Carrito */
-.penn-timer-box {
+.cart-timer-box, .penn-timer-box {
   background: #fff8e1;
   border: 2px dashed #ffb300;
   border-radius: 8px;
@@ -445,7 +445,7 @@
   color: #b78103;
 }
 
-.penn-timer-digits {
+.timer-digits, .penn-timer-digits {
   font-size: 22px;
   font-weight: 800;
   font-family: monospace;
@@ -458,8 +458,8 @@
 
 
 
-/* Tarjetas de Confirmación Estilo Penn */
-.penn-confirm-box {
+/* Tarjetas de Confirmación Estilo Gestión de Cursos */
+.confirm-box, .penn-confirm-box {
   background: #ffffff;
   border: 1px solid #ebebeb;
   border-radius: 6px;
@@ -469,7 +469,7 @@
   height: 100%;
 }
 
-.penn-confirm-box h3 {
+.confirm-box, .penn-confirm-box h3 {
   font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
@@ -479,7 +479,7 @@
   padding-bottom: 8px;
 }
 
-.penn-confirm-box h3::after {
+.confirm-box, .penn-confirm-box h3::after {
   content: "";
   position: absolute;
   left: 0;
@@ -489,7 +489,7 @@
   background: #2eca7f;
 }
 
-.penn-channel-card {
+.channel-card, .penn-channel-card {
   background: #F6F7FB;
   border: 1px solid #ebebeb;
   border-radius: 6px;
@@ -499,12 +499,12 @@
   height: 100%;
 }
 
-.penn-channel-card:hover {
+.channel-card, .penn-channel-card:hover {
   border-color: #2eca7f;
   box-shadow: 0 5px 15px rgba(46, 202, 127, 0.08);
 }
 
-.penn-channel-card .channel-icon {
+.channel-card, .penn-channel-card .channel-icon {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -558,7 +558,7 @@
   #navigation,
   .section-top,
   .footer,
-  .penn-channel-card,
+  .channel-card, .penn-channel-card,
   button,
   .btn_one,
   .btn_two,
@@ -571,7 +571,7 @@
   body {
     background: #ffffff !important;
   }
-  .penn-confirm-box {
+  .confirm-box, .penn-confirm-box {
     border: 1px solid #ccc !important;
     box-shadow: none !important;
     padding: 15px !important;

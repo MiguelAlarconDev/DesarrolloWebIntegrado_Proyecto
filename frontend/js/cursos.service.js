@@ -19,7 +19,7 @@ const CursosService = {
 
   /**
    * Enriquece los datos del curso provenientes de PostgreSQL
-   * asignando imágenes de la plantilla Penn y nombre del docente
+   * asignando imágenes de la Gestión de Cursos y nombre del docente
    */
   enrichCurso(curso, index = 0) {
     if (!curso) return null;

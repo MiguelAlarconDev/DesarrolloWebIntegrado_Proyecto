@@ -7,7 +7,7 @@ let allCursos = (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES) ? [...
 let currentModalidadHome = 'TODOS';
 let paidCourseIdsHome = new Set();
 
-async function initPennHome() {
+async function initHome() {
 	actualizarEstadoNavbar();
 
 	// Soporte de modalidad desde la URL (ej. index.html?modalidad=VIRTUAL)
@@ -67,10 +67,10 @@ function filtrarCursos(mod, btn) {
 	});
 	if (btn) btn.className = 'btn_one me-2 mb-2';
 	const filtered = CursosService.filterByModalidad(allCursos, mod);
-	renderPennCourses(filtered);
+	renderCursos(filtered);
 }
 
-function renderPennCourses(list) {
+function renderCursos(list) {
 	const container = (document.getElementById('cursos-container') || document.getElementById('penn-courses-container'));
 	if (!container) return;
 
@@ -205,4 +205,4 @@ window.addEventListener('cartUpdated', () => {
 });
 
 // Inicialización
-$(document).ready(initPennHome);
+$(document).ready(initHome);

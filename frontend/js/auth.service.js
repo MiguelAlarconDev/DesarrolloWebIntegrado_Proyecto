@@ -200,7 +200,20 @@ const AuthService = {
       }
     }
 
-    // "Mis Clases" permanece siempre accesible en el menú principal para todos los usuarios
+    // Resaltar la página activa en el menú de navegación para que el usuario siempre sepa en qué sección está
+    if (typeof window !== 'undefined') {
+      const current = window.location.pathname.split('/').pop() || 'index.html';
+      const cleanCurrent = current.replace(/\.html$/, '') || 'index';
+      document.querySelectorAll('#main-menu a, .site-navigation a.nav-link').forEach(link => {
+        const href = (link.getAttribute('href') || '').split('#')[0].split('?')[0];
+        const cleanHref = href.replace(/\.html$/, '') || 'index';
+        if (cleanHref === cleanCurrent) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
   }
 };
 

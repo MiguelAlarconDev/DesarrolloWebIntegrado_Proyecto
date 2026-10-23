@@ -1,6 +1,6 @@
 /*
 Author       : theme_ocean 
-Template Name: Penn - Education HTML Template
+Template Name: Gestión de Cursos - Plataforma de Capacitación
 Version      : 1.0
 */
 (function($) {

@@ -101,10 +101,10 @@ function applyFilter() {
 			(c.docente && c.docente.toLowerCase().includes(searchKeyword))
 		);
 	}
-	renderPennCourses(filtered);
+	renderCursos(filtered);
 }
 
-function renderPennCourses(list) {
+function renderCursos(list) {
 	const container = (document.getElementById('cursos-container') || document.getElementById('penn-courses-container'));
 	if (!container) return;
 

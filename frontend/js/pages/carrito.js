@@ -6,7 +6,7 @@
 
 let intervalTimer = null;
 
-async function initPennCart() {
+async function initCart() {
 	// 1. Si el usuario está autenticado, verificar si ya pagó algún curso que esté en el carrito
 	const user = AuthService.getCurrentUser();
 	if (user) {
@@ -245,9 +245,5 @@ function activarTimer() {
 	intervalTimer = setInterval(updateTimerDisplay, 1000);
 }
 
-// Inicialización garantizada en todos los navegadores
-$(document).ready(initPennCart);
-window.addEventListener('pageshow', initPennCart);
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-	initPennCart();
-}
+// Inicialización única al cargar el DOM
+$(document).ready(initCart);
