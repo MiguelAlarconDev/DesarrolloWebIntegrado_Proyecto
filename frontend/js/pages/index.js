@@ -1,20 +1,28 @@
 /**
- * index.js - Lógica de la Página Principal (Home)
- * Gestión del catálogo destacado, filtrado por modalidad y reserva de vacantes con control de usuario.
+ * index.js - Lógica de la Página Principal y Catálogo Unificado
+ * Gestión del catálogo completo, buscador en tiempo real, filtrado por modalidad
+ * y reserva de vacantes con control de usuario.
  */
 
 let allCursos = (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES) ? [...CONFIG.INITIAL_COURSES] : [];
 let currentModalidadHome = 'TODOS';
+let searchKeywordHome = '';
 let paidCourseIdsHome = new Set();
 
 async function initHome() {
 	actualizarEstadoNavbar();
 
-	// Soporte de modalidad desde la URL (ej. index.html?modalidad=VIRTUAL)
+	// Soporte de modalidad y búsqueda desde URL (ej. index.html?modalidad=VIRTUAL o ?q=spring)
 	const params = new URLSearchParams(window.location.search);
 	const urlMod = (params.get('modalidad') || '').toUpperCase();
 	if (['VIRTUAL', 'PRESENCIAL', 'TODOS'].includes(urlMod)) {
 		currentModalidadHome = urlMod;
+	}
+	const urlQ = params.get('q') || '';
+	if (urlQ) {
+		searchKeywordHome = urlQ.toLowerCase().trim();
+		const sInput = document.getElementById('buscador-cursos');
+		if (sInput) sInput.value = urlQ;
 	}
 
 	await cargarCursosPagadosAlumnoHome();
@@ -28,7 +36,7 @@ async function initHome() {
 		console.warn('Usando cursos iniciales precargados:', e);
 	}
 
-	filtrarCursos(currentModalidadHome, null);
+	applyFilterHome();
 	actualizarEstadoNavbar();
 }
 
@@ -55,27 +63,52 @@ function actualizarEstadoNavbar() {
 	AuthService.updateNavbar();
 }
 
+function buscarCursos(keyword) {
+	searchKeywordHome = (keyword || '').toLowerCase().trim();
+	applyFilterHome();
+}
+
 function filtrarCursos(mod, btn) {
 	currentModalidadHome = mod;
-	document.querySelectorAll('#cursos-section button').forEach(b => {
+	document.querySelectorAll('#cursos-section .filter-mod-btn, #cursos-section button').forEach(b => {
 		const onclickAttr = b.getAttribute('onclick') || '';
 		if (onclickAttr.includes(`'${mod}'`)) {
-			b.className = 'btn_one me-2 mb-2';
-		} else {
-			b.className = 'btn_two me-2 mb-2';
+			b.className = 'btn_one me-2 mb-2 filter-mod-btn';
+		} else if (onclickAttr.includes('filtrarCursos')) {
+			b.className = 'btn_two me-2 mb-2 filter-mod-btn';
 		}
 	});
-	if (btn) btn.className = 'btn_one me-2 mb-2';
-	const filtered = CursosService.filterByModalidad(allCursos, mod);
+	if (btn) btn.className = 'btn_one me-2 mb-2 filter-mod-btn';
+	applyFilterHome();
+}
+
+function applyFilterHome() {
+	let filtered = CursosService.filterByModalidad(allCursos, currentModalidadHome);
+	if (searchKeywordHome) {
+		filtered = filtered.filter(c =>
+			(c.titulo && c.titulo.toLowerCase().includes(searchKeywordHome)) ||
+			(c.descripcion && c.descripcion.toLowerCase().includes(searchKeywordHome)) ||
+			(c.docente && c.docente.toLowerCase().includes(searchKeywordHome))
+		);
+	}
 	renderCursos(filtered);
 }
 
 function renderCursos(list) {
-	const container = (document.getElementById('cursos-container'));
+	const container = document.getElementById('cursos-container');
 	if (!container) return;
 
 	if (!list || list.length === 0) {
-		container.innerHTML = `<div class="col-12 text-center py-5"><h4>No se encontraron cursos disponibles en esta categoría.</h4></div>`;
+		container.innerHTML = `
+			<div class="col-12 text-center py-5">
+				<div style="max-width: 460px; margin: 0 auto; background: #ffffff; padding: 36px 24px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid #eef2f6;">
+					<i class="fa fa-search text-muted mb-3" style="font-size: 38px; display: block;"></i>
+					<h4 style="font-size: 18px; font-weight: 700; color: #1a2d62; margin-bottom: 8px;">No se encontraron cursos</h4>
+					<p style="color: #64748b; font-size: 14px; margin-bottom: 16px;">Intenta con otro término de búsqueda o selecciona "Todos los Cursos".</p>
+					<button onclick="buscarCursos(''); document.getElementById('buscador-cursos').value=''; filtrarCursos('TODOS', null);" class="btn_one" style="padding: 6px 18px; font-size: 13px;">Ver todos los cursos</button>
+				</div>
+			</div>
+		`;
 		return;
 	}
 
@@ -191,7 +224,7 @@ function reservar(cursoId) {
 
 	const res = CartService.addToCart(c);
 	actualizarEstadoNavbar();
-	filtrarCursos(currentModalidadHome, null);
+	applyFilterHome();
 
 	Notifications.showToast(res.message || '¡Curso agregado a tu carrito!', 'success');
 	setTimeout(() => {
@@ -201,7 +234,7 @@ function reservar(cursoId) {
 
 // Reactividad ante cambios del carrito
 window.addEventListener('cartUpdated', () => {
-	filtrarCursos(currentModalidadHome, null);
+	applyFilterHome();
 });
 
 // Inicialización

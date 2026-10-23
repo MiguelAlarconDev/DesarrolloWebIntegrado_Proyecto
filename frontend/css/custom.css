@@ -1,3 +1,8 @@
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+}
+
 /* ==========================================================================
    ALINEACIÓN EXACTA, NIVELADA Y CUADRADA DEL NAVBAR
    (LOGO, MENÚ DE NAVEGACIÓN, ÍCONO DEL CARRITO Y BOTONES DE AUTENTICACIÓN)
