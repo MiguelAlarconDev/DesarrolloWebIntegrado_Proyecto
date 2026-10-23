@@ -11,6 +11,7 @@ import com.curso.auth.entity.Usuario;
 import com.curso.auth.exception.AuthenticationException;
 import com.curso.auth.repository.UsuarioRepository;
 import com.curso.auth.security.JwtService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +29,28 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final WhatsappOtpClient whatsappOtpClient;
+    private final NotificacionEmailAuthService notificacionEmailAuthService;
 
     public AuthService(
             UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             WhatsappOtpClient whatsappOtpClient) {
+        this(usuarioRepository, passwordEncoder, jwtService, whatsappOtpClient, null);
+    }
+
+    @Autowired
+    public AuthService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            WhatsappOtpClient whatsappOtpClient,
+            @Autowired(required = false) NotificacionEmailAuthService notificacionEmailAuthService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.whatsappOtpClient = whatsappOtpClient;
+        this.notificacionEmailAuthService = notificacionEmailAuthService;
     }
 
     public AuthResponse registrar(RegistroUsuarioRequest request) {
@@ -67,6 +80,11 @@ public class AuthService {
         }
 
         Usuario guardado = usuarioRepository.save(usuario);
+
+        // Envío automático de correo de bienvenida si SMTP está configurado
+        if (notificacionEmailAuthService != null) {
+            notificacionEmailAuthService.enviarBienvenidaRegistro(guardado);
+        }
 
         return new AuthResponse(
                 "Usuario registrado exitosamente",
