@@ -7,6 +7,9 @@ import com.curso.pedidos.service.NotificacionEmailService;
 import com.curso.pedidos.service.PedidoService;
 import com.curso.pedidos.service.WhatsAppCloudService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +24,14 @@ import java.util.UUID;
 @CrossOrigin(origins = "*")
 public class PedidoController {
 
+    private static final Logger log = LoggerFactory.getLogger(PedidoController.class);
+
     private final PedidoService pedidoService;
     private final WhatsAppCloudService whatsAppCloudService;
     private final NotificacionEmailService notificacionEmailService;
+
+    @Value("${whatsapp.cloud.api.verify-token:cursos_meta_verify_token_2026}")
+    private String whatsappVerifyToken;
 
     public PedidoController(PedidoService pedidoService,
                             WhatsAppCloudService whatsAppCloudService,
@@ -119,6 +127,7 @@ public class PedidoController {
         status.put("configurado", whatsAppCloudService.isConfigurado());
         status.put("version", whatsAppCloudService.getVersion());
         status.put("phoneNumberId", whatsAppCloudService.getPhoneNumberId().isBlank() ? "NO_CONFIGURADO" : whatsAppCloudService.getPhoneNumberId());
+        status.put("verifyToken", whatsappVerifyToken);
         status.put("instrucciones", "Para conectar con WhatsApp real, define WHATSAPP_PHONE_NUMBER_ID y WHATSAPP_API_TOKEN en application.properties o variables de entorno.");
         return ResponseEntity.ok(status);
     }
@@ -151,6 +160,35 @@ public class PedidoController {
                 "metaConfigurado", whatsAppCloudService.isConfigurado(),
                 "mensaje", "Reintento de despacho WhatsApp procesado."
         ));
+    }
+
+    /**
+     * Endpoint oficial de Webhook para verificación con Meta (Handshake GET).
+     */
+    @GetMapping("/whatsapp/webhook")
+    public ResponseEntity<String> verifyWhatsAppWebhook(
+            @RequestParam(value = "hub.mode", required = false) String mode,
+            @RequestParam(value = "hub.verify_token", required = false) String verifyToken,
+            @RequestParam(value = "hub.challenge", required = false) String challenge) {
+
+        log.info("[META WEBHOOK] Verificación solicitada por Meta: mode={}, verify_token={}", mode, verifyToken);
+
+        if ("subscribe".equals(mode) && whatsappVerifyToken.equals(verifyToken)) {
+            log.info("[META WEBHOOK] ✅ Webhook verificado exitosamente con Meta.");
+            return ResponseEntity.ok(challenge);
+        }
+
+        log.warn("[META WEBHOOK] ❌ Token de verificación inválido. Esperado: {}, Recibido: {}", whatsappVerifyToken, verifyToken);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Verification token mismatch");
+    }
+
+    /**
+     * Endpoint oficial de Webhook para recibir notificaciones y estados de entrega de Meta (POST).
+     */
+    @PostMapping("/whatsapp/webhook")
+    public ResponseEntity<String> receiveWhatsAppWebhook(@RequestBody(required = false) Map<String, Object> payload) {
+        log.info("[META WEBHOOK] Evento de estado recibido de Meta: {}", payload);
+        return ResponseEntity.ok("EVENT_RECEIVED");
     }
 
     // =========================================================================
