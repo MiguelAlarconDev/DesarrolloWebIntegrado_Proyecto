@@ -48,8 +48,8 @@
 					<div class="header_right">
 						<nav id="main-menu" class="ms-auto">
 							<ul>
-								<li><a class="nav-link" href="#home">Inicio</a></li>
-								<li><a class="nav-link" href="#cursos-section">Cursos</a></li>
+								<li><a class="nav-link" href="#home" onclick="irASeccion('home'); return false;">Inicio</a></li>
+								<li><a class="nav-link" href="#cursos-section" onclick="irASeccion('cursos-section'); return false;">Cursos</a></li>
 								<li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
 								<li><a class="nav-link" href="mis-cursos.html">Mis Clases</a></li>
 							</ul>
@@ -84,7 +84,7 @@
 						<p>Inscripción 100% automatizada: Elige tu curso, reserva tu vacante en tiempo real sin sobreventa, paga seguro con Mercado Pago y recibe al instante tu boleta y tus accesos de Zoom o Aula por WhatsApp.</p>						
 					</div>
 					<div class="home_btn">
-						<a href="#cursos-section" class="cta"><span>Explorar Cursos</span>
+						<a href="#cursos-section" onclick="irASeccion('cursos-section'); return false;" class="cta"><span>Explorar Cursos</span>
 						  <svg width="13px" height="10px" viewBox="0 0 13 10">
 							<path d="M1,5 L11,5"></path>
 							<polyline points="8 1 12 5 8 9"></polyline>
@@ -216,7 +216,7 @@
 								<span class="d-block text-muted mb-1" style="font-size: 14px;"><i class="fa fa-calendar text-primary me-1"></i> Lun y Mie 19:00 - 22:00</span>
 								<span class="d-block text-muted mb-3" style="font-size: 14px;"><i class="fa fa-user-circle text-secondary me-1"></i> Ing. Roberto Docente</span>
 								<div class="mb-3">
-									<span class="seats-live-badge"><i class="fa fa-table"></i> <strong>29 Vacantes Disponibles</strong> (de 30)</span>
+									<span class="seats-live-badge"><i class="fa fa-table"></i> <strong>8 Vacantes Disponibles</strong> (de 30)</span>
 								</div>
 							</div>
 							<div class="d-flex justify-content-between align-items-center pt-3 border-top">
@@ -247,7 +247,7 @@
 								<span class="d-block text-muted mb-1" style="font-size: 14px;"><i class="fa fa-calendar text-primary me-1"></i> Mar y Jue 20:00 - 22:00</span>
 								<span class="d-block text-muted mb-3" style="font-size: 14px;"><i class="fa fa-user-circle text-secondary me-1"></i> Ing. Roberto Docente</span>
 								<div class="mb-3">
-									<span class="seats-live-badge"><i class="fa fa-table"></i> <strong>25 Vacantes Disponibles</strong> (de 25)</span>
+									<span class="seats-live-badge"><i class="fa fa-table"></i> <strong>17 Vacantes Disponibles</strong> (de 25)</span>
 								</div>
 							</div>
 							<div class="d-flex justify-content-between align-items-center pt-3 border-top">
@@ -278,7 +278,7 @@
 								<span class="d-block text-muted mb-1" style="font-size: 14px;"><i class="fa fa-calendar text-primary me-1"></i> Sab 09:00 - 13:00</span>
 								<span class="d-block text-muted mb-3" style="font-size: 14px;"><i class="fa fa-user-circle text-secondary me-1"></i> Ing. Roberto Docente</span>
 								<div class="mb-3">
-									<span class="seats-live-badge"><i class="fa fa-table"></i> <strong>20 Vacantes Disponibles</strong> (de 20)</span>
+									<span class="seats-live-badge"><i class="fa fa-table"></i> <strong>9 Vacantes Disponibles</strong> (de 20)</span>
 								</div>
 							</div>
 							<div class="d-flex justify-content-between align-items-center pt-3 border-top">
@@ -316,7 +316,7 @@
 						<h4>Enlaces Rápidos</h4>
 						<ul>
 							<li><a href="index.html">Inicio</a></li>
-							<li><a href="#cursos-section">Catálogo de Cursos</a></li>
+							<li><a href="#cursos-section" onclick="irASeccion('cursos-section'); return false;">Catálogo de Cursos</a></li>
 							<li><a href="carrito.html">Carrito de Matrícula</a></li>
 							<li><a href="mis-cursos.html">Mis Clases (Zoom/Sede)</a></li>
 							<li><a href="login.html">Portal de Alumnos</a></li>
@@ -399,5 +399,16 @@
 
 	<!-- Logica de la pagina: Home -->
 	<script src="js/pages/index.js"></script>
+	<script>
+	function irASeccion(id) {
+		const el = document.getElementById(id);
+		if (el) {
+			el.scrollIntoView({ behavior: 'smooth' });
+			if (window.history && window.history.replaceState) {
+				window.history.replaceState(null, null, window.location.pathname);
+			}
+		}
+	}
+	</script>
 </body>
 </html>

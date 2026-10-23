@@ -3,7 +3,9 @@
  */
 const CONFIG = {
   // Enrutamiento de Microservicios a través del API Gateway
-  API_BASE_URL: 'http://localhost:8080/api',
+  API_BASE_URL: (typeof window !== 'undefined' && window.location.port === '8080')
+    ? `${window.location.origin}/api`
+    : 'http://localhost:8080/api',
   AUTH_SERVICE_URL: 'http://localhost:8081/api/auth',
   CURSOS_SERVICE_URL: 'http://localhost:8082/api/cursos',
   PEDIDOS_SERVICE_URL: 'http://localhost:8083/api/pedidos',
@@ -17,8 +19,7 @@ const CONFIG = {
     LAST_ORDER: 'last_successful_order'
   },
 
-  // Datos semilla sincronizados al 100% con database/schema_local.sql
-  // Mismos 3 cursos oficiales en PostgreSQL: Desarrollo Web, Arquitectura Cloud y Taller Presencial
+  // Datos semilla sincronizados al 100% con database/schema_local.sql y PostgreSQL
   INITIAL_COURSES: [
     {
       id: 'b0000000-0000-0000-0000-000000000001',
@@ -30,7 +31,7 @@ const CONFIG = {
       fechaInicio: '2026-10-15T19:00:00Z',
       fechaFin: '2026-11-20T22:00:00Z',
       aforoMaximo: 30,
-      aforoDisponible: 30,
+      aforoDisponible: 8,
       enlaceClase: 'https://meet.google.com/abc-defg-hij',
       direccionClase: null,
       aula: null,
@@ -47,7 +48,7 @@ const CONFIG = {
       fechaInicio: '2026-10-18T20:00:00Z',
       fechaFin: '2026-11-25T22:00:00Z',
       aforoMaximo: 25,
-      aforoDisponible: 25,
+      aforoDisponible: 17,
       enlaceClase: 'https://zoom.us/j/9876543210',
       direccionClase: null,
       aula: null,
@@ -64,7 +65,7 @@ const CONFIG = {
       fechaInicio: '2026-10-20T09:00:00Z',
       fechaFin: '2026-11-28T13:00:00Z',
       aforoMaximo: 20,
-      aforoDisponible: 20,
+      aforoDisponible: 9,
       enlaceClase: null,
       direccionClase: 'Av. Universitaria 1234, Lima',
       aula: 'Laboratorio 204',
