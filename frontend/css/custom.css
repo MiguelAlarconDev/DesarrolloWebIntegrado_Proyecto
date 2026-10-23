@@ -587,76 +587,313 @@ html {
 
 
 
-/* Tarjetas de Confirmación Estilo Gestión de Cursos */
-.confirm-box {
-  background: #ffffff;
-  border: 1px solid #ebebeb;
-  border-radius: 6px;
-  padding: 30px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-  margin-bottom: 30px;
-  height: 100%;
+/* ==========================================================================
+   PÁGINA DE CONFIRMACIÓN DE MATRÍCULA Y COMPROBANTE SUNAT
+   Diseño profesional, moderno, limpio y responsive
+   ========================================================================== */
+
+.confirmacion-page {
+  background: #f8fafc;
+  min-height: calc(100vh - 70px);
+  padding: 40px 0 70px;
 }
 
-.confirm-box {
-  font-size: 15px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #1a2d62;
-  margin-bottom: 20px;
-  position: relative;
-  padding-bottom: 8px;
+/* Header Hero de Confirmación */
+.confirm-hero {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 36px;
 }
 
-.confirm-box {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 40px;
-  height: 2px;
-  background: #2eca7f;
-}
-
-.channel-card {
-  background: #F6F7FB;
-  border: 1px solid #ebebeb;
-  border-radius: 6px;
-  padding: 24px;
-  margin-bottom: 20px;
-  transition: all 0.3s ease;
-  height: 100%;
-}
-
-.channel-card {
-  border-color: #2eca7f;
-  box-shadow: 0 5px 15px rgba(46, 202, 127, 0.08);
-}
-
-.channel-card {
-  width: 48px;
-  height: 48px;
+.confirm-success-icon {
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
+  background: #dcfce7;
+  color: #16a34a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+  box-shadow: 0 0 0 8px #f0fdf4;
+}
+
+.confirm-hero h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.confirm-hero p {
+  font-size: 14.5px;
+  color: #64748b;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.confirm-meta-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 20px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  font-size: 13px;
+  color: #334155;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.confirm-meta-bar strong {
+  color: #0f172a;
+}
+
+.confirm-meta-bar .badge-paid {
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+
+/* Tarjetas Principales: Detalles de Programa y Comprobante */
+.confirm-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  margin-bottom: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.confirm-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.confirm-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #0f172a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.confirm-card-title i {
+  color: #2eca7f;
+  font-size: 17px;
+}
+
+/* Caja de Acceso al Aula Virtual / Sede */
+.access-room-box {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.access-room-box h5 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.access-room-box p {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+
+.btn-enter-room {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: #2eca7f !important;
+  color: #ffffff !important;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(46, 202, 127, 0.3);
+}
+
+.btn-enter-room:hover {
+  background: #25b36f !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* Vales de SUNAT oficiales */
+.sunat-official-box {
+  border: 1.5px solid #0f172a;
+  border-radius: 8px;
+  padding: 8px 14px;
+  text-align: center;
+  background: #ffffff;
+}
+
+.sunat-table {
+  width: 100%;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.sunat-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.sunat-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.sunat-totals-card {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* Canales de Notificación Automática */
+.delivery-channel-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+  margin-bottom: 20px;
+  transition: all 0.25s ease;
+}
+
+.delivery-channel-card:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.delivery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.delivery-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-  margin-bottom: 15px;
+  font-size: 20px;
+  color: #ffffff;
 }
 
-/* Comprobante Oficial SUNAT */
-.sunat-receipt {
-  background: #ffffff;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  padding: 25px;
+.delivery-icon.email-icon {
+  background: #0f172a;
 }
 
-.sunat-box {
-  border: 2px solid #1a2d62;
-  border-radius: 4px;
-  padding: 8px 12px;
-  text-align: center;
+.delivery-icon.wa-icon {
+  background: #22c55e;
+}
+
+.delivery-chip {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.delivery-body {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+}
+
+/* Botón Principal */
+.btn-primary-classes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 38px;
+  font-size: 15.5px;
+  font-weight: 800;
+  border-radius: 10px;
+  background: #2eca7f !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 18px rgba(46, 202, 127, 0.35);
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.btn-primary-classes:hover {
+  background: #25b36f !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(46, 202, 127, 0.45);
+}
+
+.btn-print-voucher {
+  width: 100%;
+  padding: 11px;
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-print-voucher:hover {
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 /* Toast */
@@ -685,25 +922,23 @@ html {
 /* Modo Impresión / PDF */
 @media print {
   #navigation,
-  .section-top,
+  .site-navigation,
   .footer,
-  .channel-card,
-  button,
-  .btn_one,
-  .btn_two,
+  .delivery-channel-card,
+  .btn-print-voucher,
+  .btn-primary-classes,
+  .back-home-link,
   #toast-container {
     display: none !important;
   }
-  .section-padding {
+  body, .confirmacion-page {
+    background: #ffffff !important;
     padding: 0 !important;
   }
-  body {
-    background: #ffffff !important;
-  }
-  .confirm-box {
+  .confirm-card {
     border: 1px solid #ccc !important;
     box-shadow: none !important;
-    padding: 15px !important;
+    padding: 16px !important;
   }
 }
 

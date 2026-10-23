@@ -30,7 +30,7 @@
 </head>
 <body>
 	
-		<!-- START NAVBAR -->  
+	<!-- START NAVBAR -->  
 	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
 		<div class="container">
 			<div class="row align-items-center">
@@ -72,45 +72,24 @@
 	</div> 	  
 	<!-- END NAVBAR -->
 
-	<!-- START SECTION TOP  -->
-	<section class="section-top">
+	<!-- START CONFIRMATION CONTENT -->
+	<main class="confirmacion-page">
 		<div class="container">
-			<div class="col-lg-10 offset-lg-1 text-center">
-				<div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s">
-					<h1>¡Matrícula Exitosa!</h1>
-					<ul>
-						<li><a href="index.html">Inicio</a></li>
-						<li> / Confirmación de Pago y Accesos</li>
-					</ul>
+			<!-- Header Hero de Éxito -->
+			<div class="confirm-hero">
+				<div class="confirm-success-icon">
+					<i class="fa fa-check"></i>
 				</div>
-			</div>
-		</div>
-	</section>	
-	<!-- END SECTION TOP -->
-
-	<!-- Contenido de Confirmación -->
-	<div class="section-padding" style="padding-top: 50px; background: #fff;">
-		<div class="container">
-			<!-- Header de Éxito Estilo Gestión de Cursos -->
-			<div class="row">
-				<div class="col-12 text-center" style="margin-bottom: 35px;">
-					<div style="width: 65px; height: 65px; line-height: 65px; background: #2eca7f; color: #fff; border-radius: 50%; font-size: 30px; margin: 0 auto 15px; box-shadow: 0 4px 15px rgba(46, 202, 127, 0.35);">
-						<i class="fa fa-check"></i>
-					</div>
-					<div class="section-title text-center" style="margin-bottom: 12px;">
-						<h2>CONFIRMACIÓN DE MATRÍCULA</h2>
-						<p style="font-size: 32px; line-height: 38px; margin: 0 auto; width: 100%;">¡Tu vacante ha sido asegurada con éxito!</p>
-					</div>
-					<p style="color: #666; font-size: 14px; max-width: 650px; margin: 0 auto 15px;">
-						Hemos registrado tu inscripción en el sistema académico y emitido tu comprobante electrónico de pago en <strong>Gestión de Cursos</strong>.
-					</p>
-					<div style="display: inline-flex; align-items: center; gap: 15px; padding: 10px 22px; background: #F6F7FB; border: 1px solid #ebebeb; border-radius: 4px; flex-wrap: wrap; justify-content: center;">
-						<span><i class="fa fa-barcode" style="color: #2eca7f;"></i> Código: <strong id="code-order-display" style="color: #1a2d62;">ORD-000000</strong></span>
-						<span style="color: #ccc;">|</span>
-						<span><i class="fa fa-calendar" style="color: #2eca7f;"></i> Fecha: <strong id="order-date-display" style="color: #1a2d62;">05/10/2026</strong></span>
-						<span style="color: #ccc;">|</span>
-						<span class="badge" style="background: #2eca7f; color: #fff; padding: 5px 12px; font-weight: 700; border-radius: 2px;">PAGADO</span>
-					</div>
+				<h1>¡Matrícula Confirmada con Éxito!</h1>
+				<p>
+					Tu vacante ha sido asegurada y tu comprobante oficial fue emitido en <strong>Gestión de Cursos</strong>.
+				</p>
+				<div class="confirm-meta-bar">
+					<span><i class="fa fa-barcode" style="color: #2eca7f; margin-right: 4px;"></i> Código: <strong id="code-order-display">ORD-894210</strong></span>
+					<span style="color: #cbd5e1;">&bull;</span>
+					<span><i class="fa fa-calendar" style="color: #2eca7f; margin-right: 4px;"></i> Fecha: <strong id="order-date-display">23/10/2026</strong></span>
+					<span style="color: #cbd5e1;">&bull;</span>
+					<span class="badge-paid"><i class="fa fa-check me-1"></i>PAGADO</span>
 				</div>
 			</div>
 
@@ -118,191 +97,198 @@
 			<div class="row">
 				<!-- Columna 1: DETALLES DEL PROGRAMA Y ACCESO -->
 				<div class="col-lg-6 col-12 mb-4">
-					<div class="confirm-box">
-						<h3><i class="fa fa-graduation-cap" style="color: #2eca7f; margin-right: 8px;"></i> Detalles de tu Programa</h3>
+					<div class="confirm-card">
+						<div class="confirm-card-header">
+							<h3 class="confirm-card-title"><i class="fa fa-graduation-cap"></i> Detalles de tu Programa</h3>
+							<span id="rec-curso-mod" class="badge bg-primary" style="font-size: 11px; padding: 5px 10px; font-weight: 700; border-radius: 999px;">VIRTUAL</span>
+						</div>
 						
-						<h4 id="rec-curso-title" style="color: #1a2d62; font-weight: 700; font-size: 18px; margin-bottom: 8px; line-height: 1.3;">
-							Curso Profesional
+						<h4 id="rec-curso-title" style="color: #0f172a; font-weight: 800; font-size: 19px; margin-bottom: 10px; line-height: 1.35;">
+							Desarrollo Web Integrado con Spring Boot
 						</h4>
 
-						<div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
-							<span id="rec-curso-mod" class="badge bg-primary" style="font-size: 11px; padding: 5px 10px; font-weight: 700; border-radius: 3px;">VIRTUAL</span>
-							<span style="color: #666; font-size: 13px;"><i class="fa fa-clock-o" style="color: #2eca7f; margin-right: 4px;"></i> <strong id="rec-horario">Lun y Mie 19:00 - 22:00</strong></span>
+						<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px; color: #64748b; font-size: 13.5px;">
+							<i class="fa fa-clock-o" style="color: #2eca7f;"></i>
+							<span id="rec-horario" style="font-weight: 600; color: #334155;">Sábados y Domingos 09:00 - 13:00</span>
 						</div>
 
 						<!-- Caja Destacada de Acceso al Aula -->
-						<div id="box-acceso-aula" style="background: #F6F7FB; border: 1px solid #e0e0e0; border-radius: 4px; padding: 18px; margin: 18px 0;">
-							<h5 style="font-size: 14px; font-weight: 700; color: #1a2d62; margin-bottom: 6px;">
-								<i class="fa fa-video-camera" style="color: #2eca7f; margin-right: 6px;"></i> Sala de Clases en Vivo (Google Meet / Zoom)
+						<div id="box-acceso-aula" class="access-room-box">
+							<h5>
+								<i class="fa fa-video-camera" style="color: #2eca7f;"></i> Sala de Clases en Vivo (Google Meet / Zoom)
 							</h5>
-							<p style="font-size: 12px; color: #666; margin-bottom: 12px;">
-								El enlace para unirte a tus sesiones en tiempo real ya se encuentra disponible:
+							<p>
+								El enlace para unirte a tus sesiones en tiempo real ya se encuentra habilitado para tu cuenta:
 							</p>
-							<a id="btn-link-clase" href="#" target="_blank" class="btn_one" style="display: inline-block; padding: 9px 20px; font-size: 13px; text-decoration: none; border-radius: 3px;">
-								<i class="fa fa-external-link" style="margin-right: 6px;"></i> Entrar a la Sala Virtual
+							<a id="btn-link-clase" href="https://meet.google.com" target="_blank" class="btn-enter-room">
+								<i class="fa fa-external-link"></i> Entrar a la Sala Virtual
 							</a>
 						</div>
 
 						<!-- Datos del Estudiante Matriculado -->
-						<h5 style="font-size: 13px; font-weight: 700; color: #555; text-transform: uppercase; margin-bottom: 10px; border-top: 1px solid #ebebeb; padding-top: 15px;">
-							Datos del Estudiante Matriculado
-						</h5>
-						<div class="row g-2" style="font-size: 13px; color: #444;">
-							<div class="col-sm-6 col-12"><strong>Alumno:</strong> <span id="rec-cliente">Carlos Alarcón</span></div>
-							<div class="col-sm-6 col-12"><strong>Documento:</strong> <span id="rec-doc">74859612</span></div>
-							<div class="col-sm-6 col-12"><strong>WhatsApp:</strong> <span id="rec-telefono">999555666</span></div>
-							<div class="col-sm-6 col-12"><strong>Correo:</strong> <span id="rec-correo">alumno@cursos.com</span></div>
+						<div style="border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: auto;">
+							<h5 style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+								Datos del Alumno Titular
+							</h5>
+							<div class="row g-2" style="font-size: 13px; color: #334155;">
+								<div class="col-sm-6 col-12"><strong>Alumno:</strong> <span id="rec-cliente">Carlos Alarcón</span></div>
+								<div class="col-sm-6 col-12"><strong>Documento:</strong> <span id="rec-doc">74859612</span></div>
+								<div class="col-sm-6 col-12"><strong>WhatsApp:</strong> <span id="rec-telefono">935300159</span></div>
+								<div class="col-sm-6 col-12"><strong>Correo:</strong> <span id="rec-correo">alumno@cursos.com</span></div>
+							</div>
 						</div>
 					</div>
 				</div>
 
 				<!-- Columna 2: COMPROBANTE OFICIAL SUNAT -->
 				<div class="col-lg-6 col-12 mb-4">
-					<div class="confirm-box">
-						<h3><i class="fa fa-file-text-o" style="color: #2eca7f; margin-right: 8px;"></i> Comprobante Electrónico SUNAT</h3>
+					<div class="confirm-card">
+						<div class="confirm-card-header">
+							<h3 class="confirm-card-title"><i class="fa fa-file-text-o"></i> Comprobante Electrónico SUNAT</h3>
+							<span id="rec-metodo" class="badge" style="background: #009ee3; color: #fff; font-size: 11px; padding: 5px 10px; border-radius: 999px;">Mercado Pago</span>
+						</div>
 
-						<!-- Header de Facturación -->
-						<div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #ebebeb; padding-bottom: 12px; margin-bottom: 15px;">
+						<!-- Header de Facturación Oficial -->
+						<div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px; margin-bottom: 16px; gap: 15px;">
 							<div>
-								<h5 style="font-weight: 700; color: #1a2d62; margin-bottom: 2px; font-size: 15px;">Gestión de Cursos S.A.C.</h5>
-								<p style="color: #777; font-size: 11px; margin-bottom: 0;">RUC: 20609876543 &bull; Av. Universitaria 1234, Lima</p>
-								<p style="color: #777; font-size: 11px; margin-bottom: 0;">Servicios Educativos y Capacitación Integral</p>
+								<h5 style="font-weight: 800; color: #0f172a; margin-bottom: 3px; font-size: 15px;">Gestión de Cursos S.A.C.</h5>
+								<p style="color: #64748b; font-size: 12px; margin-bottom: 2px;">RUC: 20609876543 &bull; Lima, Perú</p>
+								<p style="color: #64748b; font-size: 11.5px; margin-bottom: 0;">Capacitación Profesional y Tecnológica</p>
 							</div>
-							<div class="sunat-box" style="border: 2px solid #1a2d62; padding: 6px 12px; text-align: center; border-radius: 4px;">
-								<span style="font-size: 10px; color: #777; display: block; font-weight: 600;">R.U.C. 20609876543</span>
-								<strong id="sunat-tipo-title" style="font-size: 11px; color: #1a2d62; display: block; text-transform: uppercase;">BOLETA DE VENTA ELECTRÓNICA</strong>
-								<span id="sunat-serie-display" style="font-size: 13px; font-weight: 800; color: #e53935; display: block;">B001-00001001</span>
+							<div class="sunat-official-box">
+								<span style="font-size: 10px; color: #64748b; display: block; font-weight: 700;">R.U.C. 20609876543</span>
+								<strong id="sunat-tipo-title" style="font-size: 10.5px; color: #0f172a; display: block; text-transform: uppercase;">BOLETA DE VENTA ELECTRÓNICA</strong>
+								<span id="sunat-serie-display" style="font-size: 13.5px; font-weight: 800; color: #dc2626; display: block;">B001-00001042</span>
 							</div>
 						</div>
 
 						<!-- Tabla de Ítems del Comprobante -->
-						<table class="table table-bordered align-middle" style="font-size: 12px; margin-bottom: 12px;">
-							<thead style="background: #F6F7FB;">
+						<table class="sunat-table">
+							<thead>
 								<tr>
 									<th>Descripción del Programa</th>
-									<th class="text-center" style="width: 90px;">Modalidad</th>
-									<th class="text-end" style="width: 90px;">Importe</th>
+									<th class="text-center" style="width: 85px;">Modalidad</th>
+									<th class="text-end" style="width: 95px;">Importe</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr>
-									<td id="rec-table-desc">Curso Profesional</td>
+									<td id="rec-table-desc" style="font-weight: 600;">Desarrollo Web Integrado con Spring Boot</td>
 									<td class="text-center"><span class="badge bg-secondary" id="rec-table-mod">VIRTUAL</span></td>
-									<td class="text-end" id="rec-table-total">S/ 0.00</td>
+									<td class="text-end" id="rec-table-total" style="font-weight: 700;">S/ 150.00</td>
 								</tr>
 							</tbody>
 						</table>
 
 						<!-- Totales y Medio de Pago -->
-						<div style="background: #F6F7FB; padding: 12px 16px; border-radius: 4px; font-size: 13px;">
-							<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-								<span>Subtotal:</span>
-								<strong id="rec-subtotal-val">S/ 0.00</strong>
+						<div class="sunat-totals-card">
+							<div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #64748b;">
+								<span>Op. Gravada / Subtotal:</span>
+								<strong id="rec-subtotal-val" style="color: #0f172a;">S/ 127.12</strong>
 							</div>
-							<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+							<div style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #64748b;">
 								<span>I.G.V. (18%):</span>
-								<strong id="rec-igv-val">S/ 0.00</strong>
+								<strong id="rec-igv-val" style="color: #0f172a;">S/ 22.88</strong>
 							</div>
-							<div style="display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 6px; font-size: 15px; color: #1a2d62;">
-								<strong>Total Pagado:</strong>
-								<strong id="rec-total-val" style="color: #2eca7f; font-size: 17px;">S/ 0.00</strong>
-							</div>
-							<div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #ccc; margin-top: 8px; padding-top: 8px;">
-								<span style="font-size: 12px; color: #555;">Forma de Pago:</span>
-								<span id="rec-metodo" class="badge" style="background: #009ee3; color: #fff; font-size: 11px; padding: 4px 8px;">Mercado Pago</span>
+							<div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 15px;">
+								<strong style="color: #0f172a;">Total Pagado:</strong>
+								<strong id="rec-total-val" style="color: #16a34a; font-size: 18px; font-weight: 800;">S/ 150.00</strong>
 							</div>
 						</div>
 
-						<button onclick="window.print()" class="btn_two" style="width: 100%; margin-top: 14px; padding: 10px; font-size: 13px; cursor: pointer; text-align: center; border-radius: 3px;">
-							<i class="fa fa-print" style="margin-right: 6px;"></i> Imprimir / Guardar Comprobante PDF
-						</button>
+						<div style="margin-top: auto;">
+							<button onclick="window.print()" class="btn-print-voucher">
+								<i class="fa fa-print"></i> Imprimir o Guardar en PDF
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- NOTIFICACIONES Y ENVÍOS 100% AUTOMÁTICOS (SIN BOTONES MANUALES) -->
-			<div class="row" style="margin-top: 20px;">
-				<div class="col-12 text-center" style="margin-bottom: 25px;">
-					<h3 style="font-size: 21px; font-weight: 800; color: #1a2d62; margin-bottom: 6px;">
-						<i class="fa fa-check-circle" style="color: #2eca7f; margin-right: 6px;"></i> Entrega Automática Confirmada
+			<!-- NOTIFICACIONES Y ENVÍOS 100% AUTOMÁTICOS -->
+			<div class="row" style="margin-top: 10px;">
+				<div class="col-12 text-center" style="margin-bottom: 22px;">
+					<h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
+						<i class="fa fa-shield" style="color: #2eca7f; margin-right: 6px;"></i> Entrega Automática Inmediata
 					</h3>
-					<p style="color: #64748b; font-size: 14px; margin-bottom: 0;">
-						El sistema ha despachado tus accesos y comprobante oficial a tus canales registrados sin esperas:
+					<p style="color: #64748b; font-size: 13.5px; margin-bottom: 0;">
+						Tus credenciales y boleta electrónica fueron despachadas a tus canales de contacto registrados:
 					</p>
 				</div>
 
-				<!-- Canal 1: CORREO ELECTRÓNICO (ENTREGADO) -->
+				<!-- Canal 1: CORREO ELECTRÓNICO -->
 				<div class="col-lg-6 col-12 mb-3">
-					<div class="channel-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+					<div class="delivery-channel-card">
+						<div class="delivery-header">
 							<div style="display: flex; align-items: center; gap: 12px;">
-								<div class="channel-icon" style="background: #1a2d62; color: #fff; width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+								<div class="delivery-icon email-icon">
 									<i class="fa fa-envelope"></i>
 								</div>
 								<div>
-									<h4 style="font-size: 16px; font-weight: 800; color: #1a2d62; margin: 0;">Correo Electrónico</h4>
+									<h4 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 0;">Correo Electrónico</h4>
 									<small style="color: #64748b;">Comprobante y accesos</small>
 								</div>
 							</div>
-							<span class="badge" style="background: #e6fdf0; color: #15803d; border: 1px solid #bbf7d0; font-size: 11.5px; padding: 6px 11px; font-weight: 800; border-radius: 999px;">
-								<i class="fa fa-check-circle me-1"></i> ENVIADO A TU BANDEJA
+							<span class="delivery-chip">
+								<i class="fa fa-check-circle"></i> ENVIADO
 							</span>
 						</div>
 
-						<div style="background: #f8fafc; border: 1px solid #eef2f6; border-radius: 8px; padding: 14px;">
-							<span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Bandeja registrada:</span>
-							<strong id="auto-correo-dest" style="color: #1a2d62; font-size: 14.5px; word-break: break-all;">alumno@cursos.com</strong>
-							<p style="font-size: 12.5px; color: #475569; margin-top: 8px; margin-bottom: 0; line-height: 1.45;">
-								<i class="fa fa-file-pdf-o" style="color: #e53935; margin-right: 5px;"></i> Se adjuntó tu <strong>Boleta Electrónica SUNAT (PDF/XML)</strong> y las credenciales oficiales de acceso al campus.
+						<div class="delivery-body">
+							<span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase; font-weight: 700; margin-bottom: 3px;">Bandeja de Entrada:</span>
+							<strong id="auto-correo-dest" style="color: #0f172a; font-size: 14px; word-break: break-all;">alumno@cursos.com</strong>
+							<p style="font-size: 12px; color: #475569; margin-top: 8px; margin-bottom: 0; line-height: 1.45;">
+								<i class="fa fa-file-pdf-o" style="color: #dc2626; margin-right: 4px;"></i> Se adjuntó la <strong>Boleta Oficial SUNAT (PDF)</strong> y las credenciales del campus.
 							</p>
 						</div>
 					</div>
 				</div>
 
-				<!-- Canal 2: WHATSAPP (ENTREGADO) -->
+				<!-- Canal 2: WHATSAPP -->
 				<div class="col-lg-6 col-12 mb-3">
-					<div class="channel-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+					<div class="delivery-channel-card">
+						<div class="delivery-header">
 							<div style="display: flex; align-items: center; gap: 12px;">
-								<div class="channel-icon" style="background: #25D366; color: #fff; width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+								<div class="delivery-icon wa-icon">
 									<i class="fa fa-whatsapp"></i>
 								</div>
 								<div>
-									<h4 style="font-size: 16px; font-weight: 800; color: #1a2d62; margin: 0;">WhatsApp Oficial</h4>
+									<h4 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 0;">WhatsApp Oficial</h4>
 									<small style="color: #64748b;">Notificación directa</small>
 								</div>
 							</div>
-							<span class="badge" style="background: #e6fdf0; color: #15803d; border: 1px solid #bbf7d0; font-size: 11.5px; padding: 6px 11px; font-weight: 800; border-radius: 999px;">
-								<i class="fa fa-check-circle me-1"></i> ENTREGADO AL CELULAR
+							<span class="delivery-chip">
+								<i class="fa fa-check-circle"></i> ENTREGADO
 							</span>
 						</div>
 
-						<div style="background: #f8fafc; border: 1px solid #eef2f6; border-radius: 8px; padding: 14px;">
-							<span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Número registrado:</span>
-							<strong id="auto-wa-dest" style="color: #1a2d62; font-size: 14.5px;">+51 999 555 666</strong>
-							<p style="font-size: 12.5px; color: #475569; margin-top: 8px; margin-bottom: 0; line-height: 1.45;">
-								<i class="fa fa-video-camera" style="color: #2eca7f; margin-right: 5px;"></i> Se envió el mensaje automático con el <strong>código de orden</strong>, horario y enlace de clase Zoom / Meet.
+						<div class="delivery-body">
+							<span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase; font-weight: 700; margin-bottom: 3px;">Número Destino:</span>
+							<strong id="auto-wa-dest" style="color: #0f172a; font-size: 14px;">+51 935 300 159</strong>
+							<p style="font-size: 12px; color: #475569; margin-top: 8px; margin-bottom: 0; line-height: 1.45;">
+								<i class="fa fa-video-camera" style="color: #16a34a; margin-right: 4px;"></i> Mensaje despachado con tu código de matrícula y enlace de clases en vivo.
 							</p>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- Botón Principal: Acceso Directo a Clases -->
-			<div class="row" style="margin-top: 30px; margin-bottom: 15px;">
+			<!-- Botones de Acción Final -->
+			<div class="row" style="margin-top: 25px; margin-bottom: 20px;">
 				<div class="col-12 text-center">
-					<a href="mis-cursos.html" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 38px; font-size: 16px; font-weight: 800; border-radius: 10px; background: #2eca7f !important; color: #ffffff !important; box-shadow: 0 4px 18px rgba(46, 202, 127, 0.4); text-decoration: none;">
+					<a href="mis-cursos.html" class="btn-primary-classes">
 						<i class="fa fa-graduation-cap"></i> Ingresar a Mis Clases
 					</a>
 					<div class="mt-3">
-						<a href="index.html" style="font-size: 13.5px; color: #64748b; text-decoration: none;">
-							<i class="fa fa-home me-1"></i> Volver a la página principal
+						<a href="index.html" class="back-home-link" style="font-size: 13.5px; color: #64748b; text-decoration: none; font-weight: 600;">
+							<i class="fa fa-arrow-left me-1"></i> Volver al Catálogo Principal
 						</a>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</main>
+	<!-- END CONFIRMATION CONTENT -->
 
 	<!-- START FOOTER  -->
 	<div class="footer section-padding">
@@ -352,4 +338,3 @@
 	<script src="js/pages/confirmacion.js"></script>
 </body>
 </html>
-
