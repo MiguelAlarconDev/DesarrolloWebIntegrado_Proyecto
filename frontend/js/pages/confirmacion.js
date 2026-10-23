@@ -216,6 +216,22 @@ async function initConfirmacion() {
 	// Configurar enlaces directos a WhatsApp y Gmail
 	configurarCanalesEntrega(activeTelAlumno, activeCorreoAlumno);
 
+	// Consultar estado de Meta WhatsApp Cloud API
+	try {
+		const statusRes = await API.request('/pedidos/whatsapp/status');
+		const badgeWa = document.getElementById('badge-wa-cloud');
+		if (badgeWa && statusRes) {
+			if (statusRes.configurado) {
+				badgeWa.innerHTML = '<i class="fa fa-check-circle"></i> META CLOUD API ACTIVO';
+				badgeWa.style.background = '#dcfce7';
+				badgeWa.style.color = '#15803d';
+				badgeWa.style.borderColor = '#86efac';
+			} else {
+				badgeWa.innerHTML = '<i class="fa fa-whatsapp"></i> META CLOUD API';
+			}
+		}
+	} catch (_) {}
+
 	// Limpiar y sincronizar carrito
 	CartService.updateBadge();
 	AuthService.updateNavbar();

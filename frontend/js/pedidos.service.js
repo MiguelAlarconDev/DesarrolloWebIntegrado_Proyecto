@@ -242,5 +242,16 @@ const PedidosService = {
     }
 
     return matriculas;
+  },
+
+  async getWhatsAppCloudStatus() {
+    return API.request('/pedidos/whatsapp/status');
+  },
+
+  async testWhatsAppCloud(telefono, mensaje) {
+    return API.request('/pedidos/whatsapp/test', {
+      method: 'POST',
+      body: JSON.stringify({ telefono, mensaje })
+    });
   }
 };

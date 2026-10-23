@@ -4,11 +4,13 @@ import com.curso.pedidos.dto.CrearPedidoRequest;
 import com.curso.pedidos.dto.PagarPedidoRequest;
 import com.curso.pedidos.entity.Pedido;
 import com.curso.pedidos.service.PedidoService;
+import com.curso.pedidos.service.WhatsAppCloudService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,9 +21,11 @@ import java.util.UUID;
 public class PedidoController {
 
     private final PedidoService pedidoService;
+    private final WhatsAppCloudService whatsAppCloudService;
 
-    public PedidoController(PedidoService pedidoService) {
+    public PedidoController(PedidoService pedidoService, WhatsAppCloudService whatsAppCloudService) {
         this.pedidoService = pedidoService;
+        this.whatsAppCloudService = whatsAppCloudService;
     }
 
     @PostMapping("/webhook")
@@ -97,5 +101,50 @@ public class PedidoController {
     @GetMapping("/curso/{cursoId}/participantes")
     public List<Pedido> listarParticipantesPorCurso(@PathVariable UUID cursoId) {
         return pedidoService.listarParticipantesPorCurso(cursoId);
+    }
+
+    // =========================================================================
+    // ENDPOINTS DE INTEGRACIÓN META WHATSAPP CLOUD API
+    // =========================================================================
+
+    @GetMapping("/whatsapp/status")
+    public ResponseEntity<Map<String, Object>> getWhatsAppCloudStatus() {
+        Map<String, Object> status = new HashMap<>();
+        status.put("proveedor", "Meta WhatsApp Cloud API (Oficial)");
+        status.put("configurado", whatsAppCloudService.isConfigurado());
+        status.put("version", whatsAppCloudService.getVersion());
+        status.put("phoneNumberId", whatsAppCloudService.getPhoneNumberId().isBlank() ? "NO_CONFIGURADO" : whatsAppCloudService.getPhoneNumberId());
+        status.put("instrucciones", "Para conectar con WhatsApp real, define WHATSAPP_PHONE_NUMBER_ID y WHATSAPP_API_TOKEN en application.properties o variables de entorno.");
+        return ResponseEntity.ok(status);
+    }
+
+    @PostMapping("/whatsapp/test")
+    public ResponseEntity<Map<String, Object>> testWhatsAppCloud(@RequestBody Map<String, String> body) {
+        String telefono = body.get("telefono");
+        String mensaje = body.getOrDefault("mensaje", "Hola! Este es un mensaje de prueba oficial desde Meta WhatsApp Cloud API de Gestión de Cursos.");
+
+        if (telefono == null || telefono.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El campo 'telefono' es obligatorio."));
+        }
+
+        boolean enviado = whatsAppCloudService.enviarMensajeTexto(telefono, mensaje, null);
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("enviado", enviado);
+        resp.put("telefonoDestino", whatsAppCloudService.formatearTelefono(telefono));
+        resp.put("metaConfigurado", whatsAppCloudService.isConfigurado());
+        resp.put("mensaje", enviado ? "Mensaje enviado exitosamente a través de Meta WhatsApp Cloud API." : "No se pudo despachar el mensaje por falta de credenciales o error de Meta.");
+
+        return ResponseEntity.ok(resp);
+    }
+
+    @PostMapping("/{id}/whatsapp/reenviar")
+    public ResponseEntity<Map<String, Object>> reenviarWhatsApp(@PathVariable UUID id) {
+        boolean ok = pedidoService.reenviarWhatsApp(id);
+        return ResponseEntity.ok(Map.of(
+                "pedidoId", id,
+                "reintentoExitoso", ok,
+                "metaConfigurado", whatsAppCloudService.isConfigurado(),
+                "mensaje", "Reintento de despacho WhatsApp procesado."
+        ));
     }
 }

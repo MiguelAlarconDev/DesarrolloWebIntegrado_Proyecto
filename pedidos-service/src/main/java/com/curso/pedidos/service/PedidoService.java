@@ -28,6 +28,7 @@ public class PedidoService {
     private final CursoClient cursoClient;
     private final MercadoPagoClient mercadoPagoClient;
     private final NotificacionEmailService notificacionEmailService;
+    private final WhatsAppCloudService whatsAppCloudService;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ComprobanteRepository comprobanteRepository,
@@ -35,7 +36,8 @@ public class PedidoService {
                          AuthClient authClient,
                          CursoClient cursoClient,
                          MercadoPagoClient mercadoPagoClient,
-                         NotificacionEmailService notificacionEmailService) {
+                         NotificacionEmailService notificacionEmailService,
+                         WhatsAppCloudService whatsAppCloudService) {
         this.pedidoRepository = pedidoRepository;
         this.comprobanteRepository = comprobanteRepository;
         this.notificacionRepository = notificacionRepository;
@@ -43,6 +45,11 @@ public class PedidoService {
         this.cursoClient = cursoClient;
         this.mercadoPagoClient = mercadoPagoClient;
         this.notificacionEmailService = notificacionEmailService;
+        this.whatsAppCloudService = whatsAppCloudService;
+    }
+
+    public WhatsAppCloudService getWhatsAppCloudService() {
+        return whatsAppCloudService;
     }
 
     @Transactional
@@ -138,11 +145,20 @@ public class PedidoService {
         // Generar comprobante electrónico y disparar envío real por correo si SMTP está configurado
         generarComprobante(pedidoActualizado, estudiante, curso, request);
 
-        // Despachar / preparar notificación de WhatsApp
+        // Despachar / preparar notificación de WhatsApp mediante Meta Cloud API
         enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
 
         enriquecerPedido(pedidoActualizado, estudiante, curso);
         return pedidoActualizado;
+    }
+
+    @Transactional
+    public boolean reenviarWhatsApp(UUID pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+        CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
+        enviarNotificacionWhatsApp(pedido, estudiante, curso);
+        return true;
     }
 
     @Transactional
@@ -257,8 +273,8 @@ public class PedidoService {
 
     private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         String datosClase = obtenerDatosClase(curso);
-        String mensaje = String.format("Hola %s! Tu matricula en el curso '%s' ha sido confirmada con exito. Horario: %s. %s",
-                estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), datosClase);
+        String mensaje = String.format("🎉 Hola %s! Tu matrícula en el curso '%s' ha sido confirmada con éxito.\n\n📅 Horario: %s\n%s\n🔖 Código: %s\n🏛️ Acceso aula: http://localhost:3000/mis-cursos.html",
+                estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), datosClase, pedido.getCodigoOrden());
 
         Notificacion notificacion = new Notificacion();
         notificacion.setPedidoId(pedido.getId());
@@ -266,13 +282,20 @@ public class PedidoService {
         notificacion.setDestinatario(estudiante.getWhatsapp());
         notificacion.setTipo("BIENVENIDA");
         notificacion.setMensaje(mensaje);
-        notificacion.setEstado("PREPARADO_WEB");
+        notificacion.setEstado("PENDIENTE");
         notificacion.setIntentos(1);
 
-        notificacionRepository.save(notificacion);
+        Notificacion guardada = notificacionRepository.save(notificacion);
 
-        System.out.printf("[WHATSAPP NOTIFICACION] Mensaje preparado para %s (%s): %s%n",
-                estudiante.getNombres(), estudiante.getWhatsapp(), mensaje);
+        // Despacho mediante Meta WhatsApp Cloud API
+        boolean enviado = whatsAppCloudService.enviarNotificacionBienvenida(pedido, estudiante, curso, guardada);
+        if (enviado) {
+            guardada.setEstado("ENVIADO");
+        }
+        notificacionRepository.save(guardada);
+
+        System.out.printf("[WHATSAPP CLOUD API] Notificación procesada para %s (%s). Estado: %s%n",
+                estudiante.getNombres(), estudiante.getWhatsapp(), guardada.getEstado());
     }
 
     private String obtenerDatosClase(CursoDto curso) {
