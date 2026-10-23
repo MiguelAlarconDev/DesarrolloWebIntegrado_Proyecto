@@ -71,6 +71,57 @@ const CONFIG = {
       aula: 'Laboratorio 204',
       docente: 'Ing. Carlos Mendoza',
       imagen: 'assets/images/all-img/c3.png'
+    },
+    {
+      id: 'b0000000-0000-0000-0000-000000000004',
+      titulo: 'DevOps, Docker & Kubernetes para Desarrolladores',
+      descripcion: 'Implementación de CI/CD pipelines, contenedores Docker, despliegue en clústeres Kubernetes y monitoreo continuo.',
+      modalidad: 'VIRTUAL',
+      precio: 190.00,
+      horario: 'Vie 19:00 - 22:00 y Sáb 15:00 - 18:00',
+      fechaInicio: '2026-10-24T19:00:00Z',
+      fechaFin: '2026-11-30T22:00:00Z',
+      aforoMaximo: 25,
+      aforoDisponible: 12,
+      enlaceClase: 'https://meet.google.com/devops-k8s-live',
+      direccionClase: null,
+      aula: null,
+      docente: 'Ing. Roberto Docente',
+      imagen: 'assets/images/all-img/c1.png'
+    },
+    {
+      id: 'b0000000-0000-0000-0000-000000000005',
+      titulo: 'Frontend Moderno con React, Next.js y TypeScript',
+      descripcion: 'Desarrollo de interfaces reactivas, renderizado del lado del servidor (SSR), gestión de estado global e integración con APIs REST.',
+      modalidad: 'VIRTUAL',
+      precio: 160.00,
+      horario: 'Lun y Mie 20:00 - 22:30',
+      fechaInicio: '2026-10-25T20:00:00Z',
+      fechaFin: '2026-12-05T22:30:00Z',
+      aforoMaximo: 30,
+      aforoDisponible: 15,
+      enlaceClase: 'https://zoom.us/j/1234567890',
+      direccionClase: null,
+      aula: null,
+      docente: 'Ing. Roberto Docente',
+      imagen: 'assets/images/all-img/c2.png'
+    },
+    {
+      id: 'b0000000-0000-0000-0000-000000000006',
+      titulo: 'Taller Presencial de Ciberseguridad y Ethical Hacking',
+      descripcion: 'Prácticas intensivas en laboratorio físico sobre pentesting, seguridad ofensiva, análisis forense y protección de infraestructuras críticas.',
+      modalidad: 'PRESENCIAL',
+      precio: 240.00,
+      horario: 'Dom 09:00 - 14:00',
+      fechaInicio: '2026-10-26T09:00:00Z',
+      fechaFin: '2026-12-07T14:00:00Z',
+      aforoMaximo: 20,
+      aforoDisponible: 6,
+      enlaceClase: null,
+      direccionClase: 'Av. Universitaria 1234, Lima',
+      aula: 'Laboratorio de Ciberseguridad 301',
+      docente: 'Ing. Carlos Mendoza',
+      imagen: 'assets/images/all-img/c3.png'
     }
   ]
 };

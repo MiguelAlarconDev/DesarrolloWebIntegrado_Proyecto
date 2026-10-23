@@ -1671,9 +1671,9 @@ html {
 
 .mis-cursos-card .course-img {
   position: relative !important;
-  height: 190px !important;
-  min-height: 190px !important;
-  max-height: 190px !important;
+  height: 215px !important;
+  min-height: 215px !important;
+  max-height: 215px !important;
   overflow: hidden !important;
 }
 
@@ -1693,7 +1693,7 @@ html {
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  padding: 22px !important;
+  padding: 24px 22px !important;
 }
 
 .mis-cursos-card .card-main-info {
@@ -1702,13 +1702,13 @@ html {
 }
 
 .mis-cursos-card .course-title-fixed {
-  font-size: 16px !important;
+  font-size: 16.5px !important;
   font-weight: 800 !important;
   color: #1a2d62 !important;
-  line-height: 1.35 !important;
+  line-height: 1.4 !important;
   margin-bottom: 8px !important;
-  min-height: 44px !important;
-  max-height: 44px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
   display: -webkit-box !important;
   -webkit-line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
@@ -1720,11 +1720,11 @@ html {
   background: #f8fafc !important;
   border: 1px solid #e2e8f0 !important;
   border-radius: 10px !important;
-  padding: 14px !important;
+  padding: 16px 14px !important;
   margin-top: 14px !important;
   margin-bottom: 14px !important;
-  min-height: 128px !important;
-  max-height: 128px !important;
+  min-height: 140px !important;
+  max-height: 140px !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
@@ -1732,7 +1732,7 @@ html {
 
 .mis-cursos-card .card-footer-fixed {
   border-top: 1px solid #f1f5f9 !important;
-  padding-top: 14px !important;
+  padding-top: 16px !important;
   margin-top: auto !important;
   display: flex !important;
   justify-content: space-between !important;
