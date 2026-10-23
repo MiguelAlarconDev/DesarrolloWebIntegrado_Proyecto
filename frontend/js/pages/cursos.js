@@ -154,7 +154,13 @@ function renderCursos(list) {
 		const isPaid = paidCourseIds.has(c.id);
 
 		let actionBtnHtml = '';
-		if (libres > 0) {
+		if (isPaid) {
+			actionBtnHtml = `
+				<a href="mis-cursos.html" class="btn_one btn-card-enrolled" style="text-decoration: none; padding: 7px 14px; font-size: 12.5px; font-weight: 700; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+					<i class="fa fa-graduation-cap"></i> Ir a Mi Clase
+				</a>
+			`;
+		} else if (libres > 0) {
 			actionBtnHtml = `
 				<button onclick="reservar('${c.id}')" class="btn_two btn-card-inscribir" style="cursor: pointer;">
 					<i class="fa fa-shopping-cart"></i> Inscribirme
@@ -165,7 +171,7 @@ function renderCursos(list) {
 		}
 
 		const enrolledTag = isPaid
-			? `<div style="position: absolute; top: 12px; left: 12px; background: #16a34a; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.3px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);"><i class="fa fa-check-circle me-1"></i>Ya Matriculado</div>`
+			? `<div class="badge-enrolled-corner"><i class="fa fa-check-circle me-1"></i>Ya Matriculado</div>`
 			: '';
 
 		return `

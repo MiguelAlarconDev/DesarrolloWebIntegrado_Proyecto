@@ -1641,6 +1641,43 @@ html {
 }
 
 
+
+/* ==========================================================================
+   Badge "Ya Matriculado" en tarjetas del catálogo (Esquina Superior Derecha)
+   ========================================================================== */
+.badge-enrolled-corner {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  left: auto !important;
+  bottom: auto !important;
+  background: #16a34a !important;
+  color: #ffffff !important;
+  padding: 5px 12px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.4px !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2) !important;
+  z-index: 5 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  pointer-events: none !important;
+}
+
+.btn-card-enrolled {
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3) !important;
+}
+
+.btn-card-enrolled:hover {
+  background: #15803d !important;
+  border-color: #15803d !important;
+  color: #ffffff !important;
+}
+
 /* ==========================================================================
    TARJETAS UNIFORMES Y ORGANIZADAS EN MIS CURSOS (MISMO TAMAÑO Y ALINEACIÓN)
    ========================================================================== */
