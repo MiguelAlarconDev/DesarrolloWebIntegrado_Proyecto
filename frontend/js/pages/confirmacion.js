@@ -1,11 +1,38 @@
 /**
  * confirmacion.js - Lógica de la Página de Confirmación de Matrícula
  * Renderizado de comprobante de pago SUNAT (Boleta / Factura),
- * confirmación de despacho 100% automático e invisible a WhatsApp y Correo,
+ * preparación y despacho directo a WhatsApp y Gmail Web,
  * y acceso directo a "Mis Clases".
  */
 
 let currentOrder = null;
+let activeTelAlumno = '';
+let activeCorreoAlumno = '';
+
+function formatPeruWhatsApp(phone) {
+	let raw = String(phone || '').replace(/\D/g, '');
+	if (raw.startsWith('51') && raw.length === 11) {
+		return raw;
+	}
+	if (raw.length === 9) {
+		return '51' + raw;
+	}
+	if (raw.length > 9) {
+		return raw;
+	}
+	return '51' + raw;
+}
+
+function formatDisplayPhone(rawDigits) {
+	let digits = String(rawDigits || '').replace(/\D/g, '');
+	if (digits.startsWith('51') && digits.length === 11) {
+		digits = digits.substring(2);
+	}
+	if (digits.length === 9) {
+		return `+51 ${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6)}`;
+	}
+	return `+51 ${digits}`;
+}
 
 async function initConfirmacion() {
 	let order = PedidosService.getLastOrder();
@@ -23,17 +50,18 @@ async function initConfirmacion() {
 		}
 	}
 
-	// Si no hay una orden en memoria o el alumno acaba de entrar directamente a la URL,
-	// proveer datos predeterminados realistas del primer curso para que la página siempre luzca impecable y completa.
+	// Obtener usuario autenticado si existe
+	const user = (typeof AuthService !== 'undefined' && AuthService.getCurrentUser()) || null;
+
+	// Si no hay orden en memoria, crear una por defecto
 	if (!order) {
-		const user = (typeof AuthService !== 'undefined' && AuthService.getCurrentUser()) || {
-			nombres: 'Carlos Alarcón',
-			dni: '74859612',
-			whatsapp: '935300159',
-			correo: 'alumno@cursos.com'
-		};
+		const defaultName = user ? `${user.nombres || ''} ${user.apellidos || ''}`.trim() : 'Jose Elmer Coronado';
+		const defaultDni = (user && user.dni) || '75187638';
+		const defaultWa = (user && user.whatsapp) || '935300159';
+		const defaultCorreo = (user && user.correo) || 'carlokasike333@gmail.com';
+
 		order = {
-			codigoOrden: 'ORD-894210',
+			codigoOrden: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
 			estado: 'PAGADO',
 			metodoPago: 'Mercado Pago Checkout',
 			curso: {
@@ -48,14 +76,14 @@ async function initConfirmacion() {
 			},
 			comprobante: {
 				tipo: 'BOLETA',
-				correlativo: 'B001-00001042',
-				cliente: user.nombres || 'Carlos Alarcón',
-				docIdentidad: user.dni || '74859612',
+				correlativo: 'B001-' + String(Math.floor(1000 + Math.random() * 9000)).padStart(8, '0'),
+				cliente: defaultName,
+				docIdentidad: defaultDni,
 				subtotal: '127.12',
 				igv: '22.88',
 				total: '150.00',
-				clienteCorreo: user.correo || 'alumno@cursos.com',
-				clienteTelefono: user.whatsapp || '935300159'
+				clienteCorreo: defaultCorreo,
+				clienteTelefono: defaultWa
 			}
 		};
 	}
@@ -73,8 +101,8 @@ async function initConfirmacion() {
 	const comp = order.comprobante || {
 		tipo: 'BOLETA',
 		correlativo: 'B001-00001042',
-		cliente: 'Carlos Alarcón',
-		docIdentidad: '74859612',
+		cliente: (user && user.nombres) ? `${user.nombres} ${user.apellidos || ''}`.trim() : 'Jose Elmer Coronado',
+		docIdentidad: (user && user.dni) || '75187638',
 		fechaEmision: fechaActual,
 		subtotal: '127.12',
 		igv: '22.88',
@@ -85,30 +113,35 @@ async function initConfirmacion() {
 	if (elSunatTipo) elSunatTipo.textContent = comp.tipo === 'FACTURA' ? 'FACTURA ELECTRÓNICA' : 'BOLETA DE VENTA ELECTRÓNICA';
 	const elSerie = document.getElementById('sunat-serie-display');
 	if (elSerie) elSerie.textContent = comp.correlativo || 'B001-00001042';
-	const elCliente = document.getElementById('rec-cliente');
-	if (elCliente) elCliente.textContent = comp.cliente || 'Carlos Alarcón';
-	const elDoc = document.getElementById('rec-doc');
-	if (elDoc) elDoc.textContent = comp.docIdentidad || '74859612';
 
-	// Obtener teléfono y correo del estudiante
-	const user = (typeof AuthService !== 'undefined' && AuthService.getCurrentUser()) || null;
-	const telAlumno = (comp && comp.clienteTelefono) || (order.notificacionWhatsApp && order.notificacionWhatsApp.telefono) || (user && user.whatsapp) || '935300159';
-	const correoAlumno = (comp && comp.clienteCorreo) || (user && user.correo) || 'alumno@cursos.com';
+	// Si el usuario autenticado tiene datos más específicos que el fallback
+	let nombreTitular = comp.cliente || '';
+	if (user && (!nombreTitular || nombreTitular === 'Carlos Alarcón' || nombreTitular === 'Alumno')) {
+		nombreTitular = `${user.nombres || ''} ${user.apellidos || ''}`.trim() || nombreTitular;
+	}
+	const elCliente = document.getElementById('rec-cliente');
+	if (elCliente) elCliente.textContent = nombreTitular || 'Alumno Titular';
+
+	let dniTitular = comp.docIdentidad || (user && user.dni) || '75187638';
+	const elDoc = document.getElementById('rec-doc');
+	if (elDoc) elDoc.textContent = dniTitular;
+
+	// Resolver teléfono y correo priorizando datos del usuario activo
+	activeTelAlumno = (user && user.whatsapp) || (comp && comp.clienteTelefono) || (order.notificacionWhatsApp && order.notificacionWhatsApp.telefono) || '935300159';
+	activeCorreoAlumno = (user && user.correo) || (comp && comp.clienteCorreo) || 'carlokasike333@gmail.com';
+
+	// Si el correo quedó en el dummy genérico pero el usuario autenticado es otro, corregir
+	if (user && user.correo && activeCorreoAlumno === 'alumno@cursos.com') {
+		activeCorreoAlumno = user.correo;
+	}
+	if (user && user.whatsapp && activeTelAlumno === '999555666') {
+		activeTelAlumno = user.whatsapp;
+	}
 
 	const elTel = document.getElementById('rec-telefono');
-	if (elTel) elTel.textContent = telAlumno;
+	if (elTel) elTel.textContent = formatDisplayPhone(activeTelAlumno);
 	const elMail = document.getElementById('rec-correo');
-	if (elMail) elMail.textContent = correoAlumno;
-
-	// Actualizar destinos automáticos en la tarjeta
-	const elAutoCorreo = document.getElementById('auto-correo-dest');
-	if (elAutoCorreo) elAutoCorreo.textContent = correoAlumno;
-	
-	let cleanTel = telAlumno.replace(/\D/g, '');
-	if (cleanTel.length === 9) cleanTel = '+51 ' + cleanTel;
-	else cleanTel = '+' + cleanTel;
-	const elAutoWa = document.getElementById('auto-wa-dest');
-	if (elAutoWa) elAutoWa.textContent = cleanTel;
+	if (elMail) elMail.textContent = activeCorreoAlumno;
 
 	// Medio de Pago
 	const metodo = order.metodoPago || 'Mercado Pago';
@@ -174,37 +207,140 @@ async function initConfirmacion() {
 		if (btnLink) btnLink.href = curso.enlaceClase || 'https://meet.google.com';
 	}
 
-	// Configurar enlaces interactivos para abrir directamente en WhatsApp y Correo
-	const waBtn = document.getElementById('btn-open-wa-direct');
-	if (waBtn) {
-		const waTexto = `¡Hola ${comp.cliente || 'Alumno'}! 🎉 Tu matrícula en el curso "${curso.titulo}" (Código: ${order.codigoOrden}) ha sido confirmada con éxito.\n\n` +
-			`📅 Horario: ${curso.horario}\n` +
-			(curso.modalidad === 'VIRTUAL' ? `🎥 Enlace de clase en vivo: ${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}\n\n` : `🏛️ Sede: ${curso.direccionClase || 'Sede Central'} (Aula: ${curso.aula || 'Lab 302'})\n\n`) +
-			`📄 Comprobante: ${comp.correlativo || 'B001-00001042'} emitido por S/ ${comp.total}\n\n` +
-			`¡Bienvenido a Gestión de Cursos! 🚀`;
+	// Prellenar inputs de edición rápida si están presentes
+	const customWaInput = document.getElementById('custom-wa-input');
+	if (customWaInput) customWaInput.value = String(activeTelAlumno).replace(/\D/g, '').slice(-9);
+	const customCorreoInput = document.getElementById('custom-correo-input');
+	if (customCorreoInput) customCorreoInput.value = activeCorreoAlumno;
 
-		let numWa = telAlumno.replace(/\D/g, '');
-		if (numWa.length === 9) numWa = '51' + numWa;
-		waBtn.href = `https://api.whatsapp.com/send?phone=${numWa}&text=${encodeURIComponent(waTexto)}`;
-	}
+	// Configurar enlaces directos a WhatsApp y Gmail
+	configurarCanalesEntrega(activeTelAlumno, activeCorreoAlumno);
 
-	const mailBtn = document.getElementById('btn-open-mail-direct');
-	if (mailBtn) {
-		const mailSubject = `Confirmación de Matrícula - ${curso.titulo} (${order.codigoOrden})`;
-		const mailBody = `Hola ${comp.cliente || 'Alumno'},\n\nTu matrícula en el curso "${curso.titulo}" fue confirmada con éxito.\n\nCódigo de Orden: ${order.codigoOrden}\nComprobante: ${comp.correlativo || 'B001-00001042'}\nTotal Pagado: S/ ${comp.total}\nHorario: ${curso.horario}\n` +
-			(curso.modalidad === 'VIRTUAL' ? `Enlace de acceso a clases: ${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}\n\n` : `Sede: ${curso.direccionClase || 'Sede Central'} - Aula: ${curso.aula || 'Lab 302'}\n\n`) +
-			`Saludos cordiales,\nGestión de Cursos S.A.C.`;
-		mailBtn.href = `mailto:${correoAlumno}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
-	}
-
-	// Limpiar y sincronizar contador minimalista del carrito
+	// Limpiar y sincronizar carrito
 	CartService.updateBadge();
 	AuthService.updateNavbar();
 
-	// Notificación sutil y elegante de confirmación
+	// Notificación informativa amigable
 	setTimeout(() => {
-		Notifications.showToast('¡Matrícula confirmada! Tus accesos y comprobante fueron despachados.', 'success');
-	}, 300);
+		Notifications.showToast('¡Matrícula confirmada! Haz clic en "Enviar a mi WhatsApp" o "Gmail" para recibir tus accesos.', 'success');
+	}, 400);
+}
+
+/**
+ * Genera y vincula los enlaces interactivos hacia WhatsApp y Gmail Web
+ */
+function configurarCanalesEntrega(tel, correo) {
+	if (!currentOrder) return;
+	const comp = currentOrder.comprobante || {};
+	const curso = currentOrder.curso || {};
+	const nombre = comp.cliente || 'Alumno';
+
+	// Actualizar textos en tarjetas
+	const elAutoCorreo = document.getElementById('auto-correo-dest');
+	if (elAutoCorreo) elAutoCorreo.textContent = correo;
+
+	const elAutoWa = document.getElementById('auto-wa-dest');
+	if (elAutoWa) elAutoWa.textContent = formatDisplayPhone(tel);
+
+	const numWa = formatPeruWhatsApp(tel);
+
+	// 1. Mensaje de WhatsApp estructurado y profesional
+	const infoModalidad = curso.modalidad === 'VIRTUAL'
+		? `🎥 *Enlace de Clase en Vivo (Zoom / Meet):*\n${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}\n\n`
+		: `🏛️ *Sede Física Asignada:*\n${curso.direccionClase || 'Sede Central'} (Aula: ${curso.aula || 'Lab 302'})\n\n`;
+
+	const waTexto = `🎉 *¡Hola ${nombre}! Tu Matrícula en Gestión de Cursos ha sido confirmada con éxito!*\n\n` +
+		`📚 *Curso:* ${curso.titulo}\n` +
+		`📅 *Horario:* ${curso.horario}\n` +
+		infoModalidad +
+		`📄 *Comprobante Oficial SUNAT:* ${comp.correlativo || 'B001-00001042'}\n` +
+		`💳 *Total Pagado:* S/ ${comp.total || '150.00'} (${currentOrder.metodoPago || 'Mercado Pago'})\n` +
+		`🔖 *Código de Matrícula:* ${currentOrder.codigoOrden || 'ORD-894210'}\n\n` +
+		`🏛️ *Aula Virtual del Estudiante:*\nhttp://localhost:3000/mis-cursos.html\n\n` +
+		`¡Muchos éxitos en tus clases! 🚀`;
+
+	const waUrl = `https://api.whatsapp.com/send?phone=${numWa}&text=${encodeURIComponent(waTexto)}`;
+
+	const waBtn = document.getElementById('btn-open-wa-direct');
+	if (waBtn) {
+		waBtn.href = waUrl;
+		waBtn.innerHTML = `<i class="fa fa-whatsapp fa-lg"></i> Abrir y Recibir en mi WhatsApp (${formatDisplayPhone(tel)})`;
+	}
+
+	const bannerWa = document.getElementById('btn-banner-wa');
+	if (bannerWa) {
+		bannerWa.href = waUrl;
+	}
+
+	// 2. Correo para Gmail Web y cliente de escritorio
+	const mailSubject = `¡Confirmación de Matrícula! ${curso.titulo} (${currentOrder.codigoOrden || 'ORD-894210'})`;
+	const mailBody = `Hola ${nombre},\n\nTu matrícula en el curso "${curso.titulo}" fue confirmada con éxito en Gestión de Cursos S.A.C.\n\n` +
+		`==========================================\n` +
+		`DATOS DE TU MATRÍCULA Y ACCESOS\n` +
+		`==========================================\n` +
+		`Código de Matrícula: ${currentOrder.codigoOrden || 'ORD-894210'}\n` +
+		`Comprobante SUNAT: ${comp.correlativo || 'B001-00001042'}\n` +
+		`Total Pagado: S/ ${comp.total || '150.00'}\n` +
+		`Medio de Pago: ${currentOrder.metodoPago || 'Mercado Pago Checkout'}\n` +
+		`Horario de Clase: ${curso.horario}\n` +
+		(curso.modalidad === 'VIRTUAL' ? `Enlace de Acceso en Vivo: ${curso.enlaceClase || 'https://meet.google.com/abc-defg-hij'}\n\n` : `Sede Física: ${curso.direccionClase || 'Sede Central'} - Aula: ${curso.aula || 'Lab 302'}\n\n`) +
+		`Ingresa a tu campus virtual en cualquier momento:\nhttp://localhost:3000/mis-cursos.html\n\n` +
+		`Saludos cordiales,\nGestión de Cursos S.A.C.\nRUC: 20609876543 - Lima, Perú`;
+
+	// Enlace directo al redactor web de Gmail
+	const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(correo)}&su=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+	const mailtoUrl = `mailto:${encodeURIComponent(correo)}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+
+	const mailBtn = document.getElementById('btn-open-mail-direct');
+	if (mailBtn) {
+		mailBtn.href = gmailWebUrl;
+		mailBtn.innerHTML = `<i class="fa fa-google"></i> Abrir y Recibir en mi Gmail Web (${correo})`;
+	}
+
+	const mailtoBtn = document.getElementById('btn-open-mailto-direct');
+	if (mailtoBtn) {
+		mailtoBtn.href = mailtoUrl;
+	}
+
+	const bannerGmail = document.getElementById('btn-banner-gmail');
+	if (bannerGmail) {
+		bannerGmail.href = gmailWebUrl;
+	}
+}
+
+/**
+ * Mostrar / ocultar caja de modificación de destinos
+ */
+function toggleEditDestinos() {
+	const box = document.getElementById('box-edit-destinos');
+	if (box) {
+		box.classList.toggle('d-none');
+	}
+}
+
+/**
+ * Actualizar destinos desde los inputs personalizados
+ */
+function actualizarDestinosPersonalizados() {
+	const customWa = document.getElementById('custom-wa-input');
+	const customCorreo = document.getElementById('custom-correo-input');
+
+	if (customWa && customWa.value.trim()) {
+		activeTelAlumno = customWa.value.trim();
+	}
+	if (customCorreo && customCorreo.value.trim()) {
+		activeCorreoAlumno = customCorreo.value.trim();
+	}
+
+	configurarCanalesEntrega(activeTelAlumno, activeCorreoAlumno);
+
+	// Actualizar también en el bloque de titular
+	const elTel = document.getElementById('rec-telefono');
+	if (elTel) elTel.textContent = formatDisplayPhone(activeTelAlumno);
+	const elMail = document.getElementById('rec-correo');
+	if (elMail) elMail.textContent = activeCorreoAlumno;
+
+	Notifications.showToast('¡Destinos actualizados! Ahora haz clic en enviar.', 'success');
 }
 
 // Inicialización garantizada (inmediata o en evento)

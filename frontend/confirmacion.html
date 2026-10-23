@@ -205,32 +205,55 @@
 				</div>
 			</div>
 
-			<!-- NOTIFICACIONES Y ENVÍOS 100% AUTOMÁTICOS -->
+			<!-- NOTIFICACIONES Y DESPACHO DIRECTO A WHATSAPP Y GMAIL -->
 			<div class="row" style="margin-top: 10px;">
-				<div class="col-12 text-center" style="margin-bottom: 22px;">
+				<div class="col-12" style="margin-bottom: 18px;">
+					<!-- Banner de Envío Rápido -->
+					<div class="alert p-3 d-flex align-items-center justify-content-between flex-wrap gap-3" style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.08);">
+						<div class="d-flex align-items-center gap-3">
+							<div style="width: 44px; height: 44px; border-radius: 50%; background: #22c55e; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
+								<i class="fa fa-bell-o"></i>
+							</div>
+							<div>
+								<strong style="color: #15803d; font-size: 15px; display: block;">¡Recibe tus credenciales y comprobante en tus dispositivos!</strong>
+								<span style="font-size: 13px; color: #374151;">Haz clic para enviar el mensaje oficial con tu enlace de clases en vivo a tu <strong>WhatsApp</strong> y a tu <strong>Gmail</strong>.</span>
+							</div>
+						</div>
+						<div class="d-flex gap-2 flex-wrap">
+							<a id="btn-banner-wa" href="#" target="_blank" class="btn btn-sm" style="background: #25D366; color: #ffffff; font-weight: 700; border-radius: 8px; padding: 8px 16px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+								<i class="fa fa-whatsapp"></i> Enviar a mi WhatsApp
+							</a>
+							<a id="btn-banner-gmail" href="#" target="_blank" class="btn btn-sm" style="background: #ea4335; color: #ffffff; font-weight: 700; border-radius: 8px; padding: 8px 16px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+								<i class="fa fa-google"></i> Enviar a mi Gmail
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-12 text-center" style="margin-bottom: 20px;">
 					<h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
-						<i class="fa fa-shield" style="color: #2eca7f; margin-right: 6px;"></i> Entrega Automática Inmediata
+						<i class="fa fa-paper-plane" style="color: #2eca7f; margin-right: 6px;"></i> Canales Oficiales de Despacho
 					</h3>
 					<p style="color: #64748b; font-size: 13.5px; margin-bottom: 0;">
-						Tus credenciales y boleta electrónica fueron despachadas a tus canales de contacto registrados:
+						Tus credenciales y boleta electrónica están preparadas para ser recibidas en tus canales de contacto:
 					</p>
 				</div>
 
-				<!-- Canal 1: CORREO ELECTRÓNICO -->
+				<!-- Canal 1: CORREO ELECTRÓNICO (GMAIL) -->
 				<div class="col-lg-6 col-12 mb-3">
 					<div class="delivery-channel-card">
 						<div class="delivery-header">
 							<div style="display: flex; align-items: center; gap: 12px;">
-								<div class="delivery-icon email-icon">
+								<div class="delivery-icon email-icon" style="background: #fee2e2; color: #ea4335;">
 									<i class="fa fa-envelope"></i>
 								</div>
 								<div>
-									<h4 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 0;">Correo Electrónico</h4>
-									<small style="color: #64748b;">Comprobante y accesos</small>
+									<h4 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 0;">Correo Electrónico (Gmail)</h4>
+									<small style="color: #64748b;">Comprobante y accesos de aula</small>
 								</div>
 							</div>
-							<span class="delivery-chip">
-								<i class="fa fa-check-circle"></i> ENVIADO
+							<span class="delivery-chip" style="background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;">
+								<i class="fa fa-envelope-open-o"></i> LISTO PARA ENVIAR
 							</span>
 						</div>
 
@@ -238,12 +261,15 @@
 							<span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase; font-weight: 700; margin-bottom: 3px;">Bandeja de Entrada:</span>
 							<strong id="auto-correo-dest" style="color: #0f172a; font-size: 14px; word-break: break-all;">alumno@cursos.com</strong>
 							<p style="font-size: 12px; color: #475569; margin-top: 8px; margin-bottom: 0; line-height: 1.45;">
-								<i class="fa fa-file-pdf-o" style="color: #dc2626; margin-right: 4px;"></i> Se adjuntó la <strong>Boleta Oficial SUNAT (PDF)</strong> y las credenciales del campus.
+								<i class="fa fa-file-text-o" style="color: #ea4335; margin-right: 4px;"></i> Contiene tu <strong>Boleta Oficial SUNAT</strong>, detalle de pagos y credenciales de clase.
 							</p>
 						</div>
 						<div class="mt-3">
-							<a id="btn-open-mail-direct" href="#" class="btn btn-sm w-100" style="background: #0f172a; color: #ffffff; font-weight: 700; border-radius: 8px; padding: 9px; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none;">
-								<i class="fa fa-envelope-o"></i> Abrir en mi Cliente de Correo
+							<a id="btn-open-mail-direct" href="#" target="_blank" class="btn btn-sm w-100" style="background: #ea4335; color: #ffffff; font-weight: 700; border-radius: 8px; padding: 10px; font-size: 13.5px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; box-shadow: 0 4px 12px rgba(234, 67, 53, 0.25);">
+								<i class="fa fa-google"></i> Abrir y Recibir en mi Gmail Web
+							</a>
+							<a id="btn-open-mailto-direct" href="#" class="btn btn-outline-secondary w-100 btn-sm mt-2" style="font-size: 11.5px; padding: 5px 10px; border-radius: 6px; text-decoration: none;">
+								<i class="fa fa-desktop me-1"></i> Abrir en Outlook o Cliente de Correo
 							</a>
 						</div>
 					</div>
@@ -259,11 +285,11 @@
 								</div>
 								<div>
 									<h4 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 0;">WhatsApp Oficial</h4>
-									<small style="color: #64748b;">Notificación directa</small>
+									<small style="color: #64748b;">Notificación directa móvil</small>
 								</div>
 							</div>
-							<span class="delivery-chip">
-								<i class="fa fa-check-circle"></i> ENTREGADO
+							<span class="delivery-chip" style="background: #dcfce7; color: #166534; border: 1px solid #bbf7d0;">
+								<i class="fa fa-whatsapp"></i> LISTO PARA ENVIAR
 							</span>
 						</div>
 
@@ -271,21 +297,54 @@
 							<span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase; font-weight: 700; margin-bottom: 3px;">Número Destino:</span>
 							<strong id="auto-wa-dest" style="color: #0f172a; font-size: 14px;">+51 935 300 159</strong>
 							<p style="font-size: 12px; color: #475569; margin-top: 8px; margin-bottom: 0; line-height: 1.45;">
-								<i class="fa fa-video-camera" style="color: #16a34a; margin-right: 4px;"></i> Mensaje despachado con tu código de matrícula y enlace de clases en vivo.
+								<i class="fa fa-video-camera" style="color: #16a34a; margin-right: 4px;"></i> Mensaje con código de orden, horario y enlace de transmisión en vivo.
 							</p>
 						</div>
 						<div class="mt-3">
-							<a id="btn-open-wa-direct" href="#" target="_blank" class="btn btn-sm w-100" style="background: #25D366; color: #ffffff; font-weight: 700; border-radius: 8px; padding: 9px; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; box-shadow: 0 2px 10px rgba(37, 211, 102, 0.35);">
+							<a id="btn-open-wa-direct" href="#" target="_blank" class="btn btn-sm w-100" style="background: #25D366; color: #ffffff; font-weight: 700; border-radius: 8px; padding: 10px; font-size: 13.5px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);">
 								<i class="fa fa-whatsapp" style="font-size: 16px;"></i> Abrir y Recibir en mi WhatsApp
 							</a>
 						</div>
 					</div>
 				</div>
+
+				<!-- Opciones de Edición Rápida de Destinos -->
 				<div class="col-12 mt-1 mb-2">
-					<div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: #475569; display: flex; align-items: center; gap: 10px;">
-						<i class="fa fa-info-circle text-primary" style="font-size: 16px;"></i>
+					<div style="background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 14px 18px;">
+						<div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+							<div class="d-flex align-items-center gap-2">
+								<i class="fa fa-sliders text-primary"></i>
+								<span style="font-size: 13px; font-weight: 700; color: #334155;">¿Deseas enviar a otro WhatsApp o correo personal?</span>
+							</div>
+							<button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleEditDestinos()" style="font-size: 12px; font-weight: 700; border-radius: 6px;">
+								<i class="fa fa-pencil me-1"></i> Modificar datos de destino
+							</button>
+						</div>
+						<div id="box-edit-destinos" class="d-none mt-3 pt-3 border-top">
+							<div class="row g-2">
+								<div class="col-md-5 col-12">
+									<label style="font-size: 11.5px; font-weight: 700; color: #64748b;">Número WhatsApp (+51):</label>
+									<input type="text" id="custom-wa-input" class="form-control form-control-sm" placeholder="Ej: 935300159">
+								</div>
+								<div class="col-md-5 col-12">
+									<label style="font-size: 11.5px; font-weight: 700; color: #64748b;">Correo Gmail:</label>
+									<input type="email" id="custom-correo-input" class="form-control form-control-sm" placeholder="Ej: carlokasike333@gmail.com">
+								</div>
+								<div class="col-md-2 col-12 d-flex align-items-end">
+									<button type="button" class="btn btn-sm btn-dark w-100" onclick="actualizarDestinosPersonalizados()" style="font-weight: 700; height: 31px;">
+										Actualizar
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-12 mt-2 mb-2">
+					<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: #475569; display: flex; align-items: center; gap: 10px;">
+						<i class="fa fa-shield text-success" style="font-size: 18px;"></i>
 						<div>
-							<strong>Nota del Sistema Académico:</strong> La orden se guardó con éxito en la base de datos PostgreSQL (tabla <code>notificaciones</code>). Para abrir y ver el mensaje oficial en tu WhatsApp personal o cliente de correo, haz clic en los botones de cada tarjeta.
+							<strong>Registro Académico Oficial:</strong> Tu matrícula y comprobante SUNAT quedaron registrados y asociados a tu cuenta en la base de datos PostgreSQL. Para consultar tus clases en cualquier momento, ingresa a <a href="mis-cursos.html" style="font-weight: 700; color: #0284c7;">Mis Clases</a>.
 						</div>
 					</div>
 				</div>
@@ -308,7 +367,7 @@
 	</main>
 	<!-- END CONFIRMATION CONTENT -->
 
-				<!-- START FOOTER  -->
+	<!-- START FOOTER  -->
 	<div class="footer footer-minimal section-padding" id="contacto">
 		<div class="container">
 			<div class="row align-items-center mb-3 pb-3 border-bottom border-secondary border-opacity-25">

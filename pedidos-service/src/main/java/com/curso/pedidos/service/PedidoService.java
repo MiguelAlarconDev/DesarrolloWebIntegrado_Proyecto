@@ -27,19 +27,22 @@ public class PedidoService {
     private final AuthClient authClient;
     private final CursoClient cursoClient;
     private final MercadoPagoClient mercadoPagoClient;
+    private final NotificacionEmailService notificacionEmailService;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ComprobanteRepository comprobanteRepository,
                          NotificacionRepository notificacionRepository,
                          AuthClient authClient,
                          CursoClient cursoClient,
-                         MercadoPagoClient mercadoPagoClient) {
+                         MercadoPagoClient mercadoPagoClient,
+                         NotificacionEmailService notificacionEmailService) {
         this.pedidoRepository = pedidoRepository;
         this.comprobanteRepository = comprobanteRepository;
         this.notificacionRepository = notificacionRepository;
         this.authClient = authClient;
         this.cursoClient = cursoClient;
         this.mercadoPagoClient = mercadoPagoClient;
+        this.notificacionEmailService = notificacionEmailService;
     }
 
     @Transactional
@@ -132,10 +135,10 @@ public class PedidoService {
         UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
         CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
 
-        // Generar comprobante electrónico
-        generarComprobante(pedidoActualizado, estudiante, request);
+        // Generar comprobante electrónico y disparar envío real por correo si SMTP está configurado
+        generarComprobante(pedidoActualizado, estudiante, curso, request);
 
-        // Despachar notificación de WhatsApp
+        // Despachar / preparar notificación de WhatsApp
         enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
 
         enriquecerPedido(pedidoActualizado, estudiante, curso);
@@ -212,7 +215,7 @@ public class PedidoService {
         }
     }
 
-    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, PagarPedidoRequest request) {
+    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, CursoDto curso, PagarPedidoRequest request) {
         if (comprobanteRepository.findByPedidoId(pedido.getId()).isPresent()) {
             return;
         }
@@ -234,18 +237,22 @@ public class PedidoService {
         comprobante.setMontoIgv(montoIgv);
         comprobante.setMontoTotal(montoTotal);
         comprobante.setPdfUrl("/api/comprobantes/descargar/" + pedido.getId());
-        comprobante.setEstadoEmail("ENVIADO");
+        comprobante.setEstadoEmail("PREPARADO_WEB");
 
         if (tipo == TipoComprobante.FACTURA && request != null) {
             comprobante.setRucCliente(request.getRucCliente());
             comprobante.setRazonSocial(request.getRazonSocial());
         }
 
-        comprobanteRepository.save(comprobante);
+        Comprobante guardado = comprobanteRepository.save(comprobante);
 
-        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. RUC: %s. Enviado al correo %s%n",
-                tipo, comprobante.getSerie(), comprobante.getNumeroCorrelativo(), pedido.getCodigoOrden(),
-                montoTotal, comprobante.getRucCliente() != null ? comprobante.getRucCliente() : "N/A", estudiante.getCorreo());
+        // Envío real por correo vía JavaMailSender (si SMTP está configurado en application.properties)
+        notificacionEmailService.enviarComprobanteMatricula(pedido, estudiante, curso, guardado);
+        comprobanteRepository.save(guardado);
+
+        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. Correo: %s. Estado: %s%n",
+                tipo, guardado.getSerie(), guardado.getNumeroCorrelativo(), pedido.getCodigoOrden(),
+                montoTotal, estudiante.getCorreo(), guardado.getEstadoEmail());
     }
 
     private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
@@ -259,12 +266,12 @@ public class PedidoService {
         notificacion.setDestinatario(estudiante.getWhatsapp());
         notificacion.setTipo("BIENVENIDA");
         notificacion.setMensaje(mensaje);
-        notificacion.setEstado("ENVIADO");
+        notificacion.setEstado("PREPARADO_WEB");
         notificacion.setIntentos(1);
 
         notificacionRepository.save(notificacion);
 
-        System.out.printf("[WHATSAPP NOTIFICACION] Mensaje enviado a %s (%s): %s%n",
+        System.out.printf("[WHATSAPP NOTIFICACION] Mensaje preparado para %s (%s): %s%n",
                 estudiante.getNombres(), estudiante.getWhatsapp(), mensaje);
     }
 
