@@ -1,7 +1,7 @@
 /**
  * cursos.js - Lógica del Catálogo Completo de Cursos
  * Manejo de búsquedas en tiempo real, filtros combinados por modalidad,
- * detección de cursos ya matriculados o en el carrito, y reserva directa.
+ * detección de vacantes en vivo y reserva directa con persistencia en el carrito.
  */
 
 let allCursos = (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES) ? [...CONFIG.INITIAL_COURSES] : [];
@@ -64,7 +64,9 @@ async function cargarCursosPagadosAlumno() {
 
 function actualizarEstadoNavbar() {
 	CartService.updateBadge();
-	AuthService.updateNavbar();
+	if (typeof AuthService !== 'undefined' && AuthService.updateNavbar) {
+		AuthService.updateNavbar();
+	}
 }
 
 function actualizarBotonesModalidad() {
@@ -80,15 +82,18 @@ function actualizarBotonesModalidad() {
 
 function filtrarCursos(mod, btn) {
 	currentModalidad = mod;
-	document.querySelectorAll('.best-cpurse button').forEach(b => {
-		b.className = 'btn_two me-2 mb-2';
+	document.querySelectorAll('.best-cpurse button, .filter-mod-btn').forEach(b => {
+		const onclickAttr = b.getAttribute('onclick') || '';
+		if (onclickAttr.includes('filtrarCursos')) {
+			b.className = 'btn_two me-2 mb-2 filter-mod-btn';
+		}
 	});
-	if (btn) btn.className = 'btn_one me-2 mb-2';
+	if (btn) btn.className = 'btn_one me-2 mb-2 filter-mod-btn';
 	applyFilter();
 }
 
 function buscarCursos(keyword) {
-	searchKeyword = keyword.toLowerCase().trim();
+	searchKeyword = (keyword || '').toLowerCase().trim();
 	applyFilter();
 }
 
@@ -105,14 +110,14 @@ function applyFilter() {
 }
 
 function renderCursos(list) {
-	const container = (document.getElementById('cursos-container'));
+	const container = document.getElementById('cursos-container');
 	if (!container) return;
 
 	if (!list || list.length === 0) {
 		container.innerHTML = `
 			<div class="col-12 text-center py-5">
 				<div style="max-width: 480px; margin: 0 auto; background: #ffffff; padding: 40px 30px; border-radius: 12px; border: 1px solid #eef2f6;">
-					<i class="ti-search text-muted" style="font-size: 42px; display: block; margin-bottom: 12px;"></i>
+					<i class="fa fa-search text-muted mb-3" style="font-size: 38px; display: block;"></i>
 					<h4 style="color: #1a2d62; font-weight: 800;">No se encontraron cursos</h4>
 					<p class="text-muted" style="font-size: 14px;">Intenta cambiar el término de búsqueda o selecciona otra modalidad.</p>
 					<button type="button" onclick="filtrarCursos('TODOS', null); document.getElementById('buscador-cursos').value=''; buscarCursos('');" class="btn_one mt-2" style="font-size: 13px; padding: 8px 18px; border-radius: 6px;">
@@ -143,21 +148,14 @@ function renderCursos(list) {
 			seatsText = `<i class="fa fa-exclamation-circle"></i> <strong>¡Últimas ${libres} Vacantes!</strong>`;
 		}
 
-		const imgUrl = c.imagen || `assets/images/all-img/c${(i % 6) + 1}.png`;
+		const imgUrl = c.imagen || `assets/images/all-img/c${(i % 3) + 1}.png`;
 		const docenteNombre = c.docente || (isVirtual ? 'Ing. Roberto Docente' : 'Ing. Carlos Mendoza');
 
-		// Estados inteligentes del botón de acción según el usuario
 		const isPaid = paidCourseIds.has(c.id);
 		const inCart = CartService.isInCart(c.id);
 
 		let actionBtnHtml = '';
-		if (isPaid) {
-			actionBtnHtml = `
-				<a href="mis-cursos.html" class="btn_one" style="padding: 8px 16px; font-size: 13px; border-radius: 6px; text-decoration: none; background: #16a34a;">
-					<i class="fa fa-graduation-cap me-1"></i> Ir a mi Clase
-				</a>
-			`;
-		} else if (inCart) {
+		if (inCart) {
 			actionBtnHtml = `
 				<a href="carrito.html" class="btn_one" style="padding: 8px 16px; font-size: 13px; border-radius: 6px; text-decoration: none; background: #0284c7;">
 					<i class="fa fa-shopping-cart me-1"></i> En el Carrito
@@ -227,29 +225,33 @@ function reservar(cursoId) {
 		return;
 	}
 
-	// Si ya está pagado por el usuario, avisarle y llevar a Mis Clases
-	if (paidCourseIds.has(cursoId)) {
-		Notifications.showToast('Ya estás matriculado en este curso. Te llevamos a tus clases...', 'info');
-		setTimeout(() => {
-			window.location.href = 'mis-cursos.html';
-		}, 400);
-		return;
-	}
-
 	const res = CartService.addToCart(c);
 	actualizarEstadoNavbar();
-	applyFilter(); // Actualiza el botón de la tarjeta a "En el Carrito"
+	CartService.bumpBadge();
+	applyFilter();
 
 	Notifications.showToast(res.message || '¡Curso agregado a tu carrito!', 'success');
 	setTimeout(() => {
 		window.location.href = 'carrito.html';
-	}, 350);
+	}, 500);
 }
 
-// Reactividad: refrescar botones si el carrito cambia en otra pestaña o en segundo plano
+// Exportar globalmente a window
+window.reservar = reservar;
+window.filtrarCursos = filtrarCursos;
+window.buscarCursos = buscarCursos;
+
+// Inicialización garantizada (inmediata o en evento)
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', initCursosPage);
+} else {
+	initCursosPage();
+}
+window.addEventListener('pageshow', initCursosPage);
 window.addEventListener('cartUpdated', () => {
+	actualizarEstadoNavbar();
 	applyFilter();
 });
-
-// Inicialización
-$(document).ready(initCursosPage);
+if (typeof $ !== 'undefined') {
+	$(document).ready(initCursosPage);
+}

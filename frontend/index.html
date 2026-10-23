@@ -48,8 +48,8 @@
 					<div class="header_right">
 						<nav id="main-menu" class="ms-auto">
 							<ul>
-								<li><a class="nav-link" href="#home" onclick="irASeccion('home'); return false;">Inicio</a></li>
-								<li><a class="nav-link" href="#cursos-section" onclick="irASeccion('cursos-section'); return false;">Cursos</a></li>
+								<li><a class="nav-link active" href="index.html">Inicio</a></li>
+								<li><a class="nav-link" href="cursos.html">Cursos</a></li>
 								<li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
 								<li><a class="nav-link" href="mis-cursos.html">Mis Clases</a></li>
 							</ul>
@@ -84,7 +84,7 @@
 						<p>Inscripción 100% automatizada: Elige tu curso, reserva tu vacante en tiempo real sin sobreventa, paga seguro con Mercado Pago y recibe al instante tu boleta y tus accesos de Zoom o Aula por WhatsApp.</p>						
 					</div>
 					<div class="home_btn">
-						<a href="#cursos-section" onclick="irASeccion('cursos-section'); return false;" class="cta"><span>Explorar Cursos</span>
+						<a href="cursos.html" class="cta"><span>Explorar Cursos</span>
 						  <svg width="13px" height="10px" viewBox="0 0 13 10">
 							<path d="M1,5 L11,5"></path>
 							<polyline points="8 1 12 5 8 9"></polyline>
@@ -120,7 +120,7 @@
 					<div class="single_tp">
 						<h3>Cero Sobreventa de Vacantes</h3>
 						<p>Control automático que descuenta los cupos en el momento exacto en que compras, garantizando tu asiento en el aula física o tu cupo en Zoom.</p>
-						<a href="#cursos-section" class="cta"><span>Verificar Cupos</span>
+						<a href="cursos.html" class="cta"><span>Ver Cursos Disponibles</span>
 						  <svg width="13px" height="10px" viewBox="0 0 13 10"><path d="M1,5 L11,5"></path><polyline points="8 1 12 5 8 9"></polyline></svg>
 						</a>
 					</div>
@@ -172,7 +172,7 @@
 						<h4>Clases Presenciales en Sede</h4>
 						<p>Laboratorios de cómputo y aulas físicas equipadas con asignación estricta de carpetas para garantizar tu comodidad.</p>
 					</div>	
-					<a class="btn_one" href="#cursos-section">Inscribirme Ahora</a>
+					<a class="btn_one" href="cursos.html">Explorar Todos los Cursos</a>
 				</div>								  
 			</div>
 		</div>
@@ -302,6 +302,13 @@ window.reservar = window.reservar || function(cursoId) {
 					</div>
 				</div>
 			</div>
+			<div class="row mt-4">
+				<div class="col-12 text-center">
+					<a href="cursos.html" class="btn_one" style="padding: 13px 32px; font-size: 15px; font-weight: 800; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+						<i class="fa fa-graduation-cap"></i> Ver Catálogo Completo de Cursos <i class="fa fa-arrow-right"></i>
+					</a>
+				</div>
+			</div>
 		</div>
 	</div>
 	<!-- END COURSE SECTION -->
@@ -329,7 +336,7 @@ window.reservar = window.reservar || function(cursoId) {
 						<h4>Enlaces Rápidos</h4>
 						<ul>
 							<li><a href="index.html">Inicio</a></li>
-							<li><a href="#cursos-section" onclick="irASeccion('cursos-section'); return false;">Catálogo de Cursos</a></li>
+							<li><a href="cursos.html">Catálogo de Cursos</a></li>
 							<li><a href="carrito.html">Carrito de Matrícula</a></li>
 							<li><a href="mis-cursos.html">Mis Clases (Zoom/Sede)</a></li>
 							<li><a href="login.html">Portal de Alumnos</a></li>
@@ -340,8 +347,8 @@ window.reservar = window.reservar || function(cursoId) {
 					<div class="single_footer">
 						<h4>Modalidades & Pagos</h4>
 						<ul>
-							<li><a href="#cursos-section">Virtuales por Zoom & Meet</a></li>
-							<li><a href="#cursos-section">Presenciales con Aula Asignada</a></li>
+							<li><a href="cursos.html?modalidad=VIRTUAL">Virtuales por Zoom & Meet</a></li>
+							<li><a href="cursos.html?modalidad=PRESENCIAL">Presenciales con Aula Asignada</a></li>
 							<li><a href="#">Mercado Pago (Tarjetas & Yape)</a></li>
 							<li><a href="#">Emisión de Boleta y Factura SUNAT</a></li>
 							<li><a href="#">Notificación WhatsApp Inmediata</a></li>
@@ -425,3 +432,4 @@ window.reservar = window.reservar || function(cursoId) {
 	</script>
 </body>
 </html>
+
