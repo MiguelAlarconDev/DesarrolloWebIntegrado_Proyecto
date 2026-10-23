@@ -22,6 +22,11 @@ const CartService = {
           docente: 'Ing. Roberto Silva',
           imagen: 'assets/images/all-img/c1.png'
         }];
+        try {
+          const u = new URL(window.location.href);
+          u.searchParams.delete('sample');
+          window.history.replaceState({}, document.title, u.pathname + (u.search ? u.search : ''));
+        } catch (_) {}
         localStorage.setItem(CONFIG.STORAGE_KEYS.CART, JSON.stringify(demo));
         this.startReservationTimer();
         return demo;
@@ -86,7 +91,9 @@ const CartService = {
   },
 
   removeFromCart(cursoId) {
-    this.saveCart(this.getCart().filter(item => item.id !== cursoId));
+    if (!cursoId) return;
+    const targetId = String(cursoId).trim();
+    this.saveCart(this.getCart().filter(item => item && String(item.id).trim() !== targetId));
   },
 
   clearCart() {

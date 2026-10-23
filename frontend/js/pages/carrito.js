@@ -19,15 +19,15 @@ async function initCart() {
 			if (c) {
 				CartService.addToCart(c);
 			}
+			// Limpiar los parámetros de la URL sin recargar para no re-agregar el curso al actualizar o al eliminar
+			try {
+				const url = new URL(window.location.href);
+				url.searchParams.delete('cursoId');
+				url.searchParams.delete('id');
+				window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : ''));
+			} catch (_) {}
 		}
 	} catch (_) {}
-
-	// 2. Si el carrito está vacío al ingresar directamente a carrito.html,
-	// precargar el curso oficial para que siempre esté listo para proceder al pago
-	const cartItems = CartService.getCart();
-	if (cartItems.length === 0 && typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES && CONFIG.INITIAL_COURSES.length > 0) {
-		CartService.addToCart(CONFIG.INITIAL_COURSES[0]);
-	}
 
 	renderCart();
 	actualizarNavbar();
@@ -153,9 +153,9 @@ function renderCart() {
 					<span style="font-weight: 800; color: #2eca7f; font-size: 16px;">S/ ${Number(item.precio).toFixed(2)}</span>
 				</td>
 				<td class="action text-center" data-title="Quitar">
-					<a href="#" onclick="quitar('${item.id}'); return false;" title="Quitar curso del carrito" style="color: #ef4444; font-size: 16px;">
+					<button type="button" class="btn btn-link text-danger p-0" onclick="quitar('${item.id}', event); return false;" title="Quitar curso del carrito" aria-label="Quitar ${item.titulo} del carrito" style="text-decoration: none; font-size: 17px; cursor: pointer; border: none; background: transparent;">
 						<i class="ti-trash"></i>
-					</a>
+					</button>
 				</td>
 			</tr>
 		`;
@@ -245,12 +245,27 @@ function procederAlPago() {
 	}
 }
 
-function quitar(id) {
+function quitar(id, ev) {
+	if (ev) {
+		if (ev.preventDefault) ev.preventDefault();
+		if (ev.stopPropagation) ev.stopPropagation();
+	}
+	if (!id) return false;
 	CartService.removeFromCart(id);
 	renderCart();
 	actualizarNavbar();
-	Notifications.showToast('Curso quitado del carrito.', 'info');
+	if (typeof Notifications !== 'undefined' && Notifications.showToast) {
+		Notifications.showToast('Curso quitado del carrito.', 'info');
+	}
+	return false;
 }
+
+window.quitar = quitar;
+window.procederAlPago = procederAlPago;
+window.agregarCursoPorId = agregarCursoPorId;
+window.agregarCursoDemoCarrito = agregarCursoDemoCarrito;
+window.initCart = initCart;
+window.renderCart = renderCart;
 
 function activarTimer() {
 	if (intervalTimer) clearInterval(intervalTimer);
@@ -283,7 +298,10 @@ if (document.readyState === 'loading') {
 	initCart();
 }
 window.addEventListener('pageshow', initCart);
-window.addEventListener('cartUpdated', initCart);
+window.addEventListener('cartUpdated', () => {
+	renderCart();
+	actualizarNavbar();
+});
 if (typeof $ !== 'undefined') {
 	$(document).ready(initCart);
 }
