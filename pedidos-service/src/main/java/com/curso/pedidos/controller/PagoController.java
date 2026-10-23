@@ -1,7 +1,7 @@
 package com.curso.pedidos.controller;
 
 import com.curso.pedidos.dto.CrearPreferenciaRequest;
-import com.curso.pedidos.dto.CrearPreferenciaResponse;
+import com.curso.pedidos.dto.PreferenciaResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,7 +92,7 @@ public class PagoController {
                 String finalInitPoint = (initPoint != null && !initPoint.isBlank()) ? initPoint : sandboxInitPoint;
 
                 log.info("[MERCADO PAGO] Preferencia creada exitosamente. id={}, initPoint={}", id, finalInitPoint);
-                return ResponseEntity.ok(new CrearPreferenciaResponse(id, finalInitPoint));
+                return ResponseEntity.ok(new PreferenciaResponse(id, finalInitPoint));
             } else {
                 log.error("[MERCADO PAGO] Respuesta sin id: {}", response);
                 return ResponseEntity.internalServerError().body(Map.of("error", "No se pudo obtener el initPoint de Mercado Pago."));
@@ -102,7 +102,7 @@ public class PagoController {
             log.warn("[MERCADO PAGO] Error de conexión con API Mercado Pago: {}. Generando fallback Sandbox resiliente...", ex.getMessage());
             String fallbackId = "3130074680-sandbox-" + System.currentTimeMillis();
             String fallbackUrl = "https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=" + fallbackId;
-            return ResponseEntity.ok(new CrearPreferenciaResponse(fallbackId, fallbackUrl));
+            return ResponseEntity.ok(new PreferenciaResponse(fallbackId, fallbackUrl));
         }
     }
 }
