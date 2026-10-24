@@ -312,8 +312,94 @@ window.reservar = window.reservar || function(cursoId) {
 	</div>
 	<!-- END COURSE SECTION -->
 
-							<!-- START FOOTER ADAPTADO EDUMIM -->
-	<footer class="footer-custom-dark" id="contacto">
+	<!-- START CONTACT SECTION (DISEÑO EDUMIM) -->
+	<section class="section-contact-modern" id="contacto">
+		<div class="container">
+			<div class="row align-items-center g-5">
+				<!-- Columna Izquierda: Información de Contacto -->
+				<div class="col-lg-5 col-md-12">
+					<div class="contact-info-wrapper">
+						<span class="contact-eyebrow">Contact Us</span>
+						<h2 class="contact-main-heading">
+							Get In Touch <span class="highlight-coral-word">Today<svg class="handdrawn-stroke" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M 0 15 Q 50 0 100 12" stroke="#ff6b6b" stroke-width="4" fill="none" stroke-linecap="round"/></svg></span>
+						</h2>
+						<p class="contact-subtext">
+							¿Tienes dudas sobre nuestros cursos, matrículas o certificaciones universitarias? Nuestro equipo de soporte académico está listo para ayudarte en todo momento.
+						</p>
+
+						<div class="contact-items-list">
+							<!-- Item 1: Email-Us -->
+							<div class="contact-item-card">
+								<div class="contact-icon-box icon-box-pink">
+									<i class="fa fa-envelope-o"></i>
+								</div>
+								<div class="contact-item-content">
+									<h4 class="contact-item-title">Email-Us :</h4>
+									<a href="mailto:soporte@cursos.com" class="contact-item-link">soporte@cursos.com</a>
+								</div>
+							</div>
+
+							<!-- Item 2: Call Us -->
+							<div class="contact-item-card">
+								<div class="contact-icon-box icon-box-teal">
+									<i class="fa fa-phone"></i>
+								</div>
+								<div class="contact-item-content">
+									<h4 class="contact-item-title">Call Us:</h4>
+									<a href="tel:+51999555666" class="contact-item-link">+51 999 555 666</a>, <a href="tel:+5113118888" class="contact-item-link">+51 (01) 311 8888</a>
+								</div>
+							</div>
+
+							<!-- Item 3: Office -->
+							<div class="contact-item-card">
+								<div class="contact-icon-box icon-box-yellow">
+									<i class="fa fa-map-marker"></i>
+								</div>
+								<div class="contact-item-content">
+									<h4 class="contact-item-title">Office :</h4>
+									<p class="contact-item-text mb-0">Av. Universitaria 1801, San Miguel, Lima, Perú</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Columna Derecha: Tarjeta con Formulario de Contacto -->
+				<div class="col-lg-7 col-md-12">
+					<div class="contact-form-card">
+						<form id="homeContactForm" onsubmit="event.preventDefault(); if(window.Notifications) Notifications.success('¡Gracias por comunicarte con nosotros! Te responderemos a la brevedad.'); else alert('¡Gracias por comunicarte con nosotros! Te responderemos a la brevedad.'); this.reset();">
+							<div class="row g-3">
+								<div class="col-md-6 col-12">
+									<input type="text" class="form-control contact-input" placeholder="Name*" required>
+								</div>
+								<div class="col-md-6 col-12">
+									<input type="email" class="form-control contact-input" placeholder="Email*" required>
+								</div>
+								<div class="col-md-6 col-12">
+									<input type="text" class="form-control contact-input" placeholder="Subject *" required>
+								</div>
+								<div class="col-md-6 col-12">
+									<input type="text" class="form-control contact-input" placeholder="Website Address">
+								</div>
+								<div class="col-12">
+									<textarea class="form-control contact-textarea" rows="5" placeholder="Your Message*" required></textarea>
+								</div>
+								<div class="col-12">
+									<button type="submit" class="btn btn-contact-submit">
+										Send Message
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- END CONTACT SECTION -->
+
+	<!-- START FOOTER ADAPTADO EDUMIM -->
+	<footer class="footer-custom-dark" id="pie-de-pagina">
 		<!-- Doodles Artísticos de Fondo -->
 		<svg class="footer-doodle doodle-globe" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 			<circle cx="50" cy="50" r="40" />
