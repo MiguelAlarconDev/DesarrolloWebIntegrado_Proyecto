@@ -417,6 +417,8 @@ html {
 
 
 .slicknav_nav {
+  max-height: 85vh !important;
+  overflow-y: auto !important;
 
   background: #ffffff !important;
 
@@ -4816,11 +4818,16 @@ html {
 /* ==========================================================================
    SECCIÓN DE CONTACTO MODERNA (DISEÑO EDUMIM)
    ========================================================================== */
-.section-contact-modern {
-  padding: 85px 0 !important;
+.section-contact-modern,
+#contacto {
+  padding: 120px 0 130px 0 !important;
+  min-height: 85vh !important;
   background-color: #f8fafc !important;
   position: relative !important;
+  display: flex !important;
+  align-items: center !important;
   font-family: 'Mulish', sans-serif !important;
+  scroll-margin-top: 85px !important;
 }
 
 .contact-eyebrow {
@@ -4869,7 +4876,7 @@ html {
 .contact-items-list {
   display: flex !important;
   flex-direction: column !important;
-  gap: 22px !important;
+  gap: 28px !important;
 }
 
 .contact-item-card {
@@ -4932,9 +4939,13 @@ html {
 .contact-form-card {
   background: #ffffff !important;
   border-radius: 20px !important;
-  padding: 45px 42px !important;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.05) !important;
+  padding: 50px 45px !important;
+  min-height: 530px !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06) !important;
   border: 1px solid #f1f5f9 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
 }
 
 .contact-input,
@@ -4950,7 +4961,11 @@ html {
 }
 
 .contact-input {
-  height: 50px !important;
+  height: 54px !important;
+}
+
+.contact-textarea {
+  min-height: 165px !important;
 }
 
 .contact-input::placeholder,
