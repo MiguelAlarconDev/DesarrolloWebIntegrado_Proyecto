@@ -522,23 +522,25 @@ const AuthService = {
       }
     }
 
-    // 4. Menú de Navegación Contextual (#main-menu ul) - Mismo diseño visual unificado, contenido adaptado por rol
+    // 4. Menú de Navegación Contextual (#main-menu ul) - Mismo diseño visual unificado, contenido adaptado por rol con Contacto
     const mainMenu = document.querySelector('#main-menu ul');
     if (mainMenu) {
       if (!user) {
-        // Invitado / Público general: Inicio, Cursos, Mi Carrito (diseño unificado con iconos)
+        // Invitado / Público general: Inicio, Cursos, Contacto, Mi Carrito
         mainMenu.innerHTML = `
           <li><a class="nav-link" href="index.html"><i class="fa fa-home me-1"></i> Inicio</a></li>
           <li><a class="nav-link" href="cursos.html"><i class="fa fa-book me-1"></i> Cursos</a></li>
+          <li><a class="nav-link" href="index.html#contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
           <li><a class="nav-link" href="carrito.html"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
         `;
       } else if (user.rol === 'ADMIN') {
-        // Administrador: En su portal solo sus 3 herramientas
+        // Administrador: En su portal sus herramientas + Contacto
         if (isPortalAdmin) {
           mainMenu.innerHTML = `
             <li><a class="nav-link active" id="nav-admin-cursos" href="javascript:void(0)" onclick="if(window.switchAdminTab)switchAdminTab('cursos')"><i class="fa fa-book me-1"></i> Cursos</a></li>
             <li><a class="nav-link" id="nav-admin-pedidos" href="javascript:void(0)" onclick="if(window.switchAdminTab)switchAdminTab('pedidos')"><i class="fa fa-shopping-cart me-1"></i> Matrículas</a></li>
             <li><a class="nav-link" id="nav-admin-usuarios" href="javascript:void(0)" onclick="if(window.switchAdminTab)switchAdminTab('usuarios')"><i class="fa fa-users me-1"></i> Usuarios</a></li>
+            <li><a class="nav-link" href="index.html#contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
           `;
         } else {
           // Administrador en catálogo/inicio/carrito
@@ -546,15 +548,17 @@ const AuthService = {
             <li><a class="nav-link" href="index.html"><i class="fa fa-home me-1"></i> Inicio</a></li>
             <li><a class="nav-link" href="cursos.html"><i class="fa fa-book me-1"></i> Cursos</a></li>
             <li><a class="nav-link" href="portal-admin.html"><i class="fa fa-shield me-1"></i> Panel Admin</a></li>
+            <li><a class="nav-link" href="index.html#contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
             <li><a class="nav-link" href="carrito.html"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
           `;
         }
       } else if (user.rol === 'DOCENTE') {
-        // Docente: En su portal solo sus 2 herramientas
+        // Docente: En su portal sus herramientas + Contacto
         if (isPortalDocente) {
           mainMenu.innerHTML = `
             <li><a class="nav-link active" id="nav-docente-cursos" href="javascript:void(0)" onclick="if(window.switchDocenteTab)switchDocenteTab('cursos')"><i class="fa fa-book me-1"></i> Mis Cursos</a></li>
             <li><a class="nav-link" id="nav-docente-alumnos" href="javascript:void(0)" onclick="if(window.switchDocenteTab)switchDocenteTab('alumnos')"><i class="fa fa-users me-1"></i> Alumnos</a></li>
+            <li><a class="nav-link" href="index.html#contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
           `;
         } else {
           // Docente en catálogo/inicio/carrito
@@ -562,15 +566,17 @@ const AuthService = {
             <li><a class="nav-link" href="index.html"><i class="fa fa-home me-1"></i> Inicio</a></li>
             <li><a class="nav-link" href="cursos.html"><i class="fa fa-book me-1"></i> Cursos</a></li>
             <li><a class="nav-link" href="portal-docente.html"><i class="fa fa-briefcase me-1"></i> Portal Docente</a></li>
+            <li><a class="nav-link" href="index.html#contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
             <li><a class="nav-link" href="carrito.html"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
           `;
         }
       } else {
-        // Alumno / Estudiante: Inicio, Cursos, Mis Clases, Mi Carrito
+        // Alumno / Estudiante: Inicio, Cursos, Mis Clases, Contacto, Mi Carrito
         mainMenu.innerHTML = `
           <li><a class="nav-link" href="index.html"><i class="fa fa-home me-1"></i> Inicio</a></li>
           <li><a class="nav-link" href="cursos.html"><i class="fa fa-book me-1"></i> Cursos</a></li>
           <li><a class="nav-link" href="mis-cursos.html"><i class="fa fa-graduation-cap me-1"></i> Mis Clases</a></li>
+          <li><a class="nav-link" href="index.html#contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
           <li><a class="nav-link" href="carrito.html"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
         `;
       }
@@ -615,22 +621,26 @@ const AuthService = {
       }
     }
 
-    // 6. Resaltar página activa con precisión
+    // 6. Resaltar página activa con precisión (incluye Contacto con deep-linking hash)
     if (typeof window !== 'undefined') {
       const pathname = (window.location.pathname || '').toLowerCase();
       const current = pathname.split('/').pop() || 'index.html';
       const cleanCurrent = current.replace(/\.html$/, '') || 'index';
+      const currentHash = (window.location.hash || '').toLowerCase();
 
       document.querySelectorAll('#main-menu a, .site-navigation a.nav-link').forEach(link => {
         const rawHref = link.getAttribute('href') || '';
-        if (rawHref.startsWith('javascript:') || rawHref.startsWith('#')) return;
+        if (rawHref.startsWith('javascript:')) return;
 
+        const hasHashContacto = rawHref.includes('#contacto');
         const href = rawHref.split('#')[0].split('?')[0].toLowerCase();
         const cleanHref = (href.split('/').pop() || '').replace(/\.html$/, '');
 
         let isActive = false;
-        if (cleanCurrent === 'index' || cleanCurrent === '') {
-          isActive = cleanHref === 'index';
+        if (hasHashContacto) {
+          isActive = currentHash === '#contacto';
+        } else if (cleanCurrent === 'index' || cleanCurrent === '') {
+          isActive = cleanHref === 'index' && currentHash !== '#contacto';
         } else if (cleanCurrent === 'cursos' || cleanCurrent === 'curso-detalle') {
           isActive = cleanHref === 'cursos';
         } else if (cleanCurrent === 'carrito' || cleanCurrent === 'checkout' || cleanCurrent === 'confirmacion') {
@@ -649,6 +659,14 @@ const AuthService = {
           link.classList.remove('active');
         }
       });
+
+      // Escuchar cambios de hash para actualizar la navegación dinámicamente
+      if (!window.__navHashBound) {
+        window.__navHashBound = true;
+        window.addEventListener('hashchange', () => {
+          setTimeout(() => AuthService.updateNavbar(), 50);
+        });
+      }
     }
 
     // 7. Sincronizar menú móvil (SlickNav) limpio
