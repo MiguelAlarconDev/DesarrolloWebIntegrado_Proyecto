@@ -1,4 +1,4 @@
-package com.curso.cursos.entity;
+package com.cursos.entity;
 
 public enum EstadoCurso {
     BORRADOR,

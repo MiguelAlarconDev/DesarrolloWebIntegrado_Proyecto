@@ -1,6 +1,6 @@
-package com.curso.cursos.dto;
+package com.cursos.dto;
 
-import com.curso.cursos.entity.ModalidadCurso;
+import com.cursos.entity.ModalidadCurso;
 import jakarta.validation.constraints.NotNull;
 
 public class ActualizarDatosClaseRequest {

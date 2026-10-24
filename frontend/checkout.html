@@ -50,7 +50,6 @@
 								<li><a class="nav-link" href="index.html">Inicio</a></li>
 								<li><a class="nav-link" href="cursos.html">Cursos</a></li>
 								<li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
-								<li><a class="nav-link" href="mis-cursos.html">Mis Clases</a></li>
 							</ul>
 						</nav>
 						<div id="mobile_menu"></div>
@@ -236,9 +235,9 @@
 						<div class="ck-mp-sandbox-panel" style="margin-top: 18px; padding: 18px 20px; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 12px;">
 							<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
 								<span class="badge" style="background: #e0f2fe; color: #0284c7; font-size: 11.5px; padding: 5px 12px; font-weight: 700; border-radius: 999px;">
-									<i class="fa fa-shield me-1"></i> Entorno Oficial de Pruebas (Sandbox)
+									<i class="fa fa-shield me-1"></i> Modo de Prueba Oficial
 								</span>
-								<small style="color: #64748b; font-size: 12px;"><i class="fa fa-check-circle text-success"></i> Transacciones de prueba sin costo</small>
+								<small style="color: #64748b; font-size: 12px;"><i class="fa fa-check-circle text-success"></i> Pago simulado para evaluación sin costo real</small>
 							</div>
 							
 							<p style="font-size: 13px; color: #334155; margin-bottom: 12px; line-height: 1.45;">
@@ -249,7 +248,7 @@
 							<div class="ck-test-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; border-radius: 10px; padding: 14px 18px; box-shadow: 0 4px 15px rgba(15,23,42,0.15);">
 								<div class="d-flex justify-content-between align-items-center mb-2">
 									<span style="font-size: 11px; letter-spacing: 1px; color: #94a3b8; text-transform: uppercase; font-weight: 700;">
-										Tarjeta Sandbox Aprobada
+										Tarjeta de Prueba Autorizada
 									</span>
 									<span style="font-weight: 800; color: #38bdf8; font-size: 13px;"><i class="fa fa-cc-visa"></i> VISA PERÚ</span>
 								</div>
@@ -276,14 +275,14 @@
 								<div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 									<div style="flex: 1; min-width: 220px;">
 										<strong style="color: #15803d; font-size: 13.5px; display: block;">
-											<i class="fa fa-bolt"></i> ¿Prefieres aprobar la orden en 1 solo clic?
+											<i class="fa fa-bolt"></i> ¿Deseas confirmar tu matrícula en 1 solo clic?
 										</strong>
 										<span style="font-size: 12px; color: #166534; line-height: 1.4; display: block;">
-											Simula el pago exitoso en 1 solo clic y genera tu Boleta SUNAT y accesos automáticamente.
+											Confirma tu pago al instante sin salir de la página y recibe tu comprobante y accesos de inmediato.
 										</span>
 									</div>
 									<button type="button" onclick="ejecutarPagoDirectoDemo()" class="btn btn-sm" style="background: #16a34a; color: #fff; font-weight: 800; border-radius: 6px; padding: 8px 16px; border: none; font-size: 13px; box-shadow: 0 2px 8px rgba(22,163,74,0.3); white-space: nowrap;">
-										<i class="fa fa-check-circle me-1"></i> Simular Aprobación (1 Clic)
+										<i class="fa fa-check-circle me-1"></i> Confirmar Matrícula (1 Clic)
 									</button>
 								</div>
 							</div>
@@ -328,14 +327,14 @@
 										</div>
 									</div>
 									<h5 style="color: #1a2d62; font-weight: 800; font-size: 15.5px; margin-bottom: 6px;">
-										Pasarela Oficial Mercado Pago Lista
+										Tu pasarela de pago seguro está lista
 									</h5>
 									<p style="font-size: 13px; color: #475569; margin-bottom: 14px; line-height: 1.45;">
-										Completa tu pago en la pestaña de Mercado Pago con la tarjeta de prueba <code>4067 4300 0000 0001</code>. Luego confirma para emitir tu comprobante:
+										Completa tu pago en la ventana segura de Mercado Pago. Si estás haciendo una prueba, puedes usar la tarjeta: <code>4067 4300 0000 0001</code>. Luego confirma para recibir tu comprobante:
 									</p>
 									
 									<a id="btn-mp-open-direct" href="#" target="_blank" rel="noopener noreferrer" class="ck-btn ck-btn-dark w-100 mb-2" style="font-size: 13.5px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-										<i class="fa fa-external-link"></i> Abrir Pasarela Mercado Pago
+										<i class="fa fa-external-link"></i> Ir a Pagar con Mercado Pago
 									</a>
 
 									<button type="button" id="btn-mp-confirmar-pago" onclick="finalizarMatriculaMp()" class="ck-btn ck-btn-success w-100 mb-2" style="font-size: 14px;">
@@ -343,11 +342,11 @@
 									</button>
 
 									<button type="button" onclick="ejecutarPagoDirectoDemo()" class="ck-btn w-100 mb-2" style="font-size: 12.5px; background: #f0fdf4; color: #15803d; border: 1px solid #86efac; font-weight: 700;">
-										<i class="fa fa-bolt"></i> Simular Aprobación Inmediata (Sandbox)
+										<i class="fa fa-bolt"></i> Confirmar Pago Rápido (1 Clic)
 									</button>
 
 									<div class="p-2 mt-2" style="background: #f8fafc; border-radius: 6px; font-size: 11.5px; color: #64748b;">
-										<span>Tarjeta Demo: <strong>4067 4300 0000 0001</strong> &bull; Vence: <strong>11/28</strong> &bull; CVV: <strong>123</strong></span>
+										<span>Tarjeta de prueba: <strong>4067 4300 0000 0001</strong> &bull; Vence: <strong>11/28</strong> &bull; CVV: <strong>123</strong></span>
 									</div>
 								</div>
 							</div>

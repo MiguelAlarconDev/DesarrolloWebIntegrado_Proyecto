@@ -1,200 +1,482 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
 	<meta charset="utf-8">
+
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+
 	<title>Iniciar Sesión - Gestión de Cursos</title>			
+
 	
+
 	<!-- Latest Bootstrap min CSS -->
+
 	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">		
+
 	<!-- Google Font Local -->
+
 	<link rel="stylesheet" href="assets/fonts/mulish.css">
+
 	<!-- Font Awesome CSS -->
+
 	<link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+
 	<link rel="stylesheet" href="assets/fonts/themify-icons.css">
+
 	<!--- owl carousel Css-->
+
 	<link rel="stylesheet" href="assets/owlcarousel/css/owl.carousel.css">
+
 	<link rel="stylesheet" href="assets/owlcarousel/css/owl.theme.css">				
+
 	<!--slicknav Css-->
+
 	<link rel="stylesheet" href="assets/css/slicknav.css">		
+
 	<!-- MAGNIFIC CSS -->
+
 	<link rel="stylesheet" href="assets/css/magnific-popup.css">	
+
 	<link rel="stylesheet" href="assets/css/niceselect.css" />	
+
 	<!-- animate CSS -->
+
 	<link rel="stylesheet" href="assets/css/animate.css">			
+
 	<!-- Style CSS de Gestión de Cursos -->					
+
 	<link rel="stylesheet" href="assets/css/shop.css" />				
+
 	<link rel="stylesheet" href="assets/css/style.css" />				
+
 	<link rel="stylesheet" href="css/custom.css" />
+
 </head>
+
 <body>
+
 	
+
 		<!-- START NAVBAR -->  
+
 	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
+
 		<div class="container">
+
 			<div class="row align-items-center">
+
 				<div class="col-lg-3 col-md-4 col-sm-6">
+
 					<div class="site-logo">
+
 						<a href="index.html" class="brand-logo-link">
+
 							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+
 							<span class="brand-text">Gestión de Cursos</span>
+
 						</a>          			        				
+
 					</div>
+
 				</div>
+
 				<div class="col-lg-5 col-md-5 col-sm-6">
+
 					<div class="header_right">
+
 						<nav id="main-menu" class="ms-auto">
+
 							<ul>
+
 								<li><a class="nav-link" href="index.html">Inicio</a></li>
+
 								<li><a class="nav-link" href="cursos.html">Cursos</a></li>
+
 								<li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
-								<li><a class="nav-link" href="mis-cursos.html">Mis Clases</a></li>
+
 							</ul>
+
 						</nav>
+
 						<div id="mobile_menu"></div>
+
 					</div>
+
 				</div>
+
 				<div class="col-lg-4 col-md-3 col-sm-12">
+
 					<div class="home_lc">
+
 						<a href="carrito.html" class="hlc" title="Ver Carrito de Matrícula" aria-label="Ver Carrito de Matrícula">
+
 							<i class="ti-shopping-cart"></i>
+
 							<span class="gactive is-empty" id="cart-nav-counter" style="display: none;">0</span>
+
 						</a>
+
 					</div>
+
 					<div class="call_to_action" id="auth-buttons-nav">
+
 						<a class="btn_one" href="login.html">Ingresar</a>
+
 						<a class="btn_two" href="registro.html">Registrarse</a>
+
 					</div>
+
 				</div>
+
 			</div>
+
 		</div>
+
 	</div> 	  
+
 	<!-- END NAVBAR -->
 
+
+
 	<!-- START SECTION TOP  -->
+
 	<section class="section-top">
+
 		<div class="container">
+
 			<div class="col-lg-10 offset-lg-1 text-center">
+
 				<div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s">
+
 					<h1>Ingreso de Alumnos</h1>
+
 					<ul>
+
 						<li><a href="index.html">Inicio</a></li>
+
 						<li> / Iniciar Sesión</li>
+
 					</ul>
+
 				</div>
+
 			</div>
+
 		</div>
+
 	</section>	
+
 	<!-- END SECTION TOP -->
 
+
+
 	<!-- START LOGIN  -->
+
 	<section class="login_register section-padding">
+
 		<div class="container">
+
 			<div class="row">				
+
 				<div class="col-lg-6 offset-lg-3 col-xs-12">
+
 					<div class="login">
-						<h4 class="login_register_title">Ingresa a tu cuenta de estudiante:</h4>
 
-						<form id="login-form" onsubmit="hacerLogin(event)">
-							<div class="form-group mb-3">
-								<label for="login-email">Correo Electrónico *</label>
-								<input type="email" id="login-email" class="form-control requiredField input-label" required placeholder="tu@correo.com">
-							</div>
-							<div class="form-group mb-3">
-								<label for="login-pwd">Contraseña *</label>
-								<input type="password" id="login-pwd" class="form-control requiredField input-label" required placeholder="Tu contraseña">
-							</div>
-							<div class="form-group col-lg-12">
-								<button class="btn_one w-100" type="submit" id="btn-login">Iniciar Sesión</button>
-							</div>
-						</form>
+						<h4 class="login_register_title">Ingreso al Sistema Multirrol:</h4>
 
-						<!-- Acceso Rápido para Cargar Alumno -->
-						<div class="mt-4 pt-3 border-top text-center">
-							<p class="text-muted small mb-2"><i class="fa fa-info-circle"></i> ¿Deseas inscribirte rápidamente para probar el pago?</p>
-							<button type="button" class="btn w-100 py-2" onclick="cargarAlumnoDemo()" style="background: #eef8fc; color: #0284c7; border: 1px dashed #0284c7; font-weight: 700; font-size: 13px; border-radius: 4px; cursor: pointer;">
-								<i class="fa fa-bolt"></i> ⚡ Cargar Usuario Estudiante (Carlos Alarcón)
-							</button>
+						<p class="text-muted" style="font-size: 13.5px; margin-top: -10px; margin-bottom: 20px;">
+
+							Accede directamente a tu plataforma especializada: <strong>Estudiante</strong>, <strong>Docente</strong> o <strong>Administrador</strong>.
+
+						</p>
+
+
+
+						<!-- Accesos Rápidos por Perfil -->
+
+						<div class="mb-4 p-3" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
+
+							<span class="d-block text-muted mb-2" style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+
+								<i class="fa fa-bolt text-warning me-1"></i> Accesos Rápidos de Prueba (1 Clic)
+
+							</span>
+
+							<div class="d-grid gap-2">
+
+								<button type="button" class="btn btn-sm text-start py-2 px-3" onclick="cargarDemo('estudiante@cursos.com')" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 8px; font-weight: 600; font-size: 13px;">
+
+									<i class="fa fa-graduation-cap me-2 text-primary"></i> <strong>Portal Estudiante:</strong> Carlos Alarcón
+
+								</button>
+
+								<button type="button" class="btn btn-sm text-start py-2 px-3" onclick="cargarDemo('docente@cursos.com')" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; border-radius: 8px; font-weight: 600; font-size: 13px;">
+
+									<i class="fa fa-briefcase me-2 text-success"></i> <strong>Portal Docente:</strong> Prof. Roberto Mendoza
+
+								</button>
+
+								<button type="button" class="btn btn-sm text-start py-2 px-3" onclick="cargarDemo('admin@cursos.com')" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; border-radius: 8px; font-weight: 600; font-size: 13px;">
+
+									<i class="fa fa-shield me-2 text-purple" style="color: #9333ea;"></i> <strong>Portal Administrador:</strong> Admin General
+
+								</button>
+
+							</div>
+
 						</div>
 
-						<p class="mt-4 text-center">¿No tienes cuenta? <a href="registro.html" class="fw-bold text-success">Regístrate aquí</a></p>
+
+
+						<form id="login-form" onsubmit="hacerLogin(event)">
+
+							<div class="form-group mb-3">
+
+								<label for="login-email">Correo Electrónico *</label>
+
+								<input type="email" id="login-email" class="form-control requiredField input-label" required placeholder="tu@correo.com">
+
+							</div>
+
+							<div class="form-group mb-3">
+
+								<label for="login-pwd">Contraseña *</label>
+
+								<input type="password" id="login-pwd" class="form-control requiredField input-label" required placeholder="Tu contraseña">
+
+							</div>
+
+							<div class="form-group col-lg-12">
+
+								<button class="btn_one w-100" type="submit" id="btn-login">Iniciar Sesión</button>
+
+							</div>
+
+						</form>
+
+
+
+						<p class="mt-4 text-center">¿Eres nuevo estudiante? <a href="registro.html" class="fw-bold text-success">Regístrate aquí</a></p>
+
 					</div>
+
+
+
+					<!-- MODAL DE VERIFICACIÓN 2FA -->
+
+					<div id="modal-2fa" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+
+						<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 440px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); border: 1px solid #e2e8f0; animation: toastSlideInRight 0.3s ease;">
+
+							<div class="text-center mb-3">
+
+								<div style="width: 52px; height: 52px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px;">
+
+									<i class="fa fa-shield"></i>
+
+								</div>
+
+								<h4 style="font-weight: 800; color: #0f172a; margin-bottom: 4px;">Verificación 2FA</h4>
+
+								<p class="text-muted" style="font-size: 13.5px; margin: 0;">Ingresa tu código de seguridad para acceder a tu portal.</p>
+
+							</div>
+
+
+
+							<div id="modal-2fa-msg"></div>
+
+
+
+							<div class="form-group mb-3">
+
+								<label for="otp-code-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Código OTP (6 Dígitos):</label>
+
+								<input type="text" id="otp-code-input" class="form-control text-center" maxlength="6" placeholder="Ej: 123456" style="font-size: 22px; font-weight: 800; letter-spacing: 6px; height: 48px; border: 2px solid #cbd5e1; border-radius: 8px;">
+
+							</div>
+
+
+
+							<div class="d-grid gap-2">
+
+								<button type="button" id="btn-confirmar-2fa" class="btn_one w-100" onclick="confirmar2fa()">
+
+									<i class="fa fa-unlock-alt me-1"></i> Verificar y Entrar al Portal
+
+								</button>
+
+								<button type="button" class="btn btn-outline-secondary btn-sm" onclick="cerrarModal2fa()" style="border-radius: 6px; font-weight: 600;">
+
+									Cancelar
+
+								</button>
+
+							</div>
+
+						</div>
+
+					</div>
+
 				</div>
+
 			</div>
+
 		</div>
+
 	</section>
+
 	<!-- END LOGIN -->
 
+
+
 				<!-- START FOOTER  -->
+
 	<div class="footer footer-minimal section-padding" id="contacto">
+
 		<div class="container">
+
 			<div class="row align-items-center mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+
 				<!-- Marca Oficial -->
+
 				<div class="col-lg-4 col-md-12 text-center text-lg-start mb-2 mb-lg-0">
+
 					<a href="index.html" class="brand-logo-link">
+
 						<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+
 						<span class="brand-text">Gestión de Cursos</span>
+
 					</a>
+
 				</div>
+
 				<!-- Navegación Estándar Completa -->
+
 				<div class="col-lg-8 col-md-12 text-center text-lg-end">
+
 					<div class="footer_menu">
+
 						<ul>
+
 							<li><a href="index.html">Inicio</a></li>
+
 							<li><a href="cursos.html">Cursos</a></li>
+
 							<li><a href="carrito.html">Mi Carrito</a></li>
+
 							<li><a href="mis-cursos.html">Mis Clases</a></li>
+
 							<li><a href="login.html">Ingresar</a></li>
+
 							<li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp text-success me-1"></i> WhatsApp</a></li>
+
 						</ul>
+
 					</div>
+
 				</div>
+
 			</div>
 
+
+
 			<!-- Fila Inferior: Copyright y Políticas Legales Estándar -->
+
 			<div class="row align-items-center">
+
 				<div class="col-lg-6 col-md-12 text-center text-lg-start mb-2 mb-lg-0">
+
 					<div class="footer_copyright">
+
 						<p>&copy; 2026 Gestión de Cursos. Todos los derechos reservados. Desarrollado con Spring Boot y Microservicios.</p>
+
 					</div>
+
 				</div>
+
 				<div class="col-lg-6 col-md-12 text-center text-lg-end">
+
 					<div class="footer_legal">
+
 						<ul>
+
 							<li><a href="#">Términos de Uso</a></li>
+
 							<li><a href="#">Política de Privacidad</a></li>
+
 							<li><a href="#"><i class="fa fa-book text-muted me-1"></i> Libro de Reclamaciones</a></li>
+
 						</ul>
+
 					</div>
+
 				</div>
+
 			</div>				
+
 		</div>
+
 	</div>
+
 	<!-- END FOOTER -->			
+
 		
+
 	<!-- Scripts Gestión de Cursos -->
+
 	<script src="assets/js/jquery-1.12.4.min.js"></script>
+
 	<script src="assets/bootstrap/js/bootstrap.min.js"></script>			
+
 	<script src="assets/owlcarousel/js/owl.carousel.min.js"></script>	
+
 	<script src="assets/js/jquery.slicknav.js"></script>			
+
 	<script src="assets/js/jquery.magnific-popup.min.js"></script>		
+
 	<script src="assets/js/jquery.mixitup.js"></script>			
+
 	<script src="assets/js/scrolltopcontrol.js"></script>	
+
 	<script src="assets/js/purecounter_vanilla.js"></script>	
+
 	<script src="assets/js/wow.min.js"></script>				
+
 	<script src="assets/js/scripts.js"></script>
 
+
+
 	<!-- Lógica Modular -->
+
 	<script src="js/config.js"></script>
+
 	<script src="js/api.js"></script>
+
 	<script src="js/auth.service.js"></script>
+
 	<script src="js/cursos.service.js"></script>
+
 	<script src="js/cart.service.js"></script>
+
 	<script src="js/notifications.js"></script>
 
+
+
 	<!-- Logica de la pagina: Login -->
+
 	<script src="js/pages/login.js"></script>
+
 </body>
+
 </html>
+
+
 

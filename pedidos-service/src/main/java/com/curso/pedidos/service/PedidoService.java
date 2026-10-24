@@ -138,15 +138,12 @@ public class PedidoService {
 
         Pedido pedidoActualizado = pedidoRepository.save(pedido);
 
-        // Obtener datos del estudiante y curso para comprobante y notificación
+        // Obtener datos del estudiante y curso para comprobante
         UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
         CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
 
-        // Generar comprobante electrónico y disparar envío real por correo si SMTP está configurado
+        // Generar comprobante electrónico oficial en base de datos (sin envío externo de WhatsApp o Gmail)
         generarComprobante(pedidoActualizado, estudiante, curso, request);
-
-        // Despachar / preparar notificación de WhatsApp mediante Meta Cloud API
-        enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
 
         enriquecerPedido(pedidoActualizado, estudiante, curso);
         return pedidoActualizado;
@@ -154,11 +151,7 @@ public class PedidoService {
 
     @Transactional
     public boolean reenviarWhatsApp(UUID pedidoId) {
-        Pedido pedido = buscarPorId(pedidoId);
-        UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
-        CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
-        enviarNotificacionWhatsApp(pedido, estudiante, curso);
-        return true;
+        return false;
     }
 
     @Transactional
@@ -253,7 +246,7 @@ public class PedidoService {
         comprobante.setMontoIgv(montoIgv);
         comprobante.setMontoTotal(montoTotal);
         comprobante.setPdfUrl("/api/comprobantes/descargar/" + pedido.getId());
-        comprobante.setEstadoEmail("PENDIENTE");
+        comprobante.setEstadoEmail("NO_REQUERIDO");
 
         if (tipo == TipoComprobante.FACTURA && request != null) {
             comprobante.setRucCliente(request.getRucCliente());
@@ -262,13 +255,9 @@ public class PedidoService {
 
         Comprobante guardado = comprobanteRepository.save(comprobante);
 
-        // Envío real por correo vía JavaMailSender (si SMTP está configurado en application.properties)
-        notificacionEmailService.enviarComprobanteMatricula(pedido, estudiante, curso, guardado);
-        comprobanteRepository.save(guardado);
-
-        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. Correo: %s. Estado: %s%n",
+        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f.%n",
                 tipo, guardado.getSerie(), guardado.getNumeroCorrelativo(), pedido.getCodigoOrden(),
-                montoTotal, estudiante.getCorreo(), guardado.getEstadoEmail());
+                montoTotal);
     }
 
     private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {

@@ -1,12 +1,15 @@
 /**
  * cursos.js - Lógica del Catálogo Completo de Cursos
  * Manejo de búsquedas en tiempo real, filtros combinados por modalidad,
- * detección de vacantes en vivo y reserva directa con persistencia en el carrito.
+ * rango de precios, disponibilidad de vacantes y ordenamiento multicriterio.
  */
 
 let allCursos = (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES) ? [...CONFIG.INITIAL_COURSES] : [];
 let currentModalidad = 'TODOS';
 let searchKeyword = '';
+let currentRangoPrecio = 'TODOS';
+let currentOrden = 'DESTACADOS';
+let onlyVacantes = false;
 let paidCourseIds = new Set();
 
 async function initCursosPage() {
@@ -17,7 +20,6 @@ async function initCursosPage() {
 	const urlMod = (params.get('modalidad') || '').toUpperCase();
 	if (['VIRTUAL', 'PRESENCIAL', 'TODOS'].includes(urlMod)) {
 		currentModalidad = urlMod;
-		actualizarBotonesModalidad();
 	}
 
 	const urlQ = params.get('q') || '';
@@ -26,6 +28,8 @@ async function initCursosPage() {
 		const searchInput = document.getElementById('buscador-cursos');
 		if (searchInput) searchInput.value = urlQ;
 	}
+
+	actualizarBotonesModalidad();
 
 	// 2. Si el alumno está autenticado, cargar sus cursos pagados para identificarlos en el catálogo
 	await cargarCursosPagadosAlumno();
@@ -70,25 +74,24 @@ function actualizarEstadoNavbar() {
 }
 
 function actualizarBotonesModalidad() {
-	document.querySelectorAll('.best-cpurse button, .filter-mod-btn').forEach(b => {
+	document.querySelectorAll('.filter-mod-btn').forEach(b => {
 		const onclickAttr = b.getAttribute('onclick') || '';
 		if (onclickAttr.includes(`'${currentModalidad}'`)) {
-			b.className = 'btn_one me-2 mb-2 filter-mod-btn';
-		} else if (onclickAttr.includes('filtrarCursos')) {
-			b.className = 'btn_two me-2 mb-2 filter-mod-btn';
+			b.classList.add('active');
+		} else {
+			b.classList.remove('active');
 		}
 	});
 }
 
 function filtrarCursos(mod, btn) {
 	currentModalidad = mod;
-	document.querySelectorAll('.best-cpurse button, .filter-mod-btn').forEach(b => {
-		const onclickAttr = b.getAttribute('onclick') || '';
-		if (onclickAttr.includes('filtrarCursos')) {
-			b.className = 'btn_two me-2 mb-2 filter-mod-btn';
-		}
-	});
-	if (btn) btn.className = 'btn_one me-2 mb-2 filter-mod-btn';
+	document.querySelectorAll('.filter-mod-btn').forEach(b => b.classList.remove('active'));
+	if (btn) {
+		btn.classList.add('active');
+	} else {
+		actualizarBotonesModalidad();
+	}
 	applyFilter();
 }
 
@@ -97,15 +100,112 @@ function buscarCursos(keyword) {
 	applyFilter();
 }
 
+function cambiarFiltroPrecio(valor) {
+	currentRangoPrecio = valor;
+	applyFilter();
+}
+
+function cambiarOrdenCursos(valor) {
+	currentOrden = valor;
+	applyFilter();
+}
+
+function toggleSoloVacantes(checked) {
+	onlyVacantes = !!checked;
+	applyFilter();
+}
+
+function limpiarFiltros() {
+	currentModalidad = 'TODOS';
+	searchKeyword = '';
+	currentRangoPrecio = 'TODOS';
+	currentOrden = 'DESTACADOS';
+	onlyVacantes = false;
+
+	const buscador = document.getElementById('buscador-cursos');
+	if (buscador) buscador.value = '';
+
+	const selectPrecio = document.getElementById('filtro-precio');
+	if (selectPrecio) selectPrecio.value = 'TODOS';
+
+	const selectOrden = document.getElementById('filtro-orden');
+	if (selectOrden) selectOrden.value = 'DESTACADOS';
+
+	const chkVacantes = document.getElementById('filtro-vacantes');
+	if (chkVacantes) chkVacantes.checked = false;
+
+	actualizarBotonesModalidad();
+	applyFilter();
+	Notifications.showToast('Filtros restablecidos.', 'info');
+}
+
+function actualizarContadorFiltros(visibles, total) {
+	const contadorEl = document.getElementById('filtro-contador-text');
+	const limpiarBox = document.getElementById('filtro-limpiar-box');
+
+	if (contadorEl) {
+		contadorEl.innerHTML = `Mostrando <strong style="color: #0f172a;">${visibles}</strong> de <strong style="color: #0f172a;">${total}</strong> cursos disponibles`;
+	}
+
+	const hayFiltrosActivos = currentModalidad !== 'TODOS' ||
+		searchKeyword !== '' ||
+		currentRangoPrecio !== 'TODOS' ||
+		currentOrden !== 'DESTACADOS' ||
+		onlyVacantes;
+
+	if (limpiarBox) {
+		limpiarBox.style.display = hayFiltrosActivos ? 'block' : 'none';
+	}
+}
+
 function applyFilter() {
 	let filtered = CursosService.filterByModalidad(allCursos, currentModalidad);
+
+	// 1. Buscador por texto (título, descripción, docente)
 	if (searchKeyword) {
-		filtered = filtered.filter(c => 
+		filtered = filtered.filter(c =>
 			(c.titulo && c.titulo.toLowerCase().includes(searchKeyword)) ||
 			(c.descripcion && c.descripcion.toLowerCase().includes(searchKeyword)) ||
 			(c.docente && c.docente.toLowerCase().includes(searchKeyword))
 		);
 	}
+
+	// 2. Filtro por Rango de Precio
+	if (currentRangoPrecio === 'HASTA_150') {
+		filtered = filtered.filter(c => Number(c.precio || 0) <= 150);
+	} else if (currentRangoPrecio === '151_200') {
+		filtered = filtered.filter(c => {
+			const p = Number(c.precio || 0);
+			return p > 150 && p <= 200;
+		});
+	} else if (currentRangoPrecio === 'MAS_200') {
+		filtered = filtered.filter(c => Number(c.precio || 0) > 200);
+	}
+
+	// 3. Filtro por Solo Vacantes Disponibles
+	if (onlyVacantes) {
+		filtered = filtered.filter(c => {
+			const disp = c.aforoDisponible !== undefined ? c.aforoDisponible : (c.aforoMaximo || 30);
+			return Number(disp) > 0;
+		});
+	}
+
+	// 4. Ordenamiento
+	if (currentOrden === 'PRECIO_ASC') {
+		filtered.sort((a, b) => Number(a.precio || 0) - Number(b.precio || 0));
+	} else if (currentOrden === 'PRECIO_DESC') {
+		filtered.sort((a, b) => Number(b.precio || 0) - Number(a.precio || 0));
+	} else if (currentOrden === 'TITULO_ASC') {
+		filtered.sort((a, b) => (a.titulo || '').localeCompare(b.titulo || ''));
+	} else if (currentOrden === 'VACANTES_DESC') {
+		filtered.sort((a, b) => {
+			const aDisp = a.aforoDisponible !== undefined ? a.aforoDisponible : 30;
+			const bDisp = b.aforoDisponible !== undefined ? b.aforoDisponible : 30;
+			return Number(bDisp) - Number(aDisp);
+		});
+	}
+
+	actualizarContadorFiltros(filtered.length, allCursos.length);
 	renderCursos(filtered);
 }
 
@@ -116,12 +216,16 @@ function renderCursos(list) {
 	if (!list || list.length === 0) {
 		container.innerHTML = `
 			<div class="col-12 text-center py-5">
-				<div style="max-width: 480px; margin: 0 auto; background: #ffffff; padding: 40px 30px; border-radius: 12px; border: 1px solid #eef2f6;">
-					<i class="fa fa-search text-muted mb-3" style="font-size: 38px; display: block;"></i>
-					<h4 style="color: #1a2d62; font-weight: 800;">No se encontraron cursos</h4>
-					<p class="text-muted" style="font-size: 14px;">Intenta cambiar el término de búsqueda o selecciona otra modalidad.</p>
-					<button type="button" onclick="filtrarCursos('TODOS', null); document.getElementById('buscador-cursos').value=''; buscarCursos('');" class="btn_one mt-2" style="font-size: 13px; padding: 8px 18px; border-radius: 6px;">
-						Ver todos los cursos
+				<div style="max-width: 500px; margin: 0 auto; background: #ffffff; padding: 45px 32px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);">
+					<div style="width: 64px; height: 64px; border-radius: 50%; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;">
+						<i class="fa fa-search"></i>
+					</div>
+					<h4 style="color: #0f172a; font-weight: 800; margin-bottom: 8px;">No se encontraron cursos</h4>
+					<p class="text-muted" style="font-size: 14px; margin-bottom: 20px;">
+						No hay cursos que coincidan con los criterios seleccionados. Prueba modificando los filtros o el término de búsqueda.
+					</p>
+					<button type="button" onclick="limpiarFiltros()" class="btn_one" style="font-size: 13.5px; padding: 10px 22px; border-radius: 8px;">
+						<i class="fa fa-refresh me-1"></i> Restablecer todos los filtros
 					</button>
 				</div>
 			</div>
@@ -167,7 +271,7 @@ function renderCursos(list) {
 				</button>
 			`;
 		} else {
-			actionBtnHtml = `<span class="badge bg-secondary" style="font-size: 12px; padding: 8px 12px;">Sin Vacantes</span>`;
+			actionBtnHtml = `<button type="button" class="btn_two btn-card-agotado" disabled style="opacity: 0.65; cursor: not-allowed; background: #f1f5f9; color: #94a3b8; border: 1.5px solid #e2e8f0; font-size: 12.5px; font-weight: 700; border-radius: 6px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px;"><i class="fa fa-lock"></i> Agotado</button>`;
 		}
 
 		const enrolledTag = isPaid
@@ -239,6 +343,10 @@ function reservar(cursoId) {
 window.reservar = reservar;
 window.filtrarCursos = filtrarCursos;
 window.buscarCursos = buscarCursos;
+window.cambiarFiltroPrecio = cambiarFiltroPrecio;
+window.cambiarOrdenCursos = cambiarOrdenCursos;
+window.toggleSoloVacantes = toggleSoloVacantes;
+window.limpiarFiltros = limpiarFiltros;
 
 // Inicialización garantizada (inmediata o en evento)
 if (document.readyState === 'loading') {

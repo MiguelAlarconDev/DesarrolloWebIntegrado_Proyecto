@@ -66,7 +66,7 @@ function renderUserStatusCard() {
 			<div class="ck-user-empty">
 				<div>
 					<strong><i class="fa fa-user-circle-o"></i> Identifícate para matricularte</strong>
-					<span>Asociaremos tu vacante oficial, tu comprobante SUNAT y te enviaremos los accesos de clase por WhatsApp y correo electrónico.</span>
+					<span>Asociaremos tu vacante oficial y tu comprobante SUNAT directamente a tu cuenta de estudiante en Mis Clases.</span>
 				</div>
 				<div class="ck-user-actions">
 					<button type="button" onclick="cargarUsuarioDemoCheckout()" class="ck-btn ck-btn-sm ck-btn-dark">
@@ -309,7 +309,7 @@ async function ejecutarPago(e) {
 	const btn = (document.getElementById('btn-pago') || document.getElementById('btn-pago'));
 	if (btn) {
 		btn.disabled = true;
-		btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Conectando con Mercado Pago...`;
+		btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Preparando tu pago seguro...`;
 	}
 
 	const nombres = (document.getElementById('chk-nombres') ? document.getElementById('chk-nombres').value.trim() : '') || user.nombres || 'Carlos';
@@ -321,12 +321,21 @@ async function ejecutarPago(e) {
 
 	const estId = user.id || 'a0000000-0000-0000-0000-000000000003';
 
+	// Actualizar datos del estudiante en su perfil y sesión activa
+	AuthService.updateProfile({
+		nombres: nombres,
+		apellidos: apellidos,
+		dni: dni,
+		whatsapp: whatsapp,
+		correo: correo
+	});
+
 	try {
 		// 1. Crear pedido oficial en PostgreSQL
 		const pedido = await PedidosService.crearPedido(cart[0].id, estId);
 
 		const payInfo = {
-			metodoPago: 'Mercado Pago Checkout',
+			metodoPago: 'Mercado Pago (Tarjeta de Crédito / Débito)',
 			tipoComprobante: tipoComp,
 			clienteNombres: `${nombres} ${apellidos}`.trim(),
 			docIdentidad: docIdent,
@@ -395,11 +404,11 @@ async function ejecutarPago(e) {
 			Notifications.showToast('Haz clic en "Abrir Pasarela Mercado Pago" para continuar.', 'info');
 		}
 
-		Notifications.showToast('¡Ventana de Mercado Pago lista! Usa la tarjeta 4067 4300 0000 0001 para aprobar.', 'success');
+		Notifications.showToast('¡Ventana de pago abierta! Completa tu pago de forma segura en Mercado Pago.', 'success');
 		if (btn) {
 			btn.disabled = false;
 			btn.classList.add('is-success');
-			btn.innerHTML = `<i class="fa fa-external-link"></i> Abrir Pasarela Mercado Pago`;
+			btn.innerHTML = `<i class="fa fa-external-link"></i> Ir a Pagar con Mercado Pago`;
 			btn.onclick = () => window.open(prefData.initPoint, '_blank');
 		}
 
@@ -432,7 +441,7 @@ async function ejecutarPagoDirectoDemo() {
 		return;
 	}
 
-	Notifications.showToast('Simulando aprobación de pago en Mercado Pago...', 'info');
+	Notifications.showToast('Procesando tu pago y confirmando tu matrícula...', 'info');
 
 	const nombres = (document.getElementById('chk-nombres') ? document.getElementById('chk-nombres').value.trim() : '') || user.nombres || 'Carlos';
 	const apellidos = (document.getElementById('chk-apellidos') ? document.getElementById('chk-apellidos').value.trim() : '') || user.apellidos || 'Alarcón';
@@ -443,6 +452,15 @@ async function ejecutarPagoDirectoDemo() {
 
 	const estId = user.id || 'a0000000-0000-0000-0000-000000000003';
 
+	// Actualizar datos del estudiante en su perfil y sesión activa
+	AuthService.updateProfile({
+		nombres: nombres,
+		apellidos: apellidos,
+		dni: dni,
+		whatsapp: whatsapp,
+		correo: correo
+	});
+
 	try {
 		let pedido = currentPendingMpOrder ? currentPendingMpOrder.pedido : null;
 		if (!pedido) {
@@ -450,7 +468,7 @@ async function ejecutarPagoDirectoDemo() {
 		}
 
 		const payInfo = {
-			metodoPago: 'Mercado Pago Checkout (Sandbox)',
+			metodoPago: 'Mercado Pago (Tarjeta de Crédito / Débito)',
 			tipoComprobante: tipoComp,
 			clienteNombres: `${nombres} ${apellidos}`.trim(),
 			docIdentidad: docIdent,
@@ -473,7 +491,7 @@ async function finalizarMatriculaMp() {
 	const btnConfirm = document.getElementById('btn-mp-confirmar-pago');
 	if (btnConfirm) {
 		btnConfirm.disabled = true;
-		btnConfirm.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Verificando pago y emitiendo comprobante...`;
+		btnConfirm.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Confirmando tu pago y generando comprobante...`;
 	}
 
 	let orderData = currentPendingMpOrder;
@@ -494,7 +512,7 @@ async function finalizarMatriculaMp() {
 			if (cart.length > 0 && user) {
 				const nuevoPedido = await PedidosService.crearPedido(cart[0].id, user.id);
 				const payInfo = {
-					metodoPago: 'Mercado Pago Checkout',
+					metodoPago: 'Mercado Pago (Tarjeta de Crédito / Débito)',
 					tipoComprobante: tipoComp || 'BOLETA',
 					clienteNombres: `${user.nombres || ''} ${user.apellidos || ''}`.trim() || 'Alumno',
 					docIdentidad: user.dni || '30000003',
@@ -506,7 +524,7 @@ async function finalizarMatriculaMp() {
 		}
 
 		sessionStorage.removeItem('pending_mp_order');
-		Notifications.showToast('¡Pago verificado y matrícula confirmada!', 'success');
+		Notifications.showToast('¡Pago recibido con éxito! Generando tus accesos...', 'success');
 		CartService.clearCart();
 
 		setTimeout(() => {

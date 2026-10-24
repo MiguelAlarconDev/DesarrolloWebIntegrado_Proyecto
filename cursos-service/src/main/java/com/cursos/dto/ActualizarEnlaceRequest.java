@@ -1,4 +1,4 @@
-package com.curso.cursos.dto;
+package com.cursos.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;

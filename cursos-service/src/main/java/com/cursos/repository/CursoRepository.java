@@ -1,7 +1,7 @@
-package com.curso.cursos.repository;
+package com.cursos.repository;
 
-import com.curso.cursos.entity.Curso;
-import com.curso.cursos.entity.EstadoCurso;
+import com.cursos.entity.Curso;
+import com.cursos.entity.EstadoCurso;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

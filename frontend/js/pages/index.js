@@ -150,7 +150,7 @@ function renderCursos(list) {
 				</button>
 			`;
 		} else {
-			actionBtnHtml = `<span class="badge bg-secondary" style="font-size: 12px; padding: 8px 12px;">Sin Vacantes</span>`;
+			actionBtnHtml = `<button type="button" class="btn_two btn-card-agotado" disabled style="opacity: 0.65; cursor: not-allowed; background: #f1f5f9; color: #94a3b8; border: 1.5px solid #e2e8f0; font-size: 12.5px; font-weight: 700; border-radius: 6px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px;"><i class="fa fa-lock"></i> Agotado</button>`;
 		}
 
 		const enrolledTag = isPaid

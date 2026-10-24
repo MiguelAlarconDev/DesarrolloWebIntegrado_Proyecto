@@ -1,4 +1,4 @@
-package com.curso.cursos.controller;
+package com.cursos.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,11 +1,11 @@
-package com.curso.cursos.controller;
+package com.cursos.controller;
 
-import com.curso.cursos.dto.ActualizarDatosClaseRequest;
-import com.curso.cursos.dto.ActualizarEnlaceRequest;
-import com.curso.cursos.dto.CrearCursoRequest;
-import com.curso.cursos.entity.Curso;
-import com.curso.cursos.entity.EstadoCurso;
-import com.curso.cursos.service.CursoService;
+import com.cursos.dto.ActualizarDatosClaseRequest;
+import com.cursos.dto.ActualizarEnlaceRequest;
+import com.cursos.dto.CrearCursoRequest;
+import com.cursos.entity.Curso;
+import com.cursos.entity.EstadoCurso;
+import com.cursos.service.CursoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

@@ -1,299 +1,742 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
 	<!-- Meta -->
+
 	<meta charset="utf-8">
+
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+
 	<title>Catálogo de Cursos - Gestión de Cursos</title>			
+
 	
+
 	<!-- Latest Bootstrap min CSS -->
+
 	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">		
+
 	<!-- Google Font Local -->
+
 	<link rel="stylesheet" href="assets/fonts/mulish.css">
+
 	<!-- Font Awesome CSS -->
+
 	<link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+
 	<link rel="stylesheet" href="assets/fonts/themify-icons.css">
+
 	<!-- owl carousel Css-->
+
 	<link rel="stylesheet" href="assets/owlcarousel/css/owl.carousel.css">
+
 	<link rel="stylesheet" href="assets/owlcarousel/css/owl.theme.css">				
+
 	<!--slicknav Css-->
+
 	<link rel="stylesheet" href="assets/css/slicknav.css">		
+
 	<!-- MAGNIFIC CSS -->
+
 	<link rel="stylesheet" href="assets/css/magnific-popup.css">	
+
 	<!-- animate CSS -->
+
 	<link rel="stylesheet" href="assets/css/animate.css">			
+
 	<!-- Style CSS de la plantilla Modelo Gestión de Cursos -->		
+
 	<link rel="stylesheet" href="assets/css/shop.css">
+
 	<link rel="stylesheet" href="assets/css/style.css">
+
 	<!-- Extensiones de Negocio -->
+
 	<link rel="stylesheet" href="css/custom.css">
+
 </head>
+
 <body>
+
 	
+
 	<!-- START NAVBAR -->  
+
 	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
+
 		<div class="container">
+
 			<div class="row align-items-center">
+
 				<div class="col-lg-3 col-md-4 col-sm-6">
+
 					<div class="site-logo">
+
 						<a href="index.html" class="brand-logo-link">
+
 							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+
 							<span class="brand-text">Gestión de Cursos</span>
+
 						</a>          			        				
+
 					</div>
+
 				</div>
+
 				<div class="col-lg-5 col-md-5 col-sm-6">
+
 					<div class="header_right">
+
 						<nav id="main-menu" class="ms-auto">
+
 							<ul>
+
 								<li><a class="nav-link" href="index.html">Inicio</a></li>
+
 								<li><a class="nav-link active" href="cursos.html">Cursos</a></li>
+
 								<li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
-								<li><a class="nav-link" href="mis-cursos.html">Mis Clases</a></li>
+
 							</ul>
+
 						</nav>
+
 						<div id="mobile_menu"></div>
+
 					</div>
+
 				</div>
+
 				<div class="col-lg-4 col-md-3 col-sm-12">
+
 					<div class="home_lc">
+
 						<a href="carrito.html" class="hlc" title="Ver Carrito de Matrícula" aria-label="Ver Carrito de Matrícula">
+
 							<i class="ti-shopping-cart"></i>
+
 							<span class="gactive is-empty" id="cart-nav-counter" style="display: none;">0</span>
+
 						</a>
+
 					</div>
+
 					<div class="call_to_action" id="auth-buttons-nav">
+
 						<a class="btn_one" href="login.html">Ingresar</a>
+
 						<a class="btn_two" href="registro.html">Registrarse</a>
+
 					</div>
+
 				</div>
+
 			</div>
+
 		</div>
+
 	</div> 	  
+
 	<!-- END NAVBAR -->
 
+
+
 	<!-- START SECTION TOP  -->
+
 	<section class="section-top">
+
 		<div class="container">
+
 			<div class="col-lg-10 offset-lg-1 text-center">
+
 				<div class="section-top-title">
+
 					<h1>Catálogo de Cursos</h1>
+
 					<ul>
+
 						<li><a href="index.html">Inicio</a></li>
+
 						<li> / Cursos Especializados</li>
+
 					</ul>
+
 				</div>
+
 			</div>
+
 		</div>
+
 	</section>	
+
 	<!-- END SECTION TOP -->
 
+
+
 	<!-- START COURSE SECTION  -->
+
 	<div class="best-cpurse section-padding">
+
 		<div class="container">
+
 			<div class="section-title text-center">
+
 				<h2>Cursos y Talleres Disponibles</h2>
+
 				<p>Elige tu curso de especialización y <span><u>reserva tu vacante en tiempo real</u></span></p>
+
 			</div>				
+
 			
-			<!-- Barra de Búsqueda y Filtros de Modalidad -->
-			<div class="row mb-5 justify-content-center">
-				<div class="col-lg-8 text-center">
-					<div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
-						<button type="button" onclick="filtrarCursos('TODOS', this)" class="btn_one me-2 mb-2 filter-mod-btn" style="cursor: pointer;">Todos los Cursos</button>
-						<button type="button" onclick="filtrarCursos('VIRTUAL', this)" class="btn_two me-2 mb-2 filter-mod-btn" style="cursor: pointer;"><i class="fa fa-video-camera"></i> Virtuales en Vivo (Zoom / Meet)</button>
-						<button type="button" onclick="filtrarCursos('PRESENCIAL', this)" class="btn_two mb-2 filter-mod-btn" style="cursor: pointer;"><i class="fa fa-building"></i> Presenciales en Sede</button>
+
+			<!-- Panel Completo de Filtros Avanzados -->
+
+			<div class="row justify-content-center">
+
+				<div class="col-12 col-xl-11">
+
+					<div class="cursos-filter-card">
+
+						<div class="row g-3 align-items-center">
+
+							<!-- 1. Buscador en tiempo real -->
+
+							<div class="col-lg-5 col-md-12">
+
+								<label class="d-block text-muted mb-1" style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+
+									<i class="fa fa-search me-1"></i> Búsqueda Rápida
+
+								</label>
+
+								<div class="filter-search-box">
+
+									<input type="text" id="buscador-cursos" class="filter-search-input" placeholder="Buscar por título, docente o tema..." oninput="buscarCursos(this.value)">
+
+									<i class="fa fa-search filter-search-icon"></i>
+
+								</div>
+
+							</div>
+
+
+
+							<!-- 2. Filtro por Rango de Precios -->
+
+							<div class="col-lg-3 col-sm-6">
+
+								<label class="d-block text-muted mb-1" style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+
+									<i class="fa fa-tag me-1"></i> Rango de Precio
+
+								</label>
+
+								<select id="filtro-precio" class="filter-control-select" onchange="cambiarFiltroPrecio(this.value)">
+
+									<option value="TODOS">Todos los precios</option>
+
+									<option value="HASTA_150">Económicos (Hasta S/ 150)</option>
+
+									<option value="151_200">Intermedios (S/ 151 a S/ 200)</option>
+
+									<option value="MAS_200">Especializados (Más de S/ 200)</option>
+
+								</select>
+
+							</div>
+
+
+
+							<!-- 3. Ordenar por -->
+
+							<div class="col-lg-4 col-sm-6">
+
+								<label class="d-block text-muted mb-1" style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+
+									<i class="fa fa-sort me-1"></i> Ordenar Por
+
+								</label>
+
+								<select id="filtro-orden" class="filter-control-select" onchange="cambiarOrdenCursos(this.value)">
+
+									<option value="DESTACADOS">Destacados / Por Defecto</option>
+
+									<option value="PRECIO_ASC">Precio: de menor a mayor</option>
+
+									<option value="PRECIO_DESC">Precio: de mayor a menor</option>
+
+									<option value="TITULO_ASC">Título: Alfabético (A - Z)</option>
+
+									<option value="VACANTES_DESC">Mayor cantidad de vacantes</option>
+
+								</select>
+
+							</div>
+
+						</div>
+
+
+
+						<!-- Fila Inferior: Tabs de Modalidad y Toggle de Vacantes -->
+
+						<div class="row g-3 align-items-center mt-2 pt-2 border-top">
+
+							<div class="col-lg-8 col-12">
+
+								<div class="d-flex align-items-center flex-wrap gap-2">
+
+									<span class="text-muted me-1" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">Modalidad:</span>
+
+									<div class="filter-pills-group">
+
+										<button type="button" onclick="filtrarCursos('TODOS', this)" class="filter-pill-btn active filter-mod-btn">
+
+											Todos
+
+										</button>
+
+										<button type="button" onclick="filtrarCursos('VIRTUAL', this)" class="filter-pill-btn filter-mod-btn">
+
+											<i class="fa fa-video-camera text-primary"></i> Virtuales en Vivo
+
+										</button>
+
+										<button type="button" onclick="filtrarCursos('PRESENCIAL', this)" class="filter-pill-btn filter-mod-btn">
+
+											<i class="fa fa-building text-warning"></i> Presenciales en Sede
+
+										</button>
+
+									</div>
+
+								</div>
+
+							</div>
+
+
+
+							<div class="col-lg-4 col-12 d-flex justify-content-lg-end align-items-center">
+
+								<label class="filter-checkbox-wrap">
+
+									<input type="checkbox" id="filtro-vacantes" onchange="toggleSoloVacantes(this.checked)">
+
+									<span>Solo con vacantes disponibles</span>
+
+								</label>
+
+							</div>
+
+						</div>
+
+
+
+						<!-- Barra de resumen de resultados -->
+
+						<div class="filter-results-bar">
+
+							<div>
+
+								<span id="filtro-contador-text" style="color: #475569; font-weight: 600;">
+
+									Cargando cursos disponibles...
+
+								</span>
+
+							</div>
+
+							<div id="filtro-limpiar-box" style="display: none;">
+
+								<button type="button" class="btn-reset-filters" onclick="limpiarFiltros()">
+
+									<i class="fa fa-times-circle"></i> Limpiar filtros
+
+								</button>
+
+							</div>
+
+						</div>
+
 					</div>
-					<div class="input-group" style="max-width: 500px; margin: 0 auto;">
-						<input type="text" id="buscador-cursos" class="form-control py-2 px-3 border" placeholder="Buscar por título o docente..." oninput="buscarCursos(this.value)">
-						<span class="input-group-text bg-white"><i class="fa fa-search text-muted"></i></span>
-					</div>
+
 				</div>
+
 			</div>
+
+
 
 			<script>
+
 			window.reservar = window.reservar || function(cursoId) {
+
 				try {
+
 					if (typeof CartService !== 'undefined') {
+
 						var c = (typeof CONFIG !== 'undefined' && CONFIG.INITIAL_COURSES)
+
 							? CONFIG.INITIAL_COURSES.find(function(item) { return item.id === cursoId; }) : null;
+
 						if (c) CartService.addToCart(c);
+
 					}
+
 				} catch (_) {}
+
 				window.location.href = 'carrito.html';
+
 			};
+
 			</script>
 
+
+
 			<!-- Grid de Cursos Gestión de Cursos con .course-slide -->
+
 			<div class="row" id="cursos-container">
+
 				<!-- Curso 1 -->
+
 				<div class="col-lg-4 col-sm-6 col-xs-12" style="margin-bottom: 30px;">
+
 					<div class="course-slide" style="height: 100%; display: flex; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.06); border-radius: 8px; overflow: hidden; background: #fff;">
+
 						<div class="course-img" style="position: relative;">
+
 							<a href="curso-detalle.html?id=b0000000-0000-0000-0000-000000000001">
+
 								<img src="assets/images/all-img/c1.png" alt="Desarrollo Web Integrado con Spring Boot" style="width: 100%; height: 210px; object-fit: cover;">
+
 							</a>
+
 							<div class="course-date">
+
 								<span class="month" style="font-weight: 700; font-size: 16px;">S/ 150.00</span>
+
 							</div>
+
 						</div>
+
 						<div class="course-content" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 25px;">
+
 							<div>
+
 								<div class="mb-2"><span class="badge-mod-virtual"><i class="fa fa-video-camera"></i> Virtual en Vivo (Zoom / Meet)</span></div>
+
 								<h3 style="font-size: 18px; line-height: 1.4; margin-bottom: 12px; min-height: 50px;">
+
 									<a href="curso-detalle.html?id=b0000000-0000-0000-0000-000000000001">Desarrollo Web Integrado con Spring Boot</a>
+
 								</h3>
+
 								<span class="d-block text-muted mb-1" style="font-size: 14px;"><i class="fa fa-calendar text-primary me-1"></i> Lun y Mie 19:00 - 22:00</span>
+
 								<span class="d-block text-muted mb-3" style="font-size: 14px;"><i class="fa fa-user-circle text-secondary me-1"></i> Ing. Roberto Docente</span>
+
 								<div class="mb-3">
+
 									<span class="seats-live-badge"><i class="fa fa-table"></i> <strong>8 Vacantes Disponibles</strong> (de 30)</span>
+
 								</div>
+
 							</div>
+
 							<div class="d-flex justify-content-between align-items-center pt-3 border-top">
+
 								<a class="c_btn" href="curso-detalle.html?id=b0000000-0000-0000-0000-000000000001"><i class="fa fa-book me-1"></i> Ver Temario</a>
+
 								<button onclick="reservar('b0000000-0000-0000-0000-000000000001')" class="btn_two btn-card-inscribir"><i class="fa fa-shopping-cart"></i> Inscribirme</button>
+
 							</div>
+
 						</div>
+
 					</div>
+
 				</div>
+
+
 
 				<!-- Curso 2 -->
+
 				<div class="col-lg-4 col-sm-6 col-xs-12" style="margin-bottom: 30px;">
+
 					<div class="course-slide" style="height: 100%; display: flex; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.06); border-radius: 8px; overflow: hidden; background: #fff;">
+
 						<div class="course-img" style="position: relative;">
+
 							<a href="curso-detalle.html?id=b0000000-0000-0000-0000-000000000002">
+
 								<img src="assets/images/all-img/c2.png" alt="Arquitectura Cloud en Java" style="width: 100%; height: 210px; object-fit: cover;">
+
 							</a>
+
 							<div class="course-date">
+
 								<span class="month" style="font-weight: 700; font-size: 16px;">S/ 180.00</span>
+
 							</div>
+
 						</div>
+
 						<div class="course-content" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 25px;">
+
 							<div>
+
 								<div class="mb-2"><span class="badge-mod-virtual"><i class="fa fa-video-camera"></i> Virtual en Vivo (Zoom / Meet)</span></div>
+
 								<h3 style="font-size: 18px; line-height: 1.4; margin-bottom: 12px; min-height: 50px;">
+
 									<a href="curso-detalle.html?id=b0000000-0000-0000-0000-000000000002">Arquitectura Cloud en Java</a>
+
 								</h3>
+
 								<span class="d-block text-muted mb-1" style="font-size: 14px;"><i class="fa fa-calendar text-primary me-1"></i> Mar y Jue 20:00 - 22:00</span>
+
 								<span class="d-block text-muted mb-3" style="font-size: 14px;"><i class="fa fa-user-circle text-secondary me-1"></i> Ing. Roberto Docente</span>
+
 								<div class="mb-3">
+
 									<span class="seats-live-badge"><i class="fa fa-table"></i> <strong>17 Vacantes Disponibles</strong> (de 25)</span>
+
 								</div>
+
 							</div>
+
 							<div class="d-flex justify-content-between align-items-center pt-3 border-top">
+
 								<a class="c_btn" href="curso-detalle.html?id=b0000000-0000-0000-0000-000000000002"><i class="fa fa-book me-1"></i> Ver Temario</a>
+
 								<button onclick="reservar('b0000000-0000-0000-0000-000000000002')" class="btn_two btn-card-inscribir"><i class="fa fa-shopping-cart"></i> Inscribirme</button>
+
 							</div>
+
 						</div>
+
 					</div>
+
 				</div>
+
+
 
 				<!-- Curso 3 -->
+
 				<div class="col-lg-4 col-sm-6 col-xs-12" style="margin-bottom: 30px;">
+
 					<div class="course-slide" style="height: 100%; display: flex; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.06); border-radius: 8px; overflow: hidden; background: #fff;">
+
 						<div class="course-img" style="position: relative;">
+
 							<a href="curso-detalle.html?id=b0000000-0000-0000-0000-000000000003">
+
 								<img src="assets/images/all-img/c3.png" alt="Taller Presencial de Java y Microservicios" style="width: 100%; height: 210px; object-fit: cover;">
+
 							</a>
+
 							<div class="course-date">
+
 								<span class="month" style="font-weight: 700; font-size: 16px;">S/ 220.00</span>
+
 							</div>
+
 						</div>
+
 						<div class="course-content" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 25px;">
+
 							<div>
+
 								<div class="mb-2"><span class="badge-mod-presencial"><i class="fa fa-building"></i> Presencial (Sede & Aula)</span></div>
+
 								<h3 style="font-size: 18px; line-height: 1.4; margin-bottom: 12px; min-height: 50px;">
+
 									<a href="curso-detalle.html?id=b0000000-0000-0000-0000-000000000003">Taller Presencial de Java y Microservicios</a>
+
 								</h3>
+
 								<span class="d-block text-muted mb-1" style="font-size: 14px;"><i class="fa fa-calendar text-primary me-1"></i> Sab 09:00 - 13:00</span>
+
 								<span class="d-block text-muted mb-3" style="font-size: 14px;"><i class="fa fa-user-circle text-secondary me-1"></i> Ing. Roberto Docente</span>
+
 								<div class="mb-3">
+
 									<span class="seats-live-badge"><i class="fa fa-table"></i> <strong>9 Vacantes Disponibles</strong> (de 20)</span>
+
 								</div>
+
 							</div>
+
 							<div class="d-flex justify-content-between align-items-center pt-3 border-top">
+
 								<a class="c_btn" href="curso-detalle.html?id=b0000000-0000-0000-0000-000000000003"><i class="fa fa-book me-1"></i> Ver Temario</a>
+
 								<button onclick="reservar('b0000000-0000-0000-0000-000000000003')" class="btn_two btn-card-inscribir"><i class="fa fa-shopping-cart"></i> Inscribirme</button>
+
 							</div>
+
 						</div>
+
 					</div>
+
 				</div>
+
 			</div>
+
 		</div>
+
 	</div>
+
 	<!-- END COURSE SECTION -->
 
+
+
 				<!-- START FOOTER  -->
+
 	<div class="footer footer-minimal section-padding" id="contacto">
+
 		<div class="container">
+
 			<div class="row align-items-center mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+
 				<!-- Marca Oficial -->
+
 				<div class="col-lg-4 col-md-12 text-center text-lg-start mb-2 mb-lg-0">
+
 					<a href="index.html" class="brand-logo-link">
+
 						<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+
 						<span class="brand-text">Gestión de Cursos</span>
+
 					</a>
+
 				</div>
+
 				<!-- Navegación Estándar Completa -->
+
 				<div class="col-lg-8 col-md-12 text-center text-lg-end">
+
 					<div class="footer_menu">
+
 						<ul>
+
 							<li><a href="index.html">Inicio</a></li>
+
 							<li><a href="cursos.html">Cursos</a></li>
+
 							<li><a href="carrito.html">Mi Carrito</a></li>
+
 							<li><a href="mis-cursos.html">Mis Clases</a></li>
+
 							<li><a href="login.html">Ingresar</a></li>
+
 							<li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp text-success me-1"></i> WhatsApp</a></li>
+
 						</ul>
+
 					</div>
+
 				</div>
+
 			</div>
 
+
+
 			<!-- Fila Inferior: Copyright y Políticas Legales Estándar -->
+
 			<div class="row align-items-center">
+
 				<div class="col-lg-6 col-md-12 text-center text-lg-start mb-2 mb-lg-0">
+
 					<div class="footer_copyright">
+
 						<p>&copy; 2026 Gestión de Cursos. Todos los derechos reservados. Desarrollado con Spring Boot y Microservicios.</p>
+
 					</div>
+
 				</div>
+
 				<div class="col-lg-6 col-md-12 text-center text-lg-end">
+
 					<div class="footer_legal">
+
 						<ul>
+
 							<li><a href="#">Términos de Uso</a></li>
+
 							<li><a href="#">Política de Privacidad</a></li>
+
 							<li><a href="#"><i class="fa fa-book text-muted me-1"></i> Libro de Reclamaciones</a></li>
+
 						</ul>
+
 					</div>
+
 				</div>
+
 			</div>				
+
 		</div>
+
 	</div>
+
 	<!-- END FOOTER -->			
+
 		
+
 	<!-- Scripts Oficiales -->
+
 	<script src="assets/js/jquery-1.12.4.min.js"></script>
+
 	<script src="assets/bootstrap/js/bootstrap.min.js"></script>			
+
 	<script src="assets/owlcarousel/js/owl.carousel.min.js"></script>	
+
 	<script src="assets/js/jquery.slicknav.js"></script>			
+
 	<script src="assets/js/jquery.magnific-popup.min.js"></script>		
+
 	<script src="assets/js/jquery.mixitup.js"></script>			
+
 	<script src="assets/js/scrolltopcontrol.js"></script>	
+
 	<script src="assets/js/purecounter_vanilla.js"></script>	
+
 	<script src="assets/js/wow.min.js"></script>				
+
 	<script src="assets/js/scripts.js"></script>
 
+
+
 	<!-- Servicios Modulares de Lógica de Negocio -->
+
 	<script src="js/config.js"></script>
+
 	<script src="js/api.js"></script>
+
 	<script src="js/auth.service.js"></script>
+
 	<script src="js/cursos.service.js"></script>
+
 	<script src="js/cart.service.js"></script>
+
 	<script src="js/pedidos.service.js"></script>
+
 	<script src="js/notifications.js"></script>
 
+
+
 	<!-- Logica de la pagina: Catálogo -->
+
 	<script src="js/pages/cursos.js"></script>
+
 </body>
+
 </html>
+
+
 

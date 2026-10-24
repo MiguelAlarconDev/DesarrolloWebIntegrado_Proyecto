@@ -119,7 +119,7 @@ public class AuthService {
             whatsappOtpClient.sendOtp(usuario.getWhatsapp(), codigoOtp);
 
             AuthResponse response = new AuthResponse();
-            response.setMensaje("Se requiere verificacion 2FA. Revise el codigo enviado por WhatsApp (vigencia: 5 minutos).");
+            response.setMensaje("Se requiere verificacion 2FA. Codigo OTP de acceso: " + codigoOtp);
             response.setStatus("REQUIRES_2FA");
             response.setUsuarioId(usuario.getId());
             response.setNombres(usuario.getNombres() + " " + usuario.getApellidos());

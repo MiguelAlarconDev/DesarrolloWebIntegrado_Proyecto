@@ -1,12 +1,12 @@
-package com.curso.cursos.service;
+package com.cursos.service;
 
-import com.curso.cursos.dto.ActualizarDatosClaseRequest;
-import com.curso.cursos.dto.ActualizarEnlaceRequest;
-import com.curso.cursos.dto.CrearCursoRequest;
-import com.curso.cursos.entity.Curso;
-import com.curso.cursos.entity.EstadoCurso;
-import com.curso.cursos.entity.ModalidadCurso;
-import com.curso.cursos.repository.CursoRepository;
+import com.cursos.dto.ActualizarDatosClaseRequest;
+import com.cursos.dto.ActualizarEnlaceRequest;
+import com.cursos.dto.CrearCursoRequest;
+import com.cursos.entity.Curso;
+import com.cursos.entity.EstadoCurso;
+import com.cursos.entity.ModalidadCurso;
+import com.cursos.repository.CursoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
