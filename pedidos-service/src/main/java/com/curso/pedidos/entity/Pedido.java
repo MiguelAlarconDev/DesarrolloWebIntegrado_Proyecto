@@ -1,6 +1,7 @@
 package com.curso.pedidos.entity;
 
 import jakarta.persistence.*;
+import com.curso.pedidos.dto.UsuarioDto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -47,6 +48,12 @@ public class Pedido {
     // Campos enriquecidos para la respuesta JSON
     @Transient
     private String estudianteNombre;
+
+    @Transient
+    private UsuarioDto estudiante;
+
+    @Transient
+    private Comprobante comprobante;
 
     @Transient
     private String cursoTitulo;
@@ -224,5 +231,21 @@ public class Pedido {
 
     public void setInitPoint(String initPoint) {
         this.initPoint = initPoint;
+    }
+
+    public UsuarioDto getEstudiante() {
+        return estudiante;
+    }
+
+    public void setEstudiante(UsuarioDto estudiante) {
+        this.estudiante = estudiante;
+    }
+
+    public Comprobante getComprobante() {
+        return comprobante;
+    }
+
+    public void setComprobante(Comprobante comprobante) {
+        this.comprobante = comprobante;
     }
 }

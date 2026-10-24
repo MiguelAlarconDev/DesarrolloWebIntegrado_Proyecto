@@ -132,7 +132,6 @@ const CartService = {
       el.textContent = count > 9 ? '9+' : String(count);
       el.classList.toggle('is-empty', count === 0);
       el.classList.toggle('has-items', count > 0);
-      // Look minimalista: solo mostrar el badge numérico si hay cursos en el carrito
       el.style.display = count > 0 ? 'inline-flex' : 'none';
       const link = el.closest('a');
       if (link) {
@@ -143,6 +142,26 @@ const CartService = {
           : `Ver carrito (${count} ${count === 1 ? 'curso' : 'cursos'})`;
         link.setAttribute('title', label);
         link.setAttribute('aria-label', label);
+      }
+    });
+
+    // Sincronizar también enlaces de texto 'Mi Carrito' en la navegación
+    document.querySelectorAll('nav a[href="carrito.html"], #main-menu a[href="carrito.html"], #mobile_menu a[href="carrito.html"]').forEach(a => {
+      let badge = a.querySelector('.cart-menu-pill');
+      if (count > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'badge bg-success cart-menu-pill ms-1';
+          badge.style.fontSize = '10.5px';
+          badge.style.padding = '2px 6px';
+          badge.style.borderRadius = '8px';
+          badge.style.verticalAlign = 'middle';
+          a.appendChild(badge);
+        }
+        badge.textContent = count > 9 ? '9+' : String(count);
+        badge.style.display = 'inline-block';
+      } else if (badge) {
+        badge.style.display = 'none';
       }
     });
   },

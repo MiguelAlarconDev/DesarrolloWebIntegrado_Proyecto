@@ -206,12 +206,14 @@ public class PedidoService {
             UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
             CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
             enriquecerPedido(pedido, estudiante, curso);
+            comprobanteRepository.findByPedidoId(pedido.getId()).ifPresent(pedido::setComprobante);
         } catch (Exception ignored) {
         }
     }
 
     private void enriquecerPedido(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         if (estudiante != null) {
+            pedido.setEstudiante(estudiante);
             pedido.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
         }
         if (curso != null) {

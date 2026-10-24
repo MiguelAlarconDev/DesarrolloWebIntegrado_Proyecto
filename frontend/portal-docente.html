@@ -1,279 +1,448 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<title>Portal del Docente - Gestión de Cursos</title>			
-	
-	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">		
-	<!-- Google Font Local -->
-	<link rel="stylesheet" href="assets/fonts/mulish.css">
-	<!-- Font Awesome CSS -->
-	<link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
-	<link rel="stylesheet" href="assets/fonts/themify-icons.css">
-	<link rel="stylesheet" href="assets/owlcarousel/css/owl.carousel.css">
-	<link rel="stylesheet" href="assets/owlcarousel/css/owl.theme.css">				
-	<link rel="stylesheet" href="assets/css/slicknav.css">		
-	<link rel="stylesheet" href="assets/css/magnific-popup.css">	
-	<link rel="stylesheet" href="assets/css/animate.css">			
-	<link rel="stylesheet" href="assets/css/shop.css">				
-	<link rel="stylesheet" href="assets/css/style.css">				
-	<link rel="stylesheet" href="css/custom.css">
-</head>
-<body>
-	
-	<!-- START NAVBAR -->  
-	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
-		<div class="container">
-			<div class="row align-items-center">
-				<div class="col-lg-3 col-md-4 col-sm-6">
-					<div class="site-logo">
-						<a href="index.html" class="brand-logo-link">
-							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
-							<span class="brand-text">Gestión de Cursos</span>
-						</a>          			        				
-					</div>
-				</div>
-				<div class="col-lg-5 col-md-5 col-sm-6">
-					<div class="header_right">
-						<nav id="main-menu" class="ms-auto">
-							<ul>
-								<li><a class="nav-link active" id="nav-docente-cursos" href="javascript:void(0)" onclick="if(window.navToDocenteTab){navToDocenteTab('cursos');}else if(window.switchDocenteTab){switchDocenteTab('cursos');}"><i class="fa fa-book me-1"></i> Mis Cursos</a></li>
-								<li><a class="nav-link" id="nav-docente-alumnos" href="javascript:void(0)" onclick="if(window.navToDocenteTab){navToDocenteTab('alumnos');}else if(window.switchDocenteTab){switchDocenteTab('alumnos');}"><i class="fa fa-users me-1"></i> Alumnos Matriculados</a></li>
-								<li><a class="nav-link" href="cursos.html" title="Ver catálogo general de cursos"><i class="fa fa-graduation-cap me-1"></i> Catálogo General</a></li>
-								<li><a class="nav-link" href="index.html" title="Ir a la portada"><i class="fa fa-home me-1"></i> Ir a la Web</a></li>
-							</ul>
-						</nav>
-						<div id="mobile_menu"></div>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-3 col-sm-12">
-					<div class="call_to_action" id="auth-buttons-nav">
-						<a class="btn_one" href="login.html">Ingresar</a>
-						<a class="btn_two" href="registro.html">Registrarse</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div> 	  
-	<!-- END NAVBAR -->
-
-	<!-- START SECTION TOP  -->
-	<section class="section-top">
-		<div class="container">
-			<div class="col-lg-10 offset-lg-1 text-center">
-				<div class="section-top-title">
-					<h1><i class="fa fa-briefcase me-2"></i>Portal del Docente</h1>
-					<ul>
-						<li><a href="index.html">Inicio</a></li>
-						<li> / Gestión de Cursos y Aulas</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</section>	
-	<!-- END SECTION TOP -->
-
-	<!-- CONTENIDO DEL PORTAL DOCENTE -->
-	<div class="section-padding" style="background: #f8fafc; min-height: 70vh;">
-		<div class="container">
-			
-			<!-- PERFIL DOCENTE Y MÉTRICAS -->
-			<div class="row mb-4">
-				<div class="col-12">
-					<div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
-						<div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-							<div class="d-flex align-items-center gap-3">
-								<div style="width: 56px; height: 56px; border-radius: 50%; background: #dcfce7; color: #16a34a; display: flex; align-items: center; justify-content: center; font-size: 26px;">
-									<i class="fa fa-user"></i>
-								</div>
-								<div>
-									<h3 id="docente-nombre-header" style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0;">Prof. Roberto Mendoza</h3>
-									<span id="docente-correo-header" style="font-size: 13.5px; color: #64748b;">docente@cursos.com</span>
-									<span class="badge bg-success ms-2" style="font-size: 11px; padding: 4px 8px;">Docente Oficial</span>
-								</div>
-							</div>
-							<div class="d-flex gap-3 flex-wrap">
-								<div class="text-center px-3 py-2" style="background: #f1f5f9; border-radius: 10px;">
-									<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block;">Cursos a Cargo</span>
-									<strong id="docente-total-cursos" style="font-size: 20px; color: #0f172a;">-</strong>
-								</div>
-								<div class="text-center px-3 py-2" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;">
-									<span style="font-size: 11px; font-weight: 700; color: #166534; text-transform: uppercase; display: block;">Alumnos Inscritos</span>
-									<strong id="docente-total-alumnos" style="font-size: 20px; color: #16a34a;">-</strong>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- PESTAÑAS DE TRABAJO -->
-			<div class="row mb-4">
-				<div class="col-12">
-					<div class="d-flex gap-2 border-bottom pb-2">
-						<button type="button" class="btn btn-sm btn-dark fw-bold px-3 py-2" id="tab-btn-cursos" onclick="switchDocenteTab('cursos')">
-							<i class="fa fa-book me-1"></i> Mis Cursos Asignados
-						</button>
-						<button type="button" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-2" id="tab-btn-alumnos" onclick="switchDocenteTab('alumnos')">
-							<i class="fa fa-users me-1"></i> Lista de Alumnos por Curso
-						</button>
-					</div>
-				</div>
-			</div>
-
-			<!-- SECCIÓN 1: MIS CURSOS ASIGNADOS -->
-			<div id="seccion-cursos-docente">
-				<div class="row" id="docente-cursos-container">
-					<div class="col-12 text-center py-5">
-						<i class="fa fa-spinner fa-spin fa-2x text-primary mb-2"></i>
-						<p class="text-muted">Cargando tus cursos asignados...</p>
-					</div>
-				</div>
-			</div>
-
-			<!-- SECCIÓN 2: LISTA DE ALUMNOS MATRICULADOS -->
-			<div id="seccion-alumnos-docente" style="display: none;">
-				<div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
-					<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-						<div>
-							<h4 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">
-								<i class="fa fa-users text-primary me-2"></i>Participantes y Matrículas
-							</h4>
-							<p class="text-muted" style="font-size: 13.5px; margin: 0;">Selecciona un curso para consultar la nómina oficial de estudiantes:</p>
-						</div>
-						<div class="d-flex align-items-center gap-2">
-							<select id="select-curso-participantes" class="form-select form-select-sm" style="min-width: 280px; font-weight: 600;" onchange="cargarAlumnosDeCurso(this.value)">
-								<option value="">Cargando cursos...</option>
-							</select>
-							<button type="button" class="btn btn-sm btn-outline-dark" onclick="window.print()" title="Imprimir lista">
-								<i class="fa fa-print"></i> Imprimir
-							</button>
-						</div>
-					</div>
-
-					<div class="table-responsive">
-						<table class="table table-hover align-middle" style="font-size: 13.5px;">
-							<thead style="background: #f8fafc; color: #475569; font-weight: 700;">
-								<tr>
-									<th>#</th>
-									<th>Estudiante</th>
-									<th>Correo</th>
-									<th>WhatsApp</th>
-									<th>Fecha de Matrícula</th>
-									<th>Estado</th>
-									<th>Comprobante</th>
-								</tr>
-							</thead>
-							<tbody id="tabla-participantes-body">
-								<tr>
-									<td colspan="7" class="text-center py-4 text-muted">
-										Selecciona un curso para cargar los alumnos matriculados.
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-
-		</div>
-	</div>
-
-	<!-- MODAL: ACTUALIZAR ENLACE DE CLASE (VIRTUAL) -->
-	<div id="modal-actualizar-enlace" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 500px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);">
-			<h4 style="font-weight: 800; color: #0f172a; margin-bottom: 6px;">
-				<i class="fa fa-video-camera text-primary me-2"></i>Actualizar Enlace de Clase en Vivo
-			</h4>
-			<p class="text-muted" style="font-size: 13px;">Los alumnos matriculados verán este enlace de inmediato en su portal para conectarse a clase.</p>
-			
-			<input type="hidden" id="edit-enlace-curso-id">
-			
-			<div class="form-group mb-3">
-				<label for="edit-enlace-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Enlace de Zoom / Google Meet / Teams *</label>
-				<input type="url" id="edit-enlace-input" class="form-control" placeholder="https://meet.google.com/..." required>
-			</div>
-
-			<div class="d-flex justify-content-end gap-2 mt-4">
-				<button type="button" class="btn btn-outline-secondary btn-sm" onclick="cerrarModalEnlace()">Cancelar</button>
-				<button type="button" class="btn btn-primary btn-sm fw-bold px-3" id="btn-guardar-enlace" onclick="guardarEnlaceClase()">
-					<i class="fa fa-save me-1"></i> Guardar Enlace
-				</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- MODAL: ACTUALIZAR DATOS DE SEDE Y AULA (PRESENCIAL) -->
-	<div id="modal-actualizar-aula" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 500px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);">
-			<h4 style="font-weight: 800; color: #0f172a; margin-bottom: 6px;">
-				<i class="fa fa-building text-warning me-2"></i>Actualizar Sede y Aula Física
-			</h4>
-			<p class="text-muted" style="font-size: 13px;">Informa a tus estudiantes la dirección exacta del campus y el aula o laboratorio asignado.</p>
-			
-			<input type="hidden" id="edit-aula-curso-id">
-			
-			<div class="form-group mb-3">
-				<label for="edit-sede-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Dirección de Sede / Campus *</label>
-				<input type="text" id="edit-sede-input" class="form-control" placeholder="Ej: Av. Universitaria 1234, Lima" required>
-			</div>
-
-			<div class="form-group mb-3">
-				<label for="edit-aula-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Aula o Laboratorio *</label>
-				<input type="text" id="edit-aula-input" class="form-control" placeholder="Ej: Laboratorio 204" required>
-			</div>
-
-			<div class="d-flex justify-content-end gap-2 mt-4">
-				<button type="button" class="btn btn-outline-secondary btn-sm" onclick="cerrarModalAula()">Cancelar</button>
-				<button type="button" class="btn btn-primary btn-sm fw-bold px-3" id="btn-guardar-aula" onclick="guardarAulaSede()">
-					<i class="fa fa-save me-1"></i> Guardar Cambios
-				</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- START FOOTER -->
-	<div class="footer footer-minimal section-padding" id="contacto">
-		<div class="container">
-			<div class="row align-items-center mb-3 pb-3 border-bottom border-secondary border-opacity-25">
-				<div class="col-lg-4 col-md-12 text-center text-lg-start mb-2 mb-lg-0">
-					<a href="index.html" class="brand-logo-link">
-						<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
-						<span class="brand-text">Gestión de Cursos</span>
-					</a>
-				</div>
-				<div class="col-lg-8 col-md-12 text-center text-lg-end">
-					<div class="footer_menu">
-						<ul>
-							<li><a href="index.html">Inicio</a></li>
-							<li><a href="cursos.html">Cursos</a></li>
-							<li><a href="portal-docente.html">Portal Docente</a></li>
-							<li><a href="mis-cursos.html">Mis Clases</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-			<div class="row align-items-center">
-				<div class="col-12 text-center">
-					<p class="footer_copyright text-muted mb-0" style="font-size: 13px;">&copy; 2026 Gestión de Cursos - Portal Docente Oficial.</p>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- END FOOTER -->
-
-	<!-- Scripts -->
-	<script src="assets/js/jquery-1.12.4.min.js"></script>
-	<script src="assets/bootstrap/js/bootstrap.min.js"></script>			
-	<script src="js/config.js"></script>
-	<script src="js/api.js"></script>
-	<script src="js/auth.service.js"></script>
-	<script src="js/cursos.service.js"></script>
-	<script src="js/pedidos.service.js"></script>
-	<script src="js/notifications.js"></script>
-	<script src="js/pages/portal-docente.js"></script>
-</body>
-</html>
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+	<meta charset="utf-8">
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+	<title>Portal del Docente - Gestión de Cursos</title>			
+
+	
+
+	<!-- Bootstrap CSS -->
+
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">		
+
+	<!-- Google Font Local -->
+
+	<link rel="stylesheet" href="assets/fonts/mulish.css">
+
+	<!-- Font Awesome CSS -->
+
+	<link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
+
+	<link rel="stylesheet" href="assets/fonts/themify-icons.css">
+
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.carousel.css">
+
+	<link rel="stylesheet" href="assets/owlcarousel/css/owl.theme.css">				
+
+	<link rel="stylesheet" href="assets/css/slicknav.css">		
+
+	<link rel="stylesheet" href="assets/css/magnific-popup.css">	
+
+	<link rel="stylesheet" href="assets/css/animate.css">			
+
+	<link rel="stylesheet" href="assets/css/shop.css">				
+
+	<link rel="stylesheet" href="assets/css/style.css">				
+
+	<link rel="stylesheet" href="css/custom.css">
+
+</head>
+
+<body>
+
+	
+
+	<!-- START NAVBAR -->  
+
+	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
+
+		<div class="container">
+
+			<div class="row align-items-center">
+
+				<div class="col-lg-3 col-md-4 col-sm-6">
+
+					<div class="site-logo">
+
+						<a href="index.html" class="brand-logo-link">
+
+							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+
+							<span class="brand-text">Gestión de Cursos</span>
+
+						</a>          			        				
+
+					</div>
+
+				</div>
+
+				<div class="col-lg-6 col-md-6 col-sm-6">
+
+					<div class="header_right">
+
+						<nav id="main-menu" class="ms-auto">
+							<ul>
+								<li><a class="nav-link active" id="nav-docente-cursos" href="javascript:void(0)" onclick="if(window.switchDocenteTab)switchDocenteTab('cursos')"><i class="fa fa-book me-1"></i> Mis Cursos</a></li>
+								<li><a class="nav-link" id="nav-docente-alumnos" href="javascript:void(0)" onclick="if(window.switchDocenteTab)switchDocenteTab('alumnos')"><i class="fa fa-users me-1"></i> Alumnos</a></li>
+							</ul>
+						</nav>
+
+						<div id="mobile_menu"></div>
+
+					</div>
+
+				</div>
+
+				<div class="col-lg-3 col-md-3 col-sm-12 d-flex align-items-center justify-content-end gap-3">
+					<div class="home_lc">
+						<a href="carrito.html" class="hlc" title="Ver Carrito de Matrícula" aria-label="Ver Carrito de Matrícula">
+							<i class="fa fa-shopping-cart"></i>
+							<span class="gactive is-empty" id="cart-nav-counter" style="display: none;">0</span>
+						</a>
+					</div>
+					<div class="call_to_action" id="auth-buttons-nav">
+
+						<a class="btn_one" href="login.html">Ingresar</a>
+
+						<a class="btn_two" href="registro.html">Registrarse</a>
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div> 	  
+
+	<!-- END NAVBAR -->
+
+
+
+	<!-- START SECTION TOP  -->
+
+	<section class="section-top">
+
+		<div class="container">
+
+			<div class="col-lg-10 offset-lg-1 text-center">
+
+				<div class="section-top-title">
+					<h1><i class="fa fa-briefcase me-2"></i>Portal del Docente</h1>
+					<ul>
+						<li><a href="index.html">Inicio</a></li>
+						<li> / Gestión de Cursos y Aulas</li>
+					</ul>
+				</div>
+
+			</div>
+
+		</div>
+
+	</section>	
+
+	<!-- END SECTION TOP -->
+
+
+
+	<!-- CONTENIDO DEL PORTAL DOCENTE -->
+
+	<div class="section-padding" style="background: #f8fafc; min-height: 70vh;">
+
+		<div class="container">
+
+			
+
+			<!-- PERFIL DOCENTE Y MÉTRICAS (DISEÑO ABIERTO Y HUMANO) -->
+			<div class="row mb-4">
+				<div class="col-12">
+					<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-3 border-bottom" style="border-color: #e2e8f0 !important;">
+						<div class="d-flex align-items-center gap-3">
+							<div style="width: 48px; height: 48px; border-radius: 50%; background: #dcfce7; color: #16a34a; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+								<i class="fa fa-user"></i>
+							</div>
+							<div>
+								<div class="d-flex align-items-center gap-2">
+									<h3 id="docente-nombre-header" style="font-size: 19px; font-weight: 800; color: #0f172a; margin: 0;">Prof. Roberto Mendoza</h3>
+									<span class="badge bg-success bg-opacity-10 text-success fw-bold" style="font-size: 11px;">Docente Oficial</span>
+								</div>
+								<span id="docente-correo-header" style="font-size: 13.5px; color: #64748b;">docente@cursos.com</span>
+							</div>
+						</div>
+						<div class="d-flex align-items-center gap-4">
+							<div>
+								<span class="text-muted text-uppercase" style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">Cursos a Cargo</span>
+								<div id="docente-total-cursos" style="font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.1;">-</div>
+							</div>
+							<div style="width: 1px; height: 30px; background: #e2e8f0;"></div>
+							<div>
+								<span class="text-muted text-uppercase" style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">Alumnos Inscritos</span>
+								<div id="docente-total-alumnos" style="font-size: 22px; font-weight: 800; color: #16a34a; line-height: 1.1;">-</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- PESTAÑAS DE TRABAJO (SUBRAYADO MINIMALISTA) -->
+
+			<div class="row mb-3">
+				<div class="col-12">
+					<div class="platform-tabs-wrapper">
+						<div class="platform-tabs-nav" role="tablist">
+							<button type="button" class="platform-tab-btn active" id="tab-btn-cursos" onclick="switchDocenteTab('cursos')">
+								<i class="fa fa-book me-1"></i>
+								<span>Mis Cursos Asignados</span>
+								<span class="platform-tab-badge" id="docente-tab-badge-cursos">-</span>
+							</button>
+							<button type="button" class="platform-tab-btn" id="tab-btn-alumnos" onclick="switchDocenteTab('alumnos')">
+								<i class="fa fa-users me-1"></i>
+								<span>Lista de Alumnos Matriculados</span>
+								<span class="platform-tab-badge" id="docente-tab-badge-alumnos">-</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+			<!-- SECCIÓN 1: MIS CURSOS ASIGNADOS -->
+
+			<div id="seccion-cursos-docente">
+
+				<div class="row" id="docente-cursos-container">
+
+					<div class="col-12 text-center py-5">
+
+						<i class="fa fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+
+						<p class="text-muted">Cargando tus cursos asignados...</p>
+
+					</div>
+
+				</div>
+
+			</div>
+
+
+
+			<!-- SECCIÓN 2: LISTA DE ALUMNOS MATRICULADOS -->
+
+			<div id="seccion-alumnos-docente" style="display: none;">
+
+				<div class="clean-surface">
+
+					<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+						<div>
+							<h4 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">
+								<i class="fa fa-users text-success me-2"></i>Nómina Real de Estudiantes Matriculados
+							</h4>
+							<p class="text-muted" style="font-size: 13.5px; margin: 0;">Estudiantes reales registrados en la base de datos con matrícula confirmada:</p>
+						</div>
+						<div class="d-flex flex-wrap align-items-center gap-2">
+							<div class="input-group input-group-sm" style="width: 260px;">
+								<span class="input-group-text bg-white border-end-0"><i class="fa fa-search text-muted"></i></span>
+								<input type="text" id="buscador-alumnos-docente" class="form-control border-start-0" placeholder="Buscar por alumno, DNI o correo..." oninput="filtrarAlumnosDocenteEnTabla(this.value)">
+							</div>
+							<select id="select-curso-participantes" class="form-select form-select-sm" style="min-width: 260px; font-weight: 600;" onchange="cargarAlumnosDeCurso(this.value)">
+								<option value="TODOS">-- Todos mis cursos asignados --</option>
+							</select>
+							<button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()" title="Imprimir lista">
+								<i class="fa fa-print"></i> Imprimir
+							</button>
+						</div>
+					</div>
+
+					<div class="table-responsive">
+						<table class="table table-hover align-middle" style="font-size: 13.5px;">
+							<thead style="background: #f8fafc; color: #475569; font-weight: 700;">
+								<tr>
+									<th style="width: 40px;">#</th>
+									<th>Estudiante</th>
+									<th>Curso Asignado</th>
+									<th>Correo Electrónico</th>
+									<th>WhatsApp</th>
+									<th>Fecha de Matrícula</th>
+									<th>Estado</th>
+									<th>Comprobante</th>
+								</tr>
+							</thead>
+							<tbody id="tabla-participantes-body">
+								<tr>
+									<td colspan="8" class="text-center py-4 text-muted">
+										<i class="fa fa-spinner fa-spin me-2"></i>Cargando nómina oficial de alumnos...
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+
+				</div>
+
+			</div>
+
+
+
+		</div>
+
+	</div>
+
+
+
+	<!-- MODAL: ACTUALIZAR ENLACE DE CLASE (VIRTUAL) -->
+
+	<div id="modal-actualizar-enlace" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+
+		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 500px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);">
+
+			<h4 style="font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+
+				<i class="fa fa-video-camera text-primary me-2"></i>Actualizar Enlace de Clase en Vivo
+
+			</h4>
+
+			<p class="text-muted" style="font-size: 13px;">Los alumnos matriculados verán este enlace de inmediato en su portal para conectarse a clase.</p>
+
+			
+
+			<input type="hidden" id="edit-enlace-curso-id">
+
+			
+
+			<div class="form-group mb-3">
+
+				<label for="edit-enlace-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Enlace de Zoom / Google Meet / Teams *</label>
+
+				<input type="url" id="edit-enlace-input" class="form-control" placeholder="https://meet.google.com/..." required>
+
+			</div>
+
+
+
+			<div class="d-flex justify-content-end gap-2 mt-4">
+
+				<button type="button" class="btn btn-outline-secondary btn-sm" onclick="cerrarModalEnlace()">Cancelar</button>
+
+				<button type="button" class="btn btn-primary btn-sm fw-bold px-3" id="btn-guardar-enlace" onclick="guardarEnlaceClase()">
+
+					<i class="fa fa-save me-1"></i> Guardar Enlace
+
+				</button>
+
+			</div>
+
+		</div>
+
+	</div>
+
+
+
+	<!-- MODAL: ACTUALIZAR DATOS DE SEDE Y AULA (PRESENCIAL) -->
+
+	<div id="modal-actualizar-aula" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+
+		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 500px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);">
+
+			<h4 style="font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+
+				<i class="fa fa-building text-warning me-2"></i>Actualizar Sede y Aula Física
+
+			</h4>
+
+			<p class="text-muted" style="font-size: 13px;">Informa a tus estudiantes la dirección exacta del campus y el aula o laboratorio asignado.</p>
+
+			
+
+			<input type="hidden" id="edit-aula-curso-id">
+
+			
+
+			<div class="form-group mb-3">
+
+				<label for="edit-sede-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Dirección de Sede / Campus *</label>
+
+				<input type="text" id="edit-sede-input" class="form-control" placeholder="Ej: Av. Universitaria 1234, Lima" required>
+
+			</div>
+
+
+
+			<div class="form-group mb-3">
+
+				<label for="edit-aula-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Aula o Laboratorio *</label>
+
+				<input type="text" id="edit-aula-input" class="form-control" placeholder="Ej: Laboratorio 204" required>
+
+			</div>
+
+
+
+			<div class="d-flex justify-content-end gap-2 mt-4">
+
+				<button type="button" class="btn btn-outline-secondary btn-sm" onclick="cerrarModalAula()">Cancelar</button>
+
+				<button type="button" class="btn btn-primary btn-sm fw-bold px-3" id="btn-guardar-aula" onclick="guardarAulaSede()">
+
+					<i class="fa fa-save me-1"></i> Guardar Cambios
+
+				</button>
+
+			</div>
+
+		</div>
+
+	</div>
+
+
+
+		<!-- START FOOTER MINIMALISTA -->
+	<footer class="footer-minimal-clean" id="contacto">
+		<div class="container">
+			<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 py-3 border-top" style="border-color: #eef2f6 !important;">
+				<div class="d-flex align-items-center gap-2">
+					<a href="index.html" class="brand-logo-link">
+						<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+						<span class="brand-text">Gestión de Cursos</span>
+					</a>
+					<span class="text-muted ms-2 d-none d-sm-inline" style="font-size: 12px;">&copy; 2026 &bull; Todos los derechos reservados.</span>
+				</div>
+				<div class="footer_menu">
+					<ul class="d-flex align-items-center gap-3 list-unstyled mb-0" style="font-size: 13.5px; font-weight: 600;">
+						<li><a href="index.html">Inicio</a></li>
+						<li><a href="cursos.html">Cursos</a></li>
+						<li><a href="carrito.html">Mi Carrito</a></li>
+						<li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp me-1"></i> WhatsApp</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- END FOOTER -->
+
+
+
+	<!-- Scripts -->
+
+	<script src="assets/js/jquery-1.12.4.min.js"></script>
+
+	<script src="assets/bootstrap/js/bootstrap.min.js"></script>			
+
+	<script src="js/config.js"></script>
+
+	<script src="js/api.js"></script>
+
+	<script src="js/auth.service.js"></script>
+
+	<script src="js/cursos.service.js"></script>
+
+	<script src="js/pedidos.service.js"></script>
+
+	<script src="js/notifications.js"></script>
+
+	<script src="js/pages/portal-docente.js"></script>
+
+</body>
+
+</html>
+

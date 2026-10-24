@@ -4144,281 +4144,137 @@ html {
 
    ========================================================================== */
 
+/* ==========================================================================
+   PIE DE PÁGINA (FOOTER) - ULTRA MINIMALISTA, MODERNO Y VERDE ESMERALDA
+   Sin bloques pesados, sin fondos oscuros de caja, alineado al diseño limpio
+   ========================================================================== */
 .footer.footer-minimal,
-
-.footer {
-
-  background: #1a2d62 !important;
-
-  color: #cbd5e1 !important;
-
-  padding: 28px 0 20px 0 !important;
-
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-
+.footer,
+.footer-minimal-clean {
+  background: #ffffff !important;
+  color: #64748b !important;
+  padding: 16px 0 !important;
+  border-top: 1px solid #eef2f6 !important;
   position: relative !important;
-
-}
-
-
-
-.footer .brand-logo-link {
-
-  display: inline-flex !important;
-
-  align-items: center !important;
-
-  gap: 8px !important;
-
-  text-decoration: none !important;
-
   font-family: 'Mulish', sans-serif !important;
+}
 
+.footer .brand-logo-link,
+.footer-minimal-clean .brand-logo-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  text-decoration: none !important;
+  font-family: 'Mulish', sans-serif !important;
   font-weight: 800 !important;
-
-  font-size: 18px !important;
-
-  color: #2eca7f !important;
-
+  font-size: 16px !important;
+  color: #0f172a !important;
   vertical-align: middle !important;
-
   transition: opacity 0.2s ease !important;
-
 }
 
-
-
-.footer .brand-logo-link:hover {
-
-  opacity: 0.9 !important;
-
+.footer .brand-logo-link:hover,
+.footer-minimal-clean .brand-logo-link:hover {
+  opacity: 0.85 !important;
 }
 
-
-
-.footer .brand-logo-link .brand-icon {
-
+.footer .brand-logo-link .brand-icon,
+.footer-minimal-clean .brand-logo-link .brand-icon {
   color: #2eca7f !important;
-
-  font-size: 20px !important;
-
+  font-size: 19px !important;
   display: inline-flex !important;
-
   align-items: center !important;
-
   justify-content: center !important;
-
 }
 
-
-
-.footer .brand-logo-link .brand-text {
-
-  color: #ffffff !important;
-
+.footer .brand-logo-link .brand-text,
+.footer-minimal-clean .brand-logo-link .brand-text {
+  color: #0f172a !important;
   letter-spacing: -0.2px !important;
-
 }
 
-
-
-.footer .footer_menu {
-
+.footer .footer_menu,
+.footer-minimal-clean .footer_menu {
   float: none !important;
-
   margin: 0 !important;
-
   display: flex !important;
-
   justify-content: flex-end !important;
-
 }
 
-
-
-.footer .footer_menu ul {
-
+.footer .footer_menu ul,
+.footer-minimal-clean .footer_menu ul {
   display: inline-flex !important;
-
   align-items: center !important;
-
   flex-wrap: wrap !important;
-
-  gap: 2px !important;
-
-  list-style: none !important;
-
-  margin: 0 !important;
-
-  padding: 0 !important;
-
-}
-
-
-
-.footer .footer_menu ul li {
-
-  float: none !important;
-
-  margin: 0 !important;
-
-}
-
-
-
-.footer .footer_menu ul li a {
-
-  color: #e2e8f0 !important;
-
-  font-size: 13.5px !important;
-
-  font-weight: 700 !important;
-
-  padding: 5px 12px !important;
-
-  border-radius: 6px !important;
-
-  text-decoration: none !important;
-
-  transition: all 0.2s ease !important;
-
-  display: inline-flex !important;
-
-  align-items: center !important;
-
-}
-
-
-
-.footer .footer_menu ul li a:hover {
-
-  color: #2eca7f !important;
-
-  background: rgba(255, 255, 255, 0.06) !important;
-
-}
-
-
-
-.footer .footer-wp-link {
-
-  color: #2eca7f !important;
-
-}
-
-
-
-.footer .footer_copyright p {
-
-  color: #94a3b8 !important;
-
-  font-size: 12.5px !important;
-
-  margin: 0 !important;
-
-  text-transform: none !important;
-
-}
-
-
-
-.footer .footer_legal ul {
-
-  display: inline-flex !important;
-
-  align-items: center !important;
-
-  flex-wrap: wrap !important;
-
   gap: 16px !important;
-
   list-style: none !important;
-
   margin: 0 !important;
-
   padding: 0 !important;
-
-  justify-content: flex-end !important;
-
 }
 
-
-
-.footer .footer_legal ul li {
-
+.footer .footer_menu ul li,
+.footer-minimal-clean .footer_menu ul li {
+  float: none !important;
   margin: 0 !important;
-
 }
 
-
-
-.footer .footer_legal ul li a {
-
-  color: #94a3b8 !important;
-
-  font-size: 12px !important;
-
+.footer .footer_menu ul li a,
+.footer-minimal-clean .footer_menu ul li a {
+  color: #64748b !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  padding: 4px 6px !important;
   text-decoration: none !important;
-
   transition: color 0.2s ease !important;
-
+  display: inline-flex !important;
+  align-items: center !important;
 }
 
-
-
-.footer .footer_legal ul li a:hover {
-
+.footer .footer_menu ul li a:hover,
+.footer-minimal-clean .footer_menu ul li a:hover {
   color: #2eca7f !important;
-
-  text-decoration: underline !important;
-
 }
 
+.footer .footer-wp-link,
+.footer-minimal-clean .footer-wp-link {
+  color: #16a34a !important;
+  font-weight: 700 !important;
+}
 
+.footer .footer-wp-link:hover,
+.footer-minimal-clean .footer-wp-link:hover {
+  color: #15803d !important;
+}
+
+.footer .footer_copyright p,
+.footer-minimal-clean .footer_copyright p {
+  color: #94a3b8 !important;
+  font-size: 12.5px !important;
+  margin: 0 !important;
+  text-transform: none !important;
+}
 
 @media (max-width: 991px) {
-
   .footer.footer-minimal,
-
-  .footer {
-
-    padding: 24px 0 18px 0 !important;
-
+  .footer,
+  .footer-minimal-clean {
+    padding: 16px 0 !important;
     text-align: center !important;
-
   }
-
-  .footer .footer_menu {
-
+  .footer .footer_menu,
+  .footer-minimal-clean .footer_menu {
     justify-content: center !important;
-
     margin-top: 8px !important;
-
   }
-
-  .footer .footer_menu ul {
-
+  .footer .footer_menu ul,
+  .footer-minimal-clean .footer_menu ul {
     justify-content: center !important;
-
   }
-
-  .footer .footer_legal ul {
-
-    justify-content: center !important;
-
-    margin-top: 8px !important;
-
-  }
-
-  .footer .footer_copyright p {
-
+  .footer .footer_copyright p,
+  .footer-minimal-clean .footer_copyright p {
     text-align: center !important;
-
   }
-
 }
-
-
 
 /* ==========================================================================
    BADGES Y PILLS DE ESTADO DE PAGO (DISEÑO FINTECH / ALTA GAMA)
@@ -4469,4 +4325,155 @@ html {
 .confirm-meta-bar .badge-paid i {
   color: #16a34a !important;
   font-size: 13px !important;
+}
+
+
+/* ==========================================================================
+   PLATAFORMAS Y MENÚS DE NAVEGACIÓN MINIMALISTAS (ESTILO VERDE OFICIAL)
+   ========================================================================== */
+
+/* Menú de Navegación Principal - Minimalista Verde */
+#main-menu ul {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#main-menu ul li a,
+#navigation #main-menu ul li a,
+#navigation.navbar-fixed #main-menu ul li a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 38px !important;
+  padding: 0 16px !important;
+  margin: 0 !important;
+  line-height: 38px !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  color: #1a2d62 !important;
+  text-decoration: none !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+}
+
+#main-menu ul li a:hover,
+#main-menu ul li a:focus,
+#main-menu ul li a.active {
+  color: #16a34a !important;
+  background-color: rgba(46, 202, 127, 0.12) !important;
+  box-shadow: none !important;
+}
+
+/* ==========================================================================
+   PESTAÑAS MINIMALISTAS HUMANAS (SIN CAJAS ARTIFICIALES / SIN ASPECTO IA)
+   Diseño de subrayado verde esmeralda fluido y moderno
+   ========================================================================== */
+.platform-tabs-wrapper {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-radius: 0 !important;
+  padding: 0 0 1px 0 !important;
+  box-shadow: none !important;
+  margin-bottom: 24px !important;
+}
+
+.platform-tabs-nav {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 28px !important;
+  align-items: center !important;
+  margin-bottom: -1px !important;
+}
+
+.platform-tab-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 12px 2px !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #64748b !important;
+  font-family: 'Mulish', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+.platform-tab-btn:hover {
+  background: transparent !important;
+  color: #0f172a !important;
+  border-bottom-color: #cbd5e1 !important;
+}
+
+.platform-tab-btn.active {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid #2eca7f !important;
+  color: #16a34a !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+.platform-tab-btn.active i {
+  color: #16a34a !important;
+}
+
+.platform-tab-badge {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 2px 8px !important;
+  border-radius: 10px !important;
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  transition: all 0.2s ease !important;
+}
+
+.platform-tab-btn.active .platform-tab-badge {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+/* Botones de Usuario en Navbar - Verde Oficial */
+#auth-buttons-nav .btn-nav-user {
+  background-color: #2eca7f !important;
+  color: #ffffff !important;
+  border: 1px solid #2eca7f !important;
+}
+
+#auth-buttons-nav .btn-nav-user:hover {
+  background-color: #26b36f !important;
+  border-color: #26b36f !important;
+  color: #ffffff !important;
+}
+
+#auth-buttons-nav .btn-nav-logout {
+  background-color: #ffffff !important;
+  color: #e53e3e !important;
+  border: 1px solid #fed7d7 !important;
+}
+
+#auth-buttons-nav .btn-nav-logout:hover {
+  background-color: #fff5f5 !important;
+  color: #c53030 !important;
+  border-color: #feb2b2 !important;
+}
+
+/* SlickNav Menú Móvil Limpio */
+@media (max-width: 991.98px) {
+  .slicknav_nav li a.active,
+  .slicknav_nav li a:hover {
+    color: #16a34a !important;
+    background-color: rgba(46, 202, 127, 0.12) !important;
+  }
 }
