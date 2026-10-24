@@ -522,15 +522,15 @@ const AuthService = {
       }
     }
 
-    // 4. Menú de Navegación Contextual (#main-menu ul) - Minimalista y sin cosas innecesarias
+    // 4. Menú de Navegación Contextual (#main-menu ul) - Mismo diseño visual unificado, contenido adaptado por rol
     const mainMenu = document.querySelector('#main-menu ul');
     if (mainMenu) {
       if (!user) {
-        // Invitado / Público general
+        // Invitado / Público general: Inicio, Cursos, Mi Carrito (diseño unificado con iconos)
         mainMenu.innerHTML = `
-          <li><a class="nav-link" href="index.html">Inicio</a></li>
-          <li><a class="nav-link" href="cursos.html">Cursos</a></li>
-          <li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
+          <li><a class="nav-link" href="index.html"><i class="fa fa-home me-1"></i> Inicio</a></li>
+          <li><a class="nav-link" href="cursos.html"><i class="fa fa-book me-1"></i> Cursos</a></li>
+          <li><a class="nav-link" href="carrito.html"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
         `;
       } else if (user.rol === 'ADMIN') {
         // Administrador: En su portal solo sus 3 herramientas
@@ -543,10 +543,10 @@ const AuthService = {
         } else {
           // Administrador en catálogo/inicio/carrito
           mainMenu.innerHTML = `
-            <li><a class="nav-link" href="index.html">Inicio</a></li>
-            <li><a class="nav-link" href="cursos.html">Cursos</a></li>
+            <li><a class="nav-link" href="index.html"><i class="fa fa-home me-1"></i> Inicio</a></li>
+            <li><a class="nav-link" href="cursos.html"><i class="fa fa-book me-1"></i> Cursos</a></li>
             <li><a class="nav-link" href="portal-admin.html"><i class="fa fa-shield me-1"></i> Panel Admin</a></li>
-            <li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
+            <li><a class="nav-link" href="carrito.html"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
           `;
         }
       } else if (user.rol === 'DOCENTE') {
@@ -559,19 +559,19 @@ const AuthService = {
         } else {
           // Docente en catálogo/inicio/carrito
           mainMenu.innerHTML = `
-            <li><a class="nav-link" href="index.html">Inicio</a></li>
-            <li><a class="nav-link" href="cursos.html">Cursos</a></li>
+            <li><a class="nav-link" href="index.html"><i class="fa fa-home me-1"></i> Inicio</a></li>
+            <li><a class="nav-link" href="cursos.html"><i class="fa fa-book me-1"></i> Cursos</a></li>
             <li><a class="nav-link" href="portal-docente.html"><i class="fa fa-briefcase me-1"></i> Portal Docente</a></li>
-            <li><a class="nav-link" href="carrito.html">Mi Carrito</a></li>
+            <li><a class="nav-link" href="carrito.html"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
           `;
         }
       } else {
-        // Alumno ya registrado: 4 opciones completas
+        // Alumno / Estudiante: Inicio, Cursos, Mis Clases, Mi Carrito
         mainMenu.innerHTML = `
-          <li><a class="nav-link ${currentPath.includes('index') ? 'active' : ''}" href="index.html">Inicio</a></li>
-          <li><a class="nav-link ${isCatalogo ? 'active' : ''}" href="cursos.html">Cursos</a></li>
-          <li><a class="nav-link ${isMisCursos ? 'active' : ''}" href="mis-cursos.html"><i class="fa fa-graduation-cap me-1"></i> Mis Clases</a></li>
-          <li><a class="nav-link ${currentPath.includes('carrito') ? 'active' : ''}" href="carrito.html">Mi Carrito</a></li>
+          <li><a class="nav-link" href="index.html"><i class="fa fa-home me-1"></i> Inicio</a></li>
+          <li><a class="nav-link" href="cursos.html"><i class="fa fa-book me-1"></i> Cursos</a></li>
+          <li><a class="nav-link" href="mis-cursos.html"><i class="fa fa-graduation-cap me-1"></i> Mis Clases</a></li>
+          <li><a class="nav-link" href="carrito.html"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
         `;
       }
     }
@@ -584,27 +584,28 @@ const AuthService = {
           <li><a href="portal-admin.html#cursos">Cursos</a></li>
           <li><a href="portal-admin.html#pedidos">Matrículas</a></li>
           <li><a href="portal-admin.html#usuarios">Usuarios</a></li>
-          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp text-success me-1"></i> Soporte</a></li>
+          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp me-1"></i> WhatsApp</a></li>
         `;
       } else if (user && user.rol === 'DOCENTE') {
         footerMenu.innerHTML = `
           <li><a href="portal-docente.html#cursos">Mis Cursos</a></li>
           <li><a href="portal-docente.html#alumnos">Alumnos</a></li>
-          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp text-success me-1"></i> Soporte</a></li>
+          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp me-1"></i> WhatsApp</a></li>
         `;
       } else if (user && user.rol === 'ESTUDIANTE') {
         footerMenu.innerHTML = `
-          <li><a href="mis-cursos.html">Mis Clases</a></li>
+          <li><a href="index.html">Inicio</a></li>
           <li><a href="cursos.html">Cursos</a></li>
+          <li><a href="mis-cursos.html">Mis Clases</a></li>
           <li><a href="carrito.html">Mi Carrito</a></li>
-          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp text-success me-1"></i> Soporte</a></li>
+          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp me-1"></i> WhatsApp</a></li>
         `;
       } else {
         footerMenu.innerHTML = `
           <li><a href="index.html">Inicio</a></li>
           <li><a href="cursos.html">Cursos</a></li>
           <li><a href="carrito.html">Mi Carrito</a></li>
-          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp text-success me-1"></i> Soporte</a></li>
+          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp me-1"></i> WhatsApp</a></li>
         `;
       }
     }
@@ -639,6 +640,8 @@ const AuthService = {
 
         if (isActive) {
           link.classList.add('active');
+        } else {
+          link.classList.remove('active');
         }
       });
     }

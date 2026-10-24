@@ -4332,12 +4332,19 @@ html {
    PLATAFORMAS Y MENÚS DE NAVEGACIÓN MINIMALISTAS (ESTILO VERDE OFICIAL)
    ========================================================================== */
 
-/* Menú de Navegación Principal - Minimalista Verde */
+/* Menú de Navegación Principal - Mismo Diseño Visual Unificado (Verde Minimalista) */
 #main-menu ul {
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
   list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#main-menu ul li {
+  display: inline-flex !important;
+  align-items: center !important;
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -4348,11 +4355,13 @@ html {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  gap: 6px !important;
   height: 38px !important;
-  padding: 0 16px !important;
+  padding: 0 14px !important;
   margin: 0 !important;
   line-height: 38px !important;
-  font-size: 14.5px !important;
+  font-family: 'Mulish', sans-serif !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
   color: #1a2d62 !important;
   text-decoration: none !important;
@@ -4362,12 +4371,26 @@ html {
   white-space: nowrap !important;
 }
 
+#main-menu ul li a i,
+#navigation #main-menu ul li a i,
+#navigation.navbar-fixed #main-menu ul li a i {
+  font-size: 13.5px !important;
+  color: #64748b !important;
+  transition: color 0.2s ease !important;
+}
+
 #main-menu ul li a:hover,
 #main-menu ul li a:focus,
 #main-menu ul li a.active {
   color: #16a34a !important;
   background-color: rgba(46, 202, 127, 0.12) !important;
   box-shadow: none !important;
+}
+
+#main-menu ul li a:hover i,
+#main-menu ul li a:focus i,
+#main-menu ul li a.active i {
+  color: #16a34a !important;
 }
 
 /* ==========================================================================
@@ -4469,11 +4492,64 @@ html {
   border-color: #feb2b2 !important;
 }
 
-/* SlickNav Menú Móvil Limpio */
+/* SlickNav Menú Móvil Limpio y Unificado */
 @media (max-width: 991.98px) {
+  .slicknav_nav li a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-family: 'Mulish', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #1a2d62 !important;
+    padding: 10px 16px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+  }
+  .slicknav_nav li a i {
+    font-size: 14px !important;
+    color: #64748b !important;
+    width: 18px !important;
+    text-align: center !important;
+    transition: color 0.2s ease !important;
+  }
   .slicknav_nav li a.active,
   .slicknav_nav li a:hover {
     color: #16a34a !important;
     background-color: rgba(46, 202, 127, 0.12) !important;
   }
+  .slicknav_nav li a.active i,
+  .slicknav_nav li a:hover i {
+    color: #16a34a !important;
+  }
+}
+
+/* Pie de Página Minimalista y Unificado */
+.footer_menu ul {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 16px !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.footer_menu ul li a {
+  font-family: 'Mulish', sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+.footer_menu ul li a:hover {
+  color: #16a34a !important;
+  text-decoration: none !important;
+}
+.footer_menu .footer-wp-link {
+  color: #16a34a !important;
+  font-weight: 700 !important;
+}
+.footer_menu .footer-wp-link:hover {
+  color: #15803d !important;
 }
