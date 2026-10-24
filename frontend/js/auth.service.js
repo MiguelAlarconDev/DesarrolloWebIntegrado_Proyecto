@@ -576,21 +576,25 @@ const AuthService = {
       }
     }
 
-    // 5. Menú de pie de página (Footer) minimalista adaptado al rol del usuario
+    // 5. Menú de pie de página (Footer) adaptado al rol del usuario (Diseño EduMim)
     const footerMenu = document.querySelector('.footer_menu ul');
     if (footerMenu) {
+      footerMenu.className = 'list-unstyled footer-nav-list mb-0';
       if (user && user.rol === 'ADMIN') {
         footerMenu.innerHTML = `
-          <li><a href="portal-admin.html#cursos">Cursos</a></li>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="portal-admin.html#cursos">Gestión Cursos</a></li>
           <li><a href="portal-admin.html#pedidos">Matrículas</a></li>
           <li><a href="portal-admin.html#usuarios">Usuarios</a></li>
-          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp me-1"></i> WhatsApp</a></li>
+          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer">Contacto</a></li>
         `;
       } else if (user && user.rol === 'DOCENTE') {
         footerMenu.innerHTML = `
+          <li><a href="index.html">Inicio</a></li>
           <li><a href="portal-docente.html#cursos">Mis Cursos</a></li>
           <li><a href="portal-docente.html#alumnos">Alumnos</a></li>
-          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp me-1"></i> WhatsApp</a></li>
+          <li><a href="carrito.html">Mi Carrito</a></li>
+          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer">Contacto</a></li>
         `;
       } else if (user && user.rol === 'ESTUDIANTE') {
         footerMenu.innerHTML = `
@@ -598,14 +602,15 @@ const AuthService = {
           <li><a href="cursos.html">Cursos</a></li>
           <li><a href="mis-cursos.html">Mis Clases</a></li>
           <li><a href="carrito.html">Mi Carrito</a></li>
-          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp me-1"></i> WhatsApp</a></li>
+          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer">Contacto</a></li>
         `;
       } else {
         footerMenu.innerHTML = `
           <li><a href="index.html">Inicio</a></li>
           <li><a href="cursos.html">Cursos</a></li>
           <li><a href="carrito.html">Mi Carrito</a></li>
-          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" class="footer-wp-link"><i class="fa fa-whatsapp me-1"></i> WhatsApp</a></li>
+          <li><a href="login.html">Ingresar</a></li>
+          <li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer">Contacto</a></li>
         `;
       }
     }

@@ -4553,3 +4553,261 @@ html {
 .footer_menu .footer-wp-link:hover {
   color: #15803d !important;
 }
+
+
+/* ==========================================================================
+   PIE DE PÁGINA PROFESIONAL EDUMIM (DISEÑO NAVY AZUL OSCURO CON NEWSLETTER)
+   ========================================================================== */
+.footer-custom-dark {
+  background-color: #0B132B !important;
+  color: #8b9bb4 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  font-family: 'Mulish', sans-serif !important;
+  padding-top: 55px !important;
+  border-top: none !important;
+}
+
+/* Marca Oficial */
+.footer-custom-dark .footer-brand-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  text-decoration: none !important;
+  margin-bottom: 16px !important;
+}
+.footer-custom-dark .footer-brand-icon {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  background: rgba(46, 202, 127, 0.15) !important;
+  color: #2eca7f !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 18px !important;
+}
+.footer-custom-dark .footer-brand-text {
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.3px !important;
+}
+.footer-custom-dark .footer-desc {
+  font-size: 13.5px !important;
+  line-height: 1.65 !important;
+  color: #8b9bb4 !important;
+  margin-bottom: 24px !important;
+}
+
+/* Botones de Redes Sociales */
+.footer-custom-dark .footer-social-icons {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+.footer-custom-dark .social-btn {
+  width: 38px !important;
+  height: 38px !important;
+  background: #182238 !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #cbd5e1 !important;
+  font-size: 15px !important;
+  text-decoration: none !important;
+  transition: all 0.25s ease !important;
+}
+.footer-custom-dark .social-btn:hover {
+  background: #ff6b6b !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Títulos de Columnas */
+.footer-custom-dark .footer-title {
+  color: #ffffff !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  margin-bottom: 20px !important;
+  position: relative !important;
+}
+
+/* Listas de Enlaces */
+.footer-custom-dark .footer-nav-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+.footer-custom-dark .footer-nav-list li {
+  margin-bottom: 11px !important;
+  display: block !important;
+}
+.footer-custom-dark .footer-nav-list li a {
+  color: #8b9bb4 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+  display: inline-block !important;
+}
+.footer-custom-dark .footer-nav-list li a:hover {
+  color: #ffffff !important;
+  transform: translateX(3px) !important;
+}
+
+/* Newsletter */
+.footer-custom-dark .footer-newsletter-text {
+  font-size: 13.5px !important;
+  line-height: 1.6 !important;
+  color: #8b9bb4 !important;
+  margin-bottom: 16px !important;
+}
+.footer-custom-dark .highlight-count {
+  color: #ff6b6b !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+}
+.footer-custom-dark .newsletter-input-group {
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 4px 14px !important;
+  height: 48px !important;
+  margin-bottom: 12px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+.footer-custom-dark .newsletter-input-group .newsletter-icon {
+  color: #94a3b8 !important;
+  font-size: 16px !important;
+  margin-right: 10px !important;
+}
+.footer-custom-dark .newsletter-input-group .newsletter-input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: #0f172a !important;
+  font-size: 13.5px !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+.footer-custom-dark .newsletter-input-group .newsletter-input::placeholder {
+  color: #94a3b8 !important;
+}
+.footer-custom-dark .btn-newsletter {
+  background: #ff6b6b !important;
+  border: none !important;
+  color: #ffffff !important;
+  font-family: 'Mulish', sans-serif !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  height: 46px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(255, 107, 107, 0.3) !important;
+  transition: all 0.25s ease !important;
+}
+.footer-custom-dark .btn-newsletter:hover {
+  background: #fa5252 !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(255, 107, 107, 0.45) !important;
+}
+
+/* Barra Inferior Copyright */
+.footer-custom-dark .footer-bottom-bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin-top: 40px !important;
+  padding: 22px 0 !important;
+  text-align: center !important;
+}
+.footer-custom-dark .copyright-text {
+  font-size: 13px !important;
+  color: #64748b !important;
+  margin: 0 !important;
+}
+
+/* Doodles artísticos en segundo plano */
+.footer-custom-dark .footer-doodle {
+  position: absolute !important;
+  pointer-events: none !important;
+  opacity: 0.05 !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+  z-index: 1 !important;
+}
+.footer-custom-dark .doodle-globe {
+  bottom: -20px !important;
+  left: 20px !important;
+  width: 170px !important;
+  height: 170px !important;
+}
+.footer-custom-dark .doodle-note {
+  top: 25px !important;
+  left: 33% !important;
+  width: 55px !important;
+  height: 55px !important;
+}
+.footer-custom-dark .doodle-lightbulb {
+  bottom: 25px !important;
+  left: 54% !important;
+  width: 65px !important;
+  height: 65px !important;
+}
+.footer-custom-dark .doodle-pencil {
+  top: 25px !important;
+  right: 25px !important;
+  width: 85px !important;
+  height: 85px !important;
+}
+
+/* Responsividad */
+@media (max-width: 767.98px) {
+  .footer-custom-dark {
+    padding-top: 40px !important;
+  }
+  .footer-custom-dark .footer-doodle {
+    display: none !important;
+  }
+}
+
+/* Asegurar display vertical en columnas de enlaces del nuevo Footer */
+.footer-custom-dark .footer_menu,
+.footer-custom-dark .footer_menu ul,
+.footer-custom-dark .footer-nav-list {
+  display: block !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+.footer-custom-dark .footer_menu ul li,
+.footer-custom-dark .footer-nav-list li {
+  display: block !important;
+  float: none !important;
+  margin-bottom: 11px !important;
+  padding: 0 !important;
+}
+
+.footer-custom-dark .footer_menu ul li a,
+.footer-custom-dark .footer-nav-list li a {
+  display: inline-block !important;
+  color: #8b9bb4 !important;
+  font-family: 'Mulish', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.footer-custom-dark .footer_menu ul li a:hover,
+.footer-custom-dark .footer-nav-list li a:hover {
+  color: #ffffff !important;
+  transform: translateX(4px) !important;
+  text-decoration: none !important;
+}
