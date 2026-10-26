@@ -8,6 +8,9 @@ public class PagarPedidoRequest {
     private TipoComprobante tipoComprobante = TipoComprobante.BOLETA;
     private String rucCliente;
     private String razonSocial;
+    private String whatsapp;
+    private String correo;
+    private String clienteNombres;
 
     public String getMpPaymentId() {
         return mpPaymentId;
@@ -39,5 +42,29 @@ public class PagarPedidoRequest {
 
     public void setRazonSocial(String razonSocial) {
         this.razonSocial = razonSocial;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public String getClienteNombres() {
+        return clienteNombres;
+    }
+
+    public void setClienteNombres(String clienteNombres) {
+        this.clienteNombres = clienteNombres;
     }
 }

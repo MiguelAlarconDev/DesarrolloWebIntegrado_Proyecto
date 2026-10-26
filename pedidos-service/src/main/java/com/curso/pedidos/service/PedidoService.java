@@ -138,20 +138,47 @@ public class PedidoService {
 
         Pedido pedidoActualizado = pedidoRepository.save(pedido);
 
-        // Obtener datos del estudiante y curso para comprobante
+        // Obtener datos del estudiante y curso para comprobante y notificación
         UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+        if (request != null) {
+            if (request.getWhatsapp() != null && !request.getWhatsapp().isBlank()) {
+                estudiante.setWhatsapp(request.getWhatsapp().trim());
+            }
+            if (request.getCorreo() != null && !request.getCorreo().isBlank()) {
+                estudiante.setCorreo(request.getCorreo().trim());
+            }
+            if (request.getClienteNombres() != null && !request.getClienteNombres().isBlank()) {
+                estudiante.setNombres(request.getClienteNombres().trim());
+                estudiante.setApellidos("");
+            }
+        }
         CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
 
-        // Generar comprobante electrónico oficial en base de datos (sin envío externo de WhatsApp o Gmail)
+        // Generar comprobante electrónico y disparar envío real por correo si SMTP está configurado
         generarComprobante(pedidoActualizado, estudiante, curso, request);
 
+        // Despachar / preparar notificación de WhatsApp mediante Meta Cloud API
+        enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
+
         enriquecerPedido(pedidoActualizado, estudiante, curso);
+        comprobanteRepository.findByPedidoId(pedidoActualizado.getId()).ifPresent(pedidoActualizado::setComprobante);
         return pedidoActualizado;
     }
 
     @Transactional
     public boolean reenviarWhatsApp(UUID pedidoId) {
-        return false;
+        Pedido pedido = buscarPorId(pedidoId);
+        UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+        List<Notificacion> previas = notificacionRepository.findByPedidoId(pedidoId);
+        if (!previas.isEmpty()) {
+            String ultimoDestinatario = previas.get(previas.size() - 1).getDestinatario();
+            if (ultimoDestinatario != null && !ultimoDestinatario.isBlank()) {
+                estudiante.setWhatsapp(ultimoDestinatario);
+            }
+        }
+        CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
+        enviarNotificacionWhatsApp(pedido, estudiante, curso);
+        return true;
     }
 
     @Transactional
@@ -214,7 +241,7 @@ public class PedidoService {
     private void enriquecerPedido(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         if (estudiante != null) {
             pedido.setEstudiante(estudiante);
-            pedido.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
+            pedido.setEstudianteNombre((estudiante.getNombres() + " " + (estudiante.getApellidos() != null ? estudiante.getApellidos() : "")).trim());
         }
         if (curso != null) {
             pedido.setCursoTitulo(curso.getTitulo());
@@ -248,7 +275,7 @@ public class PedidoService {
         comprobante.setMontoIgv(montoIgv);
         comprobante.setMontoTotal(montoTotal);
         comprobante.setPdfUrl("/api/comprobantes/descargar/" + pedido.getId());
-        comprobante.setEstadoEmail("NO_REQUERIDO");
+        comprobante.setEstadoEmail("PENDIENTE");
 
         if (tipo == TipoComprobante.FACTURA && request != null) {
             comprobante.setRucCliente(request.getRucCliente());
@@ -257,9 +284,13 @@ public class PedidoService {
 
         Comprobante guardado = comprobanteRepository.save(comprobante);
 
-        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f.%n",
+        // Envío real por correo vía JavaMailSender (si SMTP está configurado en application.properties)
+        notificacionEmailService.enviarComprobanteMatricula(pedido, estudiante, curso, guardado);
+        comprobanteRepository.save(guardado);
+
+        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. Correo: %s. Estado: %s%n",
                 tipo, guardado.getSerie(), guardado.getNumeroCorrelativo(), pedido.getCodigoOrden(),
-                montoTotal);
+                montoTotal, estudiante.getCorreo(), guardado.getEstadoEmail());
     }
 
     private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {

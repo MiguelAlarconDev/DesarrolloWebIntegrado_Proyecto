@@ -4141,140 +4141,177 @@ html {
 
 
 /* ==========================================================================
-
-   Pie de Página Estándar Minimalista (Completo, Legal y Limpio)
-
+   PIE DE PÁGINA (FOOTER) - NEGRO ONYX ELEGANTE CON ACENTOS VERDE ESMERALDA
+   Fondo Negro Moderno (#0b0f19) que combina armónicamente con la plataforma
    ========================================================================== */
-
-/* ==========================================================================
-   PIE DE PÁGINA (FOOTER) - ULTRA MINIMALISTA, MODERNO Y VERDE ESMERALDA
-   Sin bloques pesados, sin fondos oscuros de caja, alineado al diseño limpio
-   ========================================================================== */
-.footer.footer-minimal,
-.footer,
-.footer-minimal-clean {
-  background: #ffffff !important;
-  color: #64748b !important;
-  padding: 16px 0 !important;
-  border-top: 1px solid #eef2f6 !important;
+.footer {
+  background: #0b0f19 !important;
+  color: #94a3b8 !important;
+  padding: 65px 0 35px 0 !important;
+  font-family: 'Mulish', sans-serif !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
   position: relative !important;
-  font-family: 'Mulish', sans-serif !important;
+  margin-top: auto !important;
 }
 
-.footer .brand-logo-link,
-.footer-minimal-clean .brand-logo-link {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  text-decoration: none !important;
-  font-family: 'Mulish', sans-serif !important;
-  font-weight: 800 !important;
-  font-size: 16px !important;
-  color: #0f172a !important;
-  vertical-align: middle !important;
-  transition: opacity 0.2s ease !important;
+.footer .single_footer {
+  margin-bottom: 30px;
 }
 
-.footer .brand-logo-link:hover,
-.footer-minimal-clean .brand-logo-link:hover {
-  opacity: 0.85 !important;
+.footer .single_footer h4 {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  margin-top: 0 !important;
+  margin-bottom: 22px !important;
+  letter-spacing: -0.2px;
 }
 
-.footer .brand-logo-link .brand-icon,
-.footer-minimal-clean .brand-logo-link .brand-icon {
-  color: #2eca7f !important;
-  font-size: 19px !important;
+.footer .single_footer p {
+  color: #94a3b8 !important;
+  font-size: 14px !important;
+  line-height: 1.65 !important;
+  margin-bottom: 20px !important;
+}
+
+.footer .foot_social ul {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  gap: 10px !important;
+}
+
+.footer .foot_social ul li {
+  float: none !important;
+  margin: 0 !important;
+}
+
+.footer .foot_social ul li a {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  color: #cbd5e1 !important;
+  font-size: 14px !important;
+  text-decoration: none !important;
+  transition: all 0.25s ease !important;
 }
 
-.footer .brand-logo-link .brand-text,
-.footer-minimal-clean .brand-logo-link .brand-text {
-  color: #0f172a !important;
-  letter-spacing: -0.2px !important;
+.footer .foot_social ul li a:hover {
+  background: #2eca7f !important;
+  border-color: #2eca7f !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(46, 202, 127, 0.3) !important;
 }
 
-.footer .footer_menu,
-.footer-minimal-clean .footer_menu {
-  float: none !important;
+.footer .single_footer ul {
+  list-style: none !important;
+  padding: 0 !important;
   margin: 0 !important;
+}
+
+.footer .single_footer ul li {
+  margin-bottom: 9px !important;
+}
+
+.footer .single_footer ul li a {
+  color: #94a3b8 !important;
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+  display: inline-block !important;
+}
+
+.footer .single_footer ul li a:hover {
+  color: #2eca7f !important;
+  transform: translateX(4px) !important;
+}
+
+.footer .sf_contact {
+  margin-bottom: 20px !important;
+  overflow: hidden !important;
+}
+
+.footer .sf_contact span {
+  color: #2eca7f !important;
+  font-size: 24px !important;
+  float: left !important;
+  margin-top: 3px !important;
+  margin-right: 16px !important;
+}
+
+.footer .sf_contact h3 {
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  margin-bottom: 3px !important;
+}
+
+.footer .sf_contact p {
+  font-size: 13.5px !important;
+  color: #94a3b8 !important;
+  margin-bottom: 0 !important;
+}
+
+.footer .fc {
+  margin-top: 45px !important;
+  padding-top: 25px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.footer .footer_copyright p {
+  color: #64748b !important;
+  font-size: 13px !important;
+  margin: 0 !important;
+  text-align: left;
+}
+
+.footer .footer_menu {
+  float: none !important;
   display: flex !important;
   justify-content: flex-end !important;
 }
 
-.footer .footer_menu ul,
-.footer-minimal-clean .footer_menu ul {
-  display: inline-flex !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 16px !important;
+.footer .footer_menu ul {
   list-style: none !important;
-  margin: 0 !important;
   padding: 0 !important;
-}
-
-.footer .footer_menu ul li,
-.footer-minimal-clean .footer_menu ul li {
-  float: none !important;
   margin: 0 !important;
+  display: inline-flex !important;
+  gap: 18px !important;
 }
 
-.footer .footer_menu ul li a,
-.footer-minimal-clean .footer_menu ul li a {
-  color: #64748b !important;
-  font-size: 13.5px !important;
-  font-weight: 600 !important;
-  padding: 4px 6px !important;
+.footer .footer_menu ul li {
+  float: none !important;
+}
+
+.footer .footer_menu ul li a {
+  color: #94a3b8 !important;
+  font-size: 13px !important;
   text-decoration: none !important;
   transition: color 0.2s ease !important;
-  display: inline-flex !important;
-  align-items: center !important;
 }
 
-.footer .footer_menu ul li a:hover,
-.footer-minimal-clean .footer_menu ul li a:hover {
+.footer .footer_menu ul li a:hover {
   color: #2eca7f !important;
 }
 
-.footer .footer-wp-link,
-.footer-minimal-clean .footer-wp-link {
-  color: #16a34a !important;
-  font-weight: 700 !important;
-}
-
-.footer .footer-wp-link:hover,
-.footer-minimal-clean .footer-wp-link:hover {
-  color: #15803d !important;
-}
-
-.footer .footer_copyright p,
-.footer-minimal-clean .footer_copyright p {
-  color: #94a3b8 !important;
-  font-size: 12.5px !important;
-  margin: 0 !important;
-  text-transform: none !important;
-}
-
 @media (max-width: 991px) {
-  .footer.footer-minimal,
-  .footer,
-  .footer-minimal-clean {
-    padding: 16px 0 !important;
+  .footer {
+    padding: 50px 0 30px 0 !important;
+  }
+  .footer .footer_copyright p {
     text-align: center !important;
+    margin-bottom: 12px !important;
   }
-  .footer .footer_menu,
-  .footer-minimal-clean .footer_menu {
+  .footer .footer_menu {
     justify-content: center !important;
-    margin-top: 8px !important;
-  }
-  .footer .footer_menu ul,
-  .footer-minimal-clean .footer_menu ul {
-    justify-content: center !important;
-  }
-  .footer .footer_copyright p,
-  .footer-minimal-clean .footer_copyright p {
-    text-align: center !important;
   }
 }
 
@@ -4558,298 +4595,110 @@ html {
 
 
 /* ==========================================================================
-   PIE DE PÁGINA PROFESIONAL EDUMIM (DISEÑO NAVY AZUL OSCURO CON NEWSLETTER)
+   PIE DE PÁGINA PROFESIONAL Y ELEGANTE (DISEÑO CORPORATIVO EDUCATIVO)
    ========================================================================== */
-.footer-custom-dark {
-  background-color: #0B132B !important;
-  color: #8b9bb4 !important;
-  position: relative !important;
-  overflow: hidden !important;
-  font-family: 'Mulish', sans-serif !important;
-  padding-top: 55px !important;
-  border-top: none !important;
+
+/* Garantizar Pie de Página Fijo al Fondo (Sticky Footer) */
+html {
+  height: 100%;
 }
 
-/* Marca Oficial */
-.footer-custom-dark .footer-brand-link {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  text-decoration: none !important;
-  margin-bottom: 16px !important;
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-.footer-custom-dark .footer-brand-icon {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 8px !important;
+
+.footer,
+.portal-footer {
+  margin-top: auto !important;
+}
+
+/* Pie de Página de Portales Administrativos / Docente (.portal-footer) */
+.portal-footer {
+  background: #0f172a !important;
+  border-top: 1px solid #1e293b !important;
+  color: #94a3b8 !important;
+  font-family: 'Mulish', sans-serif !important;
+  padding: 14px 0 !important;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.portal-footer .portal-brand-badge {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 6px !important;
   background: rgba(46, 202, 127, 0.15) !important;
   color: #2eca7f !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 18px !important;
-}
-.footer-custom-dark .footer-brand-text {
-  font-size: 22px !important;
-  font-weight: 800 !important;
-  color: #ffffff !important;
-  letter-spacing: -0.3px !important;
-}
-.footer-custom-dark .footer-desc {
-  font-size: 13.5px !important;
-  line-height: 1.65 !important;
-  color: #8b9bb4 !important;
-  margin-bottom: 24px !important;
-}
-
-/* Botones de Redes Sociales */
-.footer-custom-dark .footer-social-icons {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-}
-.footer-custom-dark .social-btn {
-  width: 38px !important;
-  height: 38px !important;
-  background: #182238 !important;
-  border-radius: 8px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  color: #cbd5e1 !important;
-  font-size: 15px !important;
-  text-decoration: none !important;
-  transition: all 0.25s ease !important;
-}
-.footer-custom-dark .social-btn:hover {
-  background: #ff6b6b !important;
-  color: #ffffff !important;
-  transform: translateY(-2px) !important;
+  font-size: 13px !important;
 }
 
-/* Títulos de Columnas */
-.footer-custom-dark .footer-title {
-  color: #ffffff !important;
-  font-size: 17px !important;
-  font-weight: 700 !important;
-  margin-bottom: 20px !important;
-  position: relative !important;
-}
-
-/* Listas de Enlaces */
-.footer-custom-dark .footer-nav-list {
-  list-style: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  display: block !important;
-}
-.footer-custom-dark .footer-nav-list li {
-  margin-bottom: 11px !important;
-  display: block !important;
-}
-.footer-custom-dark .footer-nav-list li a {
+.portal-footer .portal-footer-link {
   color: #8b9bb4 !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
   text-decoration: none !important;
-  transition: all 0.2s ease !important;
-  display: inline-block !important;
-}
-.footer-custom-dark .footer-nav-list li a:hover {
-  color: #ffffff !important;
-  transform: translateX(3px) !important;
+  transition: color 0.2s ease !important;
+  font-size: 12.5px !important;
 }
 
-/* Newsletter */
-.footer-custom-dark .footer-newsletter-text {
-  font-size: 13.5px !important;
-  line-height: 1.6 !important;
-  color: #8b9bb4 !important;
-  margin-bottom: 16px !important;
-}
-.footer-custom-dark .highlight-count {
-  color: #ff6b6b !important;
-  font-weight: 700 !important;
+.portal-footer .portal-footer-link:hover {
+  color: #ffffff !important;
   text-decoration: underline !important;
 }
-.footer-custom-dark .newsletter-input-group {
-  background: #ffffff !important;
-  border-radius: 8px !important;
-  display: flex !important;
+
+.portal-footer .portal-system-status span {
+  display: inline-flex !important;
   align-items: center !important;
-  padding: 4px 14px !important;
-  height: 48px !important;
-  margin-bottom: 12px !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
-}
-.footer-custom-dark .newsletter-input-group .newsletter-icon {
-  color: #94a3b8 !important;
-  font-size: 16px !important;
-  margin-right: 10px !important;
-}
-.footer-custom-dark .newsletter-input-group .newsletter-input {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  color: #0f172a !important;
-  font-size: 13.5px !important;
-  padding: 0 !important;
-  width: 100% !important;
-}
-.footer-custom-dark .newsletter-input-group .newsletter-input::placeholder {
-  color: #94a3b8 !important;
-}
-.footer-custom-dark .btn-newsletter {
-  background: #ff6b6b !important;
-  border: none !important;
-  color: #ffffff !important;
-  font-family: 'Mulish', sans-serif !important;
-  font-size: 14.5px !important;
-  font-weight: 700 !important;
-  height: 46px !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 14px rgba(255, 107, 107, 0.3) !important;
-  transition: all 0.25s ease !important;
-}
-.footer-custom-dark .btn-newsletter:hover {
-  background: #fa5252 !important;
-  color: #ffffff !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 18px rgba(255, 107, 107, 0.45) !important;
+  font-size: 12px !important;
 }
 
-/* Barra Inferior Copyright */
-.footer-custom-dark .footer-bottom-bar {
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-  margin-top: 40px !important;
-  padding: 22px 0 !important;
-  text-align: center !important;
-}
-.footer-custom-dark .copyright-text {
-  font-size: 13px !important;
-  color: #64748b !important;
-  margin: 0 !important;
-}
-
-/* Doodles artísticos en segundo plano */
-.footer-custom-dark .footer-doodle {
-  position: absolute !important;
-  pointer-events: none !important;
-  opacity: 0.05 !important;
-  stroke: #ffffff !important;
-  fill: none !important;
-  z-index: 1 !important;
-}
-.footer-custom-dark .doodle-globe {
-  bottom: -20px !important;
-  left: 20px !important;
-  width: 170px !important;
-  height: 170px !important;
-}
-.footer-custom-dark .doodle-note {
-  top: 25px !important;
-  left: 33% !important;
-  width: 55px !important;
-  height: 55px !important;
-}
-.footer-custom-dark .doodle-lightbulb {
-  bottom: 25px !important;
-  left: 54% !important;
-  width: 65px !important;
-  height: 65px !important;
-}
-.footer-custom-dark .doodle-pencil {
-  top: 25px !important;
-  right: 25px !important;
-  width: 85px !important;
-  height: 85px !important;
-}
-
-/* Responsividad */
 @media (max-width: 767.98px) {
-  .footer-custom-dark {
-    padding-top: 40px !important;
-  }
-  .footer-custom-dark .footer-doodle {
-    display: none !important;
+  .portal-footer .portal-system-status {
+    flex-direction: column !important;
+    gap: 6px !important;
   }
 }
-
-/* Asegurar display vertical en columnas de enlaces del nuevo Footer */
-.footer-custom-dark .footer_menu,
-.footer-custom-dark .footer_menu ul,
-.footer-custom-dark .footer-nav-list {
-  display: block !important;
-  float: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  list-style: none !important;
-}
-
-.footer-custom-dark .footer_menu ul li,
-.footer-custom-dark .footer-nav-list li {
-  display: block !important;
-  float: none !important;
-  margin-bottom: 11px !important;
-  padding: 0 !important;
-}
-
-.footer-custom-dark .footer_menu ul li a,
-.footer-custom-dark .footer-nav-list li a {
-  display: inline-block !important;
-  color: #8b9bb4 !important;
-  font-family: 'Mulish', sans-serif !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-  transition: all 0.2s ease !important;
-}
-
-.footer-custom-dark .footer_menu ul li a:hover,
-.footer-custom-dark .footer-nav-list li a:hover {
-  color: #ffffff !important;
-  transform: translateX(4px) !important;
-  text-decoration: none !important;
-}
-
 
 /* ==========================================================================
-   SECCIÓN DE CONTACTO MODERNA (DISEÑO EDUMIM)
+   SECCIÓN DE CONTACTO MODERNA
+   Altura Amplia y Espaciosa (Presencia Visual Destacada)
    ========================================================================== */
 .section-contact-modern,
 #contacto {
-  padding: 120px 0 130px 0 !important;
-  min-height: 85vh !important;
+  padding: 160px 0 170px 0 !important;
+  min-height: 95vh !important;
   background-color: #f8fafc !important;
   position: relative !important;
   display: flex !important;
   align-items: center !important;
+  justify-content: center !important;
   font-family: 'Mulish', sans-serif !important;
   scroll-margin-top: 85px !important;
+  border-top: 1px solid #eef2f6 !important;
 }
 
 .contact-eyebrow {
   display: inline-block !important;
-  font-size: 14px !important;
+  font-size: 14.5px !important;
   font-weight: 700 !important;
   color: #10b981 !important;
-  margin-bottom: 12px !important;
+  margin-bottom: 14px !important;
   letter-spacing: 0.5px !important;
 }
 
 .contact-main-heading {
-  font-size: 40px !important;
+  font-size: 44px !important;
   font-weight: 800 !important;
   color: #0f172a !important;
   line-height: 1.25 !important;
-  margin-bottom: 18px !important;
+  margin-bottom: 20px !important;
   letter-spacing: -0.5px !important;
 }
 
 .highlight-coral-word {
-  color: #ff6b6b !important;
+  color: #2eca7f !important;
   position: relative !important;
   display: inline-block !important;
 }
@@ -4865,35 +4714,35 @@ html {
 }
 
 .contact-subtext {
-  font-size: 15px !important;
+  font-size: 16px !important;
   color: #64748b !important;
-  line-height: 1.7 !important;
-  margin-bottom: 35px !important;
-  max-width: 480px !important;
+  line-height: 1.75 !important;
+  margin-bottom: 42px !important;
+  max-width: 500px !important;
 }
 
 /* Lista de 3 Bloques de Información */
 .contact-items-list {
   display: flex !important;
   flex-direction: column !important;
-  gap: 28px !important;
+  gap: 30px !important;
 }
 
 .contact-item-card {
   display: flex !important;
   align-items: center !important;
-  gap: 18px !important;
+  gap: 20px !important;
 }
 
 .contact-icon-box {
-  width: 52px !important;
-  height: 52px !important;
-  border-radius: 12px !important;
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 14px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0 !important;
-  font-size: 20px !important;
+  font-size: 24px !important;
 }
 
 .icon-box-pink {
@@ -4916,7 +4765,7 @@ html {
 }
 
 .contact-item-title {
-  font-size: 16px !important;
+  font-size: 16.5px !important;
   font-weight: 800 !important;
   color: #0f172a !important;
   margin: 0 0 4px 0 !important;
@@ -4924,24 +4773,24 @@ html {
 
 .contact-item-link,
 .contact-item-text {
-  font-size: 14.5px !important;
+  font-size: 15px !important;
   color: #64748b !important;
   text-decoration: none !important;
   transition: color 0.2s ease !important;
 }
 
 .contact-item-link:hover {
-  color: #ff6b6b !important;
-  text-decoration: none !important;
+  color: #2eca7f !important;
+  text-decoration: underline !important;
 }
 
 /* Tarjeta de Formulario */
 .contact-form-card {
   background: #ffffff !important;
   border-radius: 20px !important;
-  padding: 50px 45px !important;
-  min-height: 530px !important;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06) !important;
+  padding: 55px 46px !important;
+  min-height: 540px !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.07) !important;
   border: 1px solid #f1f5f9 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -4951,12 +4800,12 @@ html {
 .contact-input,
 .contact-textarea {
   background-color: #f8fafc !important;
-  border: 1px solid #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
   border-radius: 8px !important;
   color: #0f172a !important;
-  font-size: 14px !important;
+  font-size: 14.5px !important;
   font-family: 'Mulish', sans-serif !important;
-  padding: 13px 18px !important;
+  padding: 14px 18px !important;
   transition: all 0.2s ease !important;
 }
 
@@ -4965,7 +4814,7 @@ html {
 }
 
 .contact-textarea {
-  min-height: 165px !important;
+  min-height: 160px !important;
 }
 
 .contact-input::placeholder,
@@ -4977,43 +4826,49 @@ html {
 .contact-input:focus,
 .contact-textarea:focus {
   background-color: #ffffff !important;
-  border-color: #ff6b6b !important;
-  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15) !important;
+  border-color: #2eca7f !important;
+  box-shadow: 0 0 0 3px rgba(46, 202, 127, 0.15) !important;
   outline: none !important;
 }
 
 .btn-contact-submit {
-  background-color: #ff6b6b !important;
+  background-color: #2eca7f !important;
   color: #ffffff !important;
   font-family: 'Mulish', sans-serif !important;
-  font-size: 15px !important;
+  font-size: 15.5px !important;
   font-weight: 700 !important;
-  padding: 13px 34px !important;
+  padding: 14px 38px !important;
   border-radius: 8px !important;
   border: none !important;
   cursor: pointer !important;
   transition: all 0.25s ease !important;
-  box-shadow: 0 6px 18px rgba(255, 107, 107, 0.3) !important;
-  display: inline-block !important;
+  box-shadow: 0 6px 18px rgba(46, 202, 127, 0.28) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .btn-contact-submit:hover {
-  background-color: #fa5252 !important;
+  background-color: #25b36f !important;
   color: #ffffff !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 22px rgba(255, 107, 107, 0.45) !important;
+  box-shadow: 0 8px 22px rgba(46, 202, 127, 0.4) !important;
 }
 
 /* Responsividad */
 @media (max-width: 991.98px) {
-  .section-contact-modern {
-    padding: 60px 0 !important;
+  .section-contact-modern,
+  #contacto {
+    padding: 75px 0 !important;
+    min-height: auto !important;
+    display: block !important;
   }
   .contact-main-heading {
-    font-size: 32px !important;
+    font-size: 34px !important;
   }
   .contact-form-card {
-    padding: 30px 24px !important;
-    margin-top: 15px !important;
+    padding: 34px 24px !important;
+    margin-top: 25px !important;
+    min-height: auto !important;
   }
 }
