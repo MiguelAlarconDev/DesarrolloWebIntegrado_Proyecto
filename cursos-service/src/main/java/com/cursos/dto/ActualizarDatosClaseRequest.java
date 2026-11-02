@@ -1,11 +1,9 @@
 package com.cursos.dto;
 
 import com.cursos.entity.ModalidadCurso;
-import jakarta.validation.constraints.NotNull;
 
 public class ActualizarDatosClaseRequest {
 
-    @NotNull(message = "La modalidad del curso es obligatoria")
     private ModalidadCurso modalidad;
 
     private String enlaceClase;

@@ -16,7 +16,12 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -78,13 +83,7 @@ public class PedidoService {
         guardado.setInitPoint(pref.getInitPoint());
 
         // Enriquecer datos para la respuesta
-        guardado.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
-        guardado.setCursoTitulo(cursoActualizado.getTitulo());
-        guardado.setHorario(cursoActualizado.getHorario());
-        guardado.setModalidad(cursoActualizado.getModalidad());
-        guardado.setEnlaceClase(cursoActualizado.getEnlaceClase());
-        guardado.setDireccionClase(cursoActualizado.getDireccionClase());
-        guardado.setAula(cursoActualizado.getAula());
+        enriquecerPedido(guardado, estudiante, cursoActualizado);
 
         System.out.printf("[PEDIDOS-SERVICE] Pedido %s creado para el estudiante %s. Vacante reservada. MP Preference: %s%n",
                 guardado.getCodigoOrden(), estudiante.getNombres(), guardado.getMpPreferenceId());
@@ -154,10 +153,10 @@ public class PedidoService {
         }
         CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
 
-        // Generar comprobante electrónico y disparar envío real por correo si SMTP está configurado
+        // Generar comprobante electrónico y disparar envío por correo en segundo plano
         generarComprobante(pedidoActualizado, estudiante, curso, request);
 
-        // Despachar / preparar notificación de WhatsApp mediante Meta Cloud API
+        // Despachar / preparar notificación de WhatsApp mediante Meta Cloud API en segundo plano
         enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
 
         enriquecerPedido(pedidoActualizado, estudiante, curso);
@@ -205,7 +204,7 @@ public class PedidoService {
 
     public List<Pedido> listar() {
         List<Pedido> pedidos = pedidoRepository.findAll();
-        pedidos.forEach(this::enriquecerSilenciosamente);
+        enriquecerListaPedidos(pedidos);
         return pedidos;
     }
 
@@ -218,14 +217,48 @@ public class PedidoService {
 
     public List<Pedido> listarPorEstudiante(UUID estudianteId) {
         List<Pedido> pedidos = pedidoRepository.findByEstudianteId(estudianteId);
-        pedidos.forEach(this::enriquecerSilenciosamente);
+        enriquecerListaPedidos(pedidos);
         return pedidos;
     }
 
     public List<Pedido> listarParticipantesPorCurso(UUID cursoId) {
         List<Pedido> pedidos = pedidoRepository.findByCursoIdAndEstado(cursoId, EstadoPedido.PAGADO);
-        pedidos.forEach(this::enriquecerSilenciosamente);
+        enriquecerListaPedidos(pedidos);
         return pedidos;
+    }
+
+    /**
+     * Enriquecimiento en lote (Batch): evita el problema N+1 de consultas HTTP y SQL.
+     */
+    private void enriquecerListaPedidos(List<Pedido> pedidos) {
+        if (pedidos == null || pedidos.isEmpty()) {
+            return;
+        }
+
+        try {
+            Set<UUID> pedidoIds = pedidos.stream().map(Pedido::getId).filter(Objects::nonNull).collect(Collectors.toSet());
+            Set<UUID> estudianteIds = pedidos.stream().map(Pedido::getEstudianteId).filter(Objects::nonNull).collect(Collectors.toSet());
+            Set<UUID> cursoIds = pedidos.stream().map(Pedido::getCursoId).filter(Objects::nonNull).collect(Collectors.toSet());
+
+            Map<UUID, Comprobante> comprobantesMap = comprobanteRepository.findByPedidoIdIn(pedidoIds)
+                    .stream()
+                    .collect(Collectors.toMap(Comprobante::getPedidoId, Function.identity(), (a, b) -> a));
+
+            Map<UUID, UsuarioDto> usuariosMap = authClient.obtenerUsuariosPorIds(estudianteIds);
+            Map<UUID, CursoDto> cursosMap = cursoClient.obtenerCursosPorIds(cursoIds);
+
+            for (Pedido pedido : pedidos) {
+                UsuarioDto estudiante = usuariosMap.get(pedido.getEstudianteId());
+                CursoDto curso = cursosMap.get(pedido.getCursoId());
+                enriquecerPedido(pedido, estudiante, curso);
+                Comprobante comp = comprobantesMap.get(pedido.getId());
+                if (comp != null) {
+                    pedido.setComprobante(comp);
+                }
+            }
+        } catch (Exception ex) {
+            pedidos.forEach(this::enriquecerSilenciosamente);
+        }
     }
 
     private void enriquecerSilenciosamente(Pedido pedido) {
@@ -283,19 +316,25 @@ public class PedidoService {
         }
 
         Comprobante guardado = comprobanteRepository.save(comprobante);
+        pedido.setComprobante(guardado);
 
-        // Envío real por correo vía JavaMailSender (si SMTP está configurado en application.properties)
-        notificacionEmailService.enviarComprobanteMatricula(pedido, estudiante, curso, guardado);
-        comprobanteRepository.save(guardado);
+        // Envío asíncrono por correo vía JavaMailSender para no bloquear la respuesta HTTP
+        CompletableFuture.runAsync(() -> {
+            try {
+                notificacionEmailService.enviarComprobanteMatricula(pedido, estudiante, curso, guardado);
+                comprobanteRepository.save(guardado);
+            } catch (Exception ignored) {
+            }
+        });
 
-        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. Correo: %s. Estado: %s%n",
+        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. Correo: %s%n",
                 tipo, guardado.getSerie(), guardado.getNumeroCorrelativo(), pedido.getCodigoOrden(),
-                montoTotal, estudiante.getCorreo(), guardado.getEstadoEmail());
+                montoTotal, estudiante.getCorreo());
     }
 
     private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         String datosClase = obtenerDatosClase(curso);
-        String mensaje = String.format("🎉 Hola %s! Tu matrícula en el curso '%s' ha sido confirmada con éxito.\n\n📅 Horario: %s\n%s\n🔖 Código: %s\n🏛️ Acceso aula: http://localhost:3000/mis-cursos.html",
+        String mensaje = String.format("🎉 Hola %s! Tu matrícula en el curso '%s' ha sido confirmada con éxito.\n\n📅 Horario: %s\n%s\n🔖 Código: %s\n🏛️ Acceso aula: http://localhost:4200/mis-cursos.html",
                 estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), datosClase, pedido.getCodigoOrden());
 
         Notificacion notificacion = new Notificacion();
@@ -309,15 +348,17 @@ public class PedidoService {
 
         Notificacion guardada = notificacionRepository.save(notificacion);
 
-        // Despacho mediante Meta WhatsApp Cloud API
-        boolean enviado = whatsAppCloudService.enviarNotificacionBienvenida(pedido, estudiante, curso, guardada);
-        if (enviado) {
-            guardada.setEstado("ENVIADO");
-        }
-        notificacionRepository.save(guardada);
-
-        System.out.printf("[WHATSAPP CLOUD API] Notificación procesada para %s (%s). Estado: %s%n",
-                estudiante.getNombres(), estudiante.getWhatsapp(), guardada.getEstado());
+        // Despacho asíncrono mediante Meta WhatsApp Cloud API para no bloquear la transacción
+        CompletableFuture.runAsync(() -> {
+            try {
+                boolean enviado = whatsAppCloudService.enviarNotificacionBienvenida(pedido, estudiante, curso, guardada);
+                if (enviado) {
+                    guardada.setEstado("ENVIADO");
+                }
+                notificacionRepository.save(guardada);
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     private String obtenerDatosClase(CursoDto curso) {

@@ -75,8 +75,9 @@ public class CursoService {
     @Transactional
     public Curso actualizarDatosClase(UUID id, ActualizarDatosClaseRequest request) {
         Curso curso = buscarPorId(id);
-        validarDatosClase(request.getModalidad(), request.getEnlaceClase(), request.getDireccionClase());
-        aplicarDatosClase(curso, request.getModalidad(), request.getEnlaceClase(), request.getDireccionClase(), request.getAula());
+        ModalidadCurso modalidad = request.getModalidad() != null ? request.getModalidad() : curso.getModalidad();
+        validarDatosClase(modalidad, request.getEnlaceClase(), request.getDireccionClase());
+        aplicarDatosClase(curso, modalidad, request.getEnlaceClase(), request.getDireccionClase(), request.getAula());
         return cursoRepository.save(curso);
     }
 
