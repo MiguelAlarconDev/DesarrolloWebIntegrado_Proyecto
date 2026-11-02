@@ -16,7 +16,7 @@ import { NotificationService } from '../../services/notification.service';
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="cd-page-wrapper">
-      <div class="container py-4">
+      <div class="container cd-container py-4">
         <div class="row g-4">
           
           <!-- COLUMNA PRINCIPAL (IZQUIERDA) -->
@@ -420,16 +420,26 @@ import { NotificationService } from '../../services/notification.service';
     .cd-page-wrapper {
       background-color: #ffffff;
       min-height: 100vh;
-      padding-top: 20px;
+      padding-top: 15px;
       padding-bottom: 60px;
       font-family: 'Mulish', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* Contenedor principal ajustado un 10% menos ancho (1080px) */
+    .cd-container,
+    .cd-page-wrapper .container {
+      max-width: 1080px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      padding-left: 20px !important;
+      padding-right: 20px !important;
     }
 
     /* Hero Banner Izquierdo */
     .cd-hero-card {
       position: relative;
       width: 100%;
-      height: 400px;
+      height: 360px;
       border-radius: 14px;
       overflow: hidden;
       background: #0f172a;
@@ -548,7 +558,7 @@ import { NotificationService } from '../../services/notification.service';
     .cd-video-showcase-box {
       position: relative;
       width: 100%;
-      height: 330px;
+      height: 300px;
       border-radius: 12px;
       overflow: hidden;
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
