@@ -16,7 +16,17 @@ import { NotificationService } from '../../services/notification.service';
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="cd-page-wrapper">
-      <div class="container cd-container py-4">
+      <div class="container cd-container">
+        
+        <!-- Breadcrumb de Navegación -->
+        <nav class="cd-breadcrumb-nav mb-3" aria-label="breadcrumb">
+          <ol class="breadcrumb m-0 small fw-bold">
+            <li class="breadcrumb-item"><a routerLink="/" class="text-success text-decoration-none"><i class="fa fa-home me-1"></i>Inicio</a></li>
+            <li class="breadcrumb-item"><a routerLink="/cursos" class="text-success text-decoration-none">Cursos</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">{{ curso?.titulo || 'Detalle del Curso' }}</li>
+          </ol>
+        </nav>
+
         <div class="row g-4">
           
           <!-- COLUMNA PRINCIPAL (IZQUIERDA) -->
@@ -420,9 +430,22 @@ import { NotificationService } from '../../services/notification.service';
     .cd-page-wrapper {
       background-color: #ffffff;
       min-height: 100vh;
-      padding-top: 15px;
-      padding-bottom: 60px;
+      padding-top: 110px !important;
+      padding-bottom: 120px !important;
       font-family: 'Mulish', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .cd-breadcrumb-nav .breadcrumb-item + .breadcrumb-item::before {
+      color: #94a3b8;
+    }
+
+    .cd-breadcrumb-nav a {
+      color: #2eca7f !important;
+      text-decoration: none;
+    }
+
+    .cd-breadcrumb-nav a:hover {
+      text-decoration: underline;
     }
 
     /* Contenedor principal ajustado un 10% menos ancho (1080px) */
