@@ -325,7 +325,6 @@ export class AuthService {
           <li><a class="nav-link" href="/"><i class="fa fa-home me-1"></i> Inicio</a></li>
           <li><a class="nav-link" href="/cursos"><i class="fa fa-book me-1"></i> Cursos</a></li>
           <li><a class="nav-link" href="/contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
-          <li><a class="nav-link" href="/carrito"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
         `;
       } else if (user.rol === 'ADMIN') {
         // Perfil Admin: sin Inicio, sin Contacto, sin Carrito
@@ -355,12 +354,12 @@ export class AuthService {
           `;
         }
       } else {
-        // Perfil Estudiante: sin Inicio
+        // Perfil Estudiante: Cursos, Mis Clases, Mis Comprobantes y Mis Certificados (el carrito está a la derecha en el ícono con contador)
         mainMenu.innerHTML = `
           <li><a class="nav-link" href="/cursos"><i class="fa fa-book me-1"></i> Cursos</a></li>
           <li><a class="nav-link" href="/mis-cursos"><i class="fa fa-graduation-cap me-1"></i> Mis Clases</a></li>
-          <li><a class="nav-link" href="/contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
-          <li><a class="nav-link" href="/carrito"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
+          <li><a class="nav-link" href="/mis-comprobantes"><i class="fa fa-file-text-o me-1"></i> Mis Comprobantes</a></li>
+          <li><a class="nav-link" href="/mis-certificados"><i class="fa fa-certificate me-1"></i> Mis Certificados</a></li>
         `;
       }
     }
@@ -383,8 +382,9 @@ export class AuthService {
         footerMenu.innerHTML = `
           <li><a href="/cursos">Cursos</a></li>
           <li><a href="/mis-cursos">Mis Clases</a></li>
+          <li><a href="/mis-comprobantes">Mis Comprobantes</a></li>
+          <li><a href="/mis-certificados">Mis Certificados</a></li>
           <li><a href="/carrito">Mi Carrito</a></li>
-          <li><a href="/contacto">Contacto</a></li>
         `;
       } else {
         footerMenu.innerHTML = `
@@ -398,6 +398,13 @@ export class AuthService {
     }
 
     document.querySelectorAll('.single_footer ul li a[href="/"]').forEach((a: any) => {
+      const li = a.parentElement;
+      if (li) {
+        li.style.display = !user ? '' : 'none';
+      }
+    });
+
+    document.querySelectorAll('.single_footer ul li a[href="/contacto"]').forEach((a: any) => {
       const li = a.parentElement;
       if (li) {
         li.style.display = !user ? '' : 'none';
@@ -447,6 +454,10 @@ export class AuthService {
           isActive = cleanHref === 'carrito';
         } else if (cleanCurrent === 'mis-cursos' || cleanCurrent === 'portal-estudiante' || cleanCurrent === 'estudiante') {
           isActive = cleanHref === 'mis-cursos';
+        } else if (cleanCurrent === 'mis-comprobantes' || cleanCurrent === 'comprobantes') {
+          isActive = cleanHref === 'mis-comprobantes';
+        } else if (cleanCurrent === 'mis-certificados' || cleanCurrent === 'certificados') {
+          isActive = cleanHref === 'mis-certificados';
         } else if (cleanCurrent === 'portal-docente' || cleanCurrent === 'docente') {
           isActive = cleanHref === 'portal-docente';
         } else if (cleanCurrent === 'portal-admin' || cleanCurrent === 'admin') {

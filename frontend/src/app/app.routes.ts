@@ -8,6 +8,8 @@ import { ConfirmacionComponent } from './pages/confirmacion/confirmacion.compone
 import { LoginComponent } from './pages/login/login.component';
 import { RegistroComponent } from './pages/registro/registro.component';
 import { EstudiantePanelComponent } from './pages/estudiante-panel/estudiante-panel.component';
+import { MisComprobantesComponent } from './pages/mis-comprobantes/mis-comprobantes.component';
+import { MisCertificadosComponent } from './pages/mis-certificados/mis-certificados.component';
 import { DocentePanelComponent } from './pages/docente-panel/docente-panel.component';
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel.component';
 import { ContactoComponent } from './pages/contacto/contacto.component';
@@ -37,6 +39,10 @@ export const routes: Routes = [
   { path: 'registro.html', redirectTo: 'registro', pathMatch: 'full' },
   { path: 'mis-cursos', component: EstudiantePanelComponent },
   { path: 'mis-cursos.html', redirectTo: 'mis-cursos', pathMatch: 'full' },
+  { path: 'mis-comprobantes', component: MisComprobantesComponent },
+  { path: 'mis-comprobantes.html', redirectTo: 'mis-comprobantes', pathMatch: 'full' },
+  { path: 'mis-certificados', component: MisCertificadosComponent },
+  { path: 'mis-certificados.html', redirectTo: 'mis-certificados', pathMatch: 'full' },
   { path: 'portal-estudiante', component: EstudiantePanelComponent },
   { path: 'portal-estudiante.html', redirectTo: 'portal-estudiante', pathMatch: 'full' },
   { path: 'portal-docente', component: DocentePanelComponent },

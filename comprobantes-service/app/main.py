@@ -193,8 +193,130 @@ def crear_y_enviar_comprobante(datos: ComprobanteRequest):
 
 
 @app.get("/api/comprobantes/{pedido_id}/descargar")
-def descargar_comprobante(pedido_id: UUID):
+def descargar_comprobante(
+    pedido_id: UUID,
+    codigoOrden: str = "ORD-000001",
+    estudiante: str = "Estudiante Matriculado",
+    correo: str = "estudiante@cursos.com",
+    curso: str = "Curso de Especializacion Profesional",
+    monto: Decimal = Decimal("150.00"),
+    tipoComprobante: str = "BOLETA",
+    rucCliente: str | None = None,
+    razonSocial: str | None = None,
+):
     pdf_path = OUTPUT_DIR / f"comprobante-{pedido_id}.pdf"
     if not pdf_path.exists():
-        raise HTTPException(status_code=404, detail="Comprobante no encontrado")
-    return FileResponse(pdf_path, media_type="application/pdf", filename=pdf_path.name)
+        tipo_norm = (tipoComprobante or "BOLETA").upper()
+        if tipo_norm not in {"BOLETA", "FACTURA"}:
+            tipo_norm = "BOLETA"
+        if tipo_norm == "FACTURA" and (not rucCliente or len(rucCliente) != 11 or not rucCliente.isdigit()):
+            rucCliente = "20609876543"
+        if tipo_norm == "FACTURA" and not razonSocial:
+            razonSocial = estudiante
+        datos_fallback = ComprobanteRequest.model_construct(
+            pedidoId=pedido_id,
+            codigoOrden=codigoOrden,
+            estudiante=estudiante,
+            correo=correo,
+            curso=curso,
+            monto=Decimal(str(monto)).quantize(Decimal("0.01")),
+            tipoComprobante=tipo_norm,
+            rucCliente=rucCliente,
+            razonSocial=razonSocial,
+        )
+        generar_pdf(datos_fallback, pdf_path)
+    filename_dl = f"Comprobante_{codigoOrden}.pdf" if codigoOrden and codigoOrden != "ORD-000001" else pdf_path.name
+    return FileResponse(pdf_path, media_type="application/pdf", filename=filename_dl)
+
+
+def generar_certificado_pdf(
+    destino: Path,
+    codigo_certificado: str,
+    estudiante: str,
+    dni: str,
+    curso: str,
+    modalidad: str,
+    docente: str,
+    horas: str,
+    fecha: str,
+) -> None:
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=20 * mm,
+        leftMargin=20 * mm,
+        topMargin=20 * mm,
+        bottomMargin=20 * mm,
+    )
+    styles = getSampleStyleSheet()
+
+    contenido = [
+        Paragraph("GESTIÓN DE CURSOS", styles["Title"]),
+        Paragraph("CERTIFICADO DE ESPECIALIZACIÓN ACADÉMICA", styles["Heading2"]),
+        Spacer(1, 8 * mm),
+        Paragraph(
+            f"Se otorga el presente certificado a <b>{estudiante}</b> (DNI: <b>{dni}</b>) "
+            f"por haber aprobado satisfactoriamente el programa de especialización:",
+            styles["Normal"],
+        ),
+        Spacer(1, 6 * mm),
+    ]
+
+    filas = [
+        ["Código de Certificado", codigo_certificado],
+        ["Programa Académico", curso],
+        ["Modalidad", modalidad],
+        ["Docente Responsable", docente],
+        ["Duración Acreditada", f"{horas} horas académicas"],
+        ["Fecha de Emisión", fecha],
+        ["Condición", "APROBADO Y VERIFICADO"],
+    ]
+
+    tabla = Table(filas, colWidths=[50 * mm, 110 * mm])
+    tabla.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#EEEEEE")),
+        ("TEXTCOLOR", (0, 0), (-1, -1), colors.HexColor("#222222")),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#BBBBBB")),
+        ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("PADDING", (0, 0), (-1, -1), 8),
+    ]))
+    contenido.extend([
+        tabla,
+        Spacer(1, 10 * mm),
+        Paragraph(
+            "Documento oficial emitido por la Plataforma de Gestión de Cursos con código único de verificación.",
+            styles["Italic"],
+        ),
+    ])
+    doc.build(contenido)
+    destino.write_bytes(buffer.getvalue())
+
+
+@app.get("/api/comprobantes/certificado/{pedido_id}/descargar")
+def descargar_certificado(
+    pedido_id: UUID,
+    codigoCertificado: str = "CERT-2026-002040",
+    estudiante: str = "Estudiante Matriculado",
+    dni: str = "30000003",
+    curso: str = "Curso de Especialización Profesional",
+    modalidad: str = "VIRTUAL",
+    docente: str = "Ing. Roberto Docente",
+    horas: str = "48",
+    fecha: str = "24/10/2026",
+):
+    cert_path = OUTPUT_DIR / f"certificado-{pedido_id}.pdf"
+    generar_certificado_pdf(
+        destino=cert_path,
+        codigo_certificado=codigoCertificado,
+        estudiante=estudiante,
+        dni=dni,
+        curso=curso,
+        modalidad=modalidad,
+        docente=docente,
+        horas=horas,
+        fecha=fecha,
+    )
+    return FileResponse(cert_path, media_type="application/pdf", filename=f"Certificado_{codigoCertificado}.pdf")
+

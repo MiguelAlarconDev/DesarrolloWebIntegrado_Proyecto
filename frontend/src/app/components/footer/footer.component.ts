@@ -76,17 +76,22 @@ import { AuthService } from '../../services/auth.service';
 					<!-- Columna 1: Logo & Descripción -->
 					<div class="col-lg-3 col-sm-6 col-12 mb-4 mb-lg-0">
 						<div class="single_footer">
-							<a href="/" class="d-inline-block mb-3">
-								<img src="assets/images/all-img/logo2.png" alt="Gestión de Cursos" style="max-height: 48px; width: auto;">
-							</a>
+							<div class="mb-3">
+								<div class="site-logo">
+									<a href="/" class="brand-logo-link" aria-label="Gestión de Cursos - Inicio">
+										<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
+										<span class="brand-text">Gestión de Cursos</span>
+									</a>
+								</div>
+							</div>
 							<p>Plataforma líder en capacitación profesional con clases virtuales en vivo y presenciales en Lima. Inscripción automatizada con Mercado Pago y soporte académico continuo.</p>
 						</div>
 						<div class="foot_social">
 							<ul>
-								<li><a href="#" title="Facebook"><i class="fa fa-facebook"></i></a></li>
-								<li><a href="#" title="Twitter"><i class="fa fa-twitter"></i></a></li>
-								<li><a href="#" title="LinkedIn"><i class="fa fa-linkedin"></i></a></li>
-								<li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" title="WhatsApp"><i class="fa fa-whatsapp"></i></a></li>
+								<li><a href="#" title="Facebook">FB</a></li>
+								<li><a href="#" title="Twitter">TW</a></li>
+								<li><a href="#" title="LinkedIn">IN</a></li>
+								<li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" title="WhatsApp">WA</a></li>
 							</ul>
 						</div>
 					</div><!--- END COL -->

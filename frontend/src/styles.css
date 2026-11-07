@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    AJUSTE DE ANCHO GLOBAL DEL SISTEMA (-10%)
    Reduce el ancho de todos los contenedores y secciones del sistema en un 10%
    ========================================================================== */
@@ -4214,15 +4214,16 @@ html {
 
 
 /* ==========================================================================
-   PIE DE PÁGINA (FOOTER) - NEGRO ONYX ELEGANTE CON ACENTOS VERDE ESMERALDA
-   Fondo Negro Moderno (#0b0f19) que combina armónicamente con la plataforma
+   PIE DE PÁGINA (FOOTER) - DISEÑO INSTITUCIONAL AZUL MARINO
+   Fondo Navy (#1a2d62), textos blancos, listas con guion, íconos verdes
+   (#2eca7f) y redes sociales como texto subrayado.
    ========================================================================== */
 .footer {
-  background: #0b0f19 !important;
-  color: #94a3b8 !important;
-  padding: 65px 0 35px 0 !important;
+  background: #1a2d62 !important;
+  color: #ffffff !important;
+  padding: 90px 0 40px 0 !important;
   font-family: 'Mulish', sans-serif !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: none !important;
   position: relative !important;
   margin-top: auto !important;
 }
@@ -4233,26 +4234,37 @@ html {
 
 .footer .single_footer h4 {
   color: #ffffff !important;
-  font-size: 18px !important;
+  font-size: 20px !important;
   font-weight: 700 !important;
   margin-top: 0 !important;
-  margin-bottom: 22px !important;
-  letter-spacing: -0.2px;
+  margin-bottom: 28px !important;
+  letter-spacing: 0;
 }
 
 .footer .single_footer p {
-  color: #94a3b8 !important;
-  font-size: 14px !important;
-  line-height: 1.65 !important;
-  margin-bottom: 20px !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  margin-bottom: 30px !important;
 }
 
+/* Logo del pie */
+.footer .site-logo .brand-logo-link,
+.footer .site-logo .brand-text {
+  font-size: 22px !important;
+}
+.footer .site-logo .brand-icon {
+  font-size: 28px !important;
+}
+
+/* Redes sociales: texto subrayado (TW  FB  INS  YT) */
 .footer .foot_social ul {
   list-style: none !important;
   padding: 0 !important;
   margin: 0 !important;
   display: flex !important;
-  gap: 10px !important;
+  flex-wrap: wrap !important;
+  gap: 18px !important;
 }
 
 .footer .foot_social ul li {
@@ -4261,28 +4273,27 @@ html {
 }
 
 .footer .foot_social ul li a {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: #cbd5e1 !important;
-  font-size: 14px !important;
-  text-decoration: none !important;
-  transition: all 0.25s ease !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  display: inline !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: color 0.25s ease !important;
 }
 
 .footer .foot_social ul li a:hover {
-  background: #2eca7f !important;
-  border-color: #2eca7f !important;
-  color: #ffffff !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(46, 202, 127, 0.3) !important;
+  color: #2eca7f !important;
 }
 
+/* Listas de enlaces con guion */
 .footer .single_footer ul {
   list-style: none !important;
   padding: 0 !important;
@@ -4290,60 +4301,83 @@ html {
 }
 
 .footer .single_footer ul li {
-  margin-bottom: 9px !important;
+  margin-bottom: 0 !important;
+}
+
+.footer .single_footer ul li {
+  padding: 4px 0 !important;
 }
 
 .footer .single_footer ul li a {
-  color: #94a3b8 !important;
-  font-size: 14px !important;
-  line-height: 1.7 !important;
+  position: relative !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+  text-transform: none !important;
   text-decoration: none !important;
-  transition: all 0.2s ease !important;
+  transition: color 0.25s ease !important;
   display: inline-block !important;
+  padding-left: 14px !important;
+}
+
+.footer .single_footer ul li a:before {
+  content: "-" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  font-family: inherit !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  margin-right: 0 !important;
 }
 
 .footer .single_footer ul li a:hover {
   color: #2eca7f !important;
-  transform: translateX(4px) !important;
 }
 
+/* Información de contacto */
 .footer .sf_contact {
-  margin-bottom: 20px !important;
+  margin-bottom: 30px !important;
   overflow: hidden !important;
 }
 
 .footer .sf_contact span {
   color: #2eca7f !important;
-  font-size: 24px !important;
+  font-size: 28px !important;
   float: left !important;
-  margin-top: 3px !important;
-  margin-right: 16px !important;
+  margin-top: 4px !important;
+  margin-right: 20px !important;
 }
 
 .footer .sf_contact h3 {
   font-weight: 700 !important;
   color: #ffffff !important;
-  font-size: 15px !important;
-  margin-bottom: 3px !important;
+  font-size: 19px !important;
+  overflow: hidden !important;
+  margin-bottom: 6px !important;
 }
 
 .footer .sf_contact p {
   font-size: 13.5px !important;
-  color: #94a3b8 !important;
+  color: #ffffff !important;
+  overflow: hidden !important;
   margin-bottom: 0 !important;
 }
 
+/* Fila inferior: copyright + enlaces */
 .footer .fc {
-  margin-top: 45px !important;
-  padding-top: 25px !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin-top: 60px !important;
+  padding-top: 40px !important;
+  border-top: 1px solid #243c80 !important;
 }
 
 .footer .footer_copyright p {
-  color: #64748b !important;
-  font-size: 13px !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
   margin: 0 !important;
   text-align: left;
+  text-transform: none !important;
 }
 
 .footer .footer_menu {
@@ -4357,6 +4391,7 @@ html {
   padding: 0 !important;
   margin: 0 !important;
   display: inline-flex !important;
+  flex-wrap: wrap !important;
   gap: 18px !important;
 }
 
@@ -4365,19 +4400,27 @@ html {
 }
 
 .footer .footer_menu ul li a {
-  color: #94a3b8 !important;
-  font-size: 13px !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  text-transform: none !important;
+  padding: 0 !important;
   text-decoration: none !important;
-  transition: color 0.2s ease !important;
+  transition: color 0.25s ease !important;
 }
 
 .footer .footer_menu ul li a:hover {
   color: #2eca7f !important;
+  text-decoration: underline !important;
 }
 
 @media (max-width: 991px) {
   .footer {
-    padding: 50px 0 30px 0 !important;
+    padding: 60px 0 30px 0 !important;
+  }
+  .footer .fc {
+    margin-top: 30px !important;
+    padding-top: 30px !important;
   }
   .footer .footer_copyright p {
     text-align: center !important;
@@ -5037,4 +5080,329 @@ app-root > div > main {
   .tp_promo_box > div:last-child .single_tp {
     border-bottom: none !important;
   }
+}
+
+/* ==========================================================
+   Precio en tarjetas de curso (Home + Catálogo)
+   Reemplaza el círculo fijo de 60px (.month) por una píldora
+   que se adapta al ancho del monto (ej. "S/ 180.00").
+   ========================================================== */
+.course-slide .course-date.course-price-wrap {
+  position: absolute !important;
+  top: 14px !important;
+  left: 14px !important;
+  z-index: 2;
+}
+
+.course-price-badge {
+  display: inline-flex !important;
+  align-items: baseline;
+  gap: 4px;
+  width: auto !important;
+  height: auto !important;
+  line-height: 1 !important;
+  padding: 8px 14px !important;
+  border-radius: 999px !important;
+  background: #2eca7f !important;
+  color: #ffffff !important;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+}
+
+.course-price-badge .price-currency {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.9;
+  letter-spacing: 0.3px;
+}
+
+.course-price-badge .price-amount {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+@media (max-width: 575.98px) {
+  .course-price-badge {
+    padding: 7px 12px !important;
+  }
+  .course-price-badge .price-amount {
+    font-size: 15px;
+  }
+}
+
+/* ==========================================================================
+   MENÚ PRINCIPAL (NAVBAR) - REDUCIDO UN 5% PARA TODO EL SISTEMA
+   Escalado armónico de logo, enlaces, ícono de carrito y botones de acceso
+   ========================================================================== */
+#navigation,
+.site-navigation {
+  min-height: 71px !important;
+  padding: 13px 0 !important;
+}
+
+#navigation.navbar-scrolled,
+#navigation.navbar-fixed,
+.site-navigation.navbar-fixed {
+  padding: 11px 0 !important;
+}
+
+/* 1. Logo (-5%) */
+.site-logo {
+  min-height: 45px !important;
+}
+
+.site-logo a,
+.site-logo .brand-logo-link {
+  font-size: 21px !important;
+  gap: 9px !important;
+}
+
+.site-logo .brand-icon,
+.site-logo a span:first-child {
+  font-size: 25px !important;
+}
+
+.site-logo .brand-text,
+.site-logo a span:last-child {
+  font-size: 21px !important;
+}
+
+/* 2. Enlaces del menú central (-5%) */
+#main-menu ul {
+  gap: 5px !important;
+}
+
+#main-menu ul li a,
+#navigation #main-menu ul li a,
+#navigation.navbar-fixed #main-menu ul li a {
+  height: 40px !important;
+  line-height: 40px !important;
+  padding: 0 14px !important;
+  font-size: 15px !important;
+  letter-spacing: -0.1px !important;
+}
+
+#main-menu ul li a i {
+  font-size: 15.5px !important;
+}
+
+/* 3. Ícono del carrito alineado y con el mismo diseño de botón (40x40, borde 8px) */
+.home_lc {
+  height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.hlc,
+.home_lc a.hlc {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  border-radius: 8px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #1a2d62 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  transition: all 0.2s ease !important;
+}
+
+.hlc:hover,
+.home_lc a.hlc:hover,
+.hlc.has-items,
+.home_lc a.hlc.has-items {
+  background-color: #f8fafc !important;
+  border-color: #2eca7f !important;
+  color: #2eca7f !important;
+}
+
+.home_lc a i {
+  font-size: 18px !important;
+  color: #1a2d62 !important;
+  line-height: 1 !important;
+  transition: color 0.2s ease !important;
+}
+
+.hlc:hover i,
+.home_lc a.hlc:hover i {
+  color: #2eca7f !important;
+}
+
+.home_lc a .gactive {
+  min-width: 19px !important;
+  height: 19px !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  top: -6px !important;
+  right: -6px !important;
+  background: #2eca7f !important;
+  color: #ffffff !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 0 2px #ffffff !important;
+}
+/* 4. Botones de acción / usuario (-5%) */
+.call_to_action,
+#auth-buttons-nav {
+  height: 40px !important;
+  gap: 9px !important;
+}
+
+.call_to_action .btn_one,
+.call_to_action .btn_two,
+#auth-buttons-nav .btn_one,
+#auth-buttons-nav .btn_two {
+  height: 40px !important;
+  min-height: 40px !important;
+  line-height: 40px !important;
+  padding: 0 16px !important;
+  font-size: 14.5px !important;
+}
+
+#auth-buttons-nav .btn-nav-user {
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 16px !important;
+  font-size: 14.5px !important;
+}
+
+#auth-buttons-nav .btn-nav-logout {
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 13px !important;
+  font-size: 14.5px !important;
+}
+
+/* 5. Menú móvil SlickNav (-5%) */
+.slicknav_btn {
+  padding: 8px 11px !important;
+}
+
+.slicknav_nav li a {
+  font-size: 15px !important;
+  padding: 9px 13px !important;
+}
+/* ==========================================================================
+   MODAL MINIMALISTA DE DETALLE DE COMPROBANTE
+   ========================================================================== */
+.comp-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.comp-modal-window {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  max-width: 460px;
+  width: 100%;
+  height: auto;
+  padding: 24px 26px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+}
+
+.comp-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.comp-modal-type {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2eca7f;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 2px;
+}
+
+.comp-modal-number {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a2d62;
+  margin: 0;
+}
+
+.comp-modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.comp-modal-close-btn:hover {
+  color: #1a2d62;
+}
+
+.comp-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comp-modal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.comp-modal-row strong {
+  color: #1a2d62;
+  font-weight: 700;
+  text-align: right;
+}
+
+.comp-modal-divider {
+  height: 1px;
+  background: #eef2f6;
+  margin: 6px 0;
+}
+
+.comp-modal-total {
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a2d62;
+}
+
+.comp-modal-total strong {
+  font-size: 18px;
+  font-weight: 800;
+  color: #2eca7f;
+}
+
+.comp-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #eef2f6;
 }

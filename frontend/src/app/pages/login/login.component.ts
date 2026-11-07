@@ -33,28 +33,7 @@ import { NotificationService } from '../../services/notification.service';
 			<div class="row">				
 				<div class="col-lg-6 offset-lg-3 col-xs-12">
 					<div class="login">
-						<h4 class="login_register_title">Ingreso al Sistema Multirrol:</h4>
-						<p class="text-muted" style="font-size: 13.5px; margin-top: -10px; margin-bottom: 20px;">
-							Accede directamente a tu plataforma especializada: <strong>Estudiante</strong>, <strong>Docente</strong> o <strong>Administrador</strong>.
-						</p>
-
-						<!-- Accesos Rápidos por Perfil -->
-						<div class="mb-4 p-3" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
-							<span class="d-block text-muted mb-2" style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-								<i class="fa fa-bolt text-warning me-1"></i> Accesos Rápidos de Prueba (1 Clic)
-							</span>
-							<div class="d-grid gap-2">
-								<button type="button" class="btn btn-sm text-start py-2 px-3" (click)="cargarDemo('estudiante@cursos.com')" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 8px; font-weight: 600; font-size: 13px;">
-									<i class="fa fa-graduation-cap me-2 text-primary"></i> <strong>Portal Estudiante:</strong> Carlos Alarcón
-								</button>
-								<button type="button" class="btn btn-sm text-start py-2 px-3" (click)="cargarDemo('docente@cursos.com')" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; border-radius: 8px; font-weight: 600; font-size: 13px;">
-									<i class="fa fa-briefcase me-2 text-success"></i> <strong>Portal Docente:</strong> Prof. Roberto Mendoza
-								</button>
-								<button type="button" class="btn btn-sm text-start py-2 px-3" (click)="cargarDemo('admin@cursos.com')" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; border-radius: 8px; font-weight: 600; font-size: 13px;">
-									<i class="fa fa-shield me-2 text-purple" style="color: #9333ea;"></i> <strong>Portal Administrador:</strong> Admin General
-								</button>
-							</div>
-						</div>
+						<h4 class="login_register_title">¿Ya eres miembro? Inicia sesión:</h4>
 
 						<form id="login-form" (submit)="hacerLogin($event)">
 							<div class="form-group mb-3">
@@ -240,7 +219,7 @@ export class LoginComponent implements AfterViewInit {
 
     let destUrl = this.authService.getPortalUrlForRole(user.rol);
     if (explicitRedirect) {
-      const isStudentUrl = explicitRedirect.includes('mis-cursos') || explicitRedirect.includes('carrito');
+      const isStudentUrl = explicitRedirect.includes('mis-cursos') || explicitRedirect.includes('mis-comprobantes') || explicitRedirect.includes('carrito');
       if ((user.rol === 'ADMIN' || user.rol === 'DOCENTE') && isStudentUrl) {
         destUrl = this.authService.getPortalUrlForRole(user.rol);
       } else {
@@ -253,11 +232,4 @@ export class LoginComponent implements AfterViewInit {
     }, 350);
   }
 
-  async cargarDemo(correo: string): Promise<void> {
-    const emailEl = document.getElementById('login-email') as HTMLInputElement | null;
-    const pwdEl = document.getElementById('login-pwd') as HTMLInputElement | null;
-    if (emailEl) emailEl.value = correo;
-    if (pwdEl) pwdEl.value = '123456';
-    await this.hacerLogin();
-  }
 }

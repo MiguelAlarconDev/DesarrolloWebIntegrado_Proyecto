@@ -14,8 +14,8 @@ import { CartService } from '../../services/cart.service';
 	<!-- START NAVBAR -->  
 	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
 		<div class="container">
-			<div class="row align-items-center">
-				<div class="col-lg-3 col-md-4 col-sm-6">
+			<div class="row align-items-center justify-content-between">
+				<div class="col-lg-auto col-md-4 col-sm-6">
 					<div class="site-logo">
 						<a href="/" class="brand-logo-link">
 							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
@@ -23,20 +23,19 @@ import { CartService } from '../../services/cart.service';
 						</a>          			        				
 					</div>
 				</div>
-				<div class="col-lg-6 col-md-6 col-sm-6">
+				<div class="col-lg col-md-5 col-sm-6">
 					<div class="header_right">
-						<nav id="main-menu" class="ms-auto">
+						<nav id="main-menu">
 							<ul>
 								<li><a class="nav-link active" href="/"><i class="fa fa-home me-1"></i> Inicio</a></li>
 								<li><a class="nav-link" href="/cursos"><i class="fa fa-book me-1"></i> Cursos</a></li>
 								<li><a class="nav-link" href="/contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
-								<li><a class="nav-link" href="/carrito"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
 							</ul>
 						</nav>
 						<div id="mobile_menu"></div>
 					</div>
 				</div>
-				<div class="col-lg-3 col-md-3 col-sm-12">
+				<div class="col-lg-auto col-md-3 col-sm-12">
 					<div class="home_lc">
 						<a href="/carrito" class="hlc" title="Ver Carrito de Matrícula" aria-label="Ver Carrito de Matrícula">
 							<i class="fa fa-shopping-cart"></i>

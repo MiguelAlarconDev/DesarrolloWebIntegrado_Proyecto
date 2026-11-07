@@ -224,6 +224,9 @@ export class EstudiantePanelComponent implements AfterViewInit {
             </div>
           </div>
           <div class="d-flex gap-2 flex-wrap">
+            <a href="/mis-comprobantes" class="btn_two" style="font-size: 13px; font-weight: 700; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #cbd5e1; color: #1a2d62;">
+              <i class="fa fa-file-text-o"></i> Mis Comprobantes
+            </a>
             <a href="/cursos" class="btn_one" style="font-size: 13px; font-weight: 700; padding: 10px 18px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
               <i class="fa fa-plus"></i> Matricular otro curso
             </a>
@@ -317,7 +320,7 @@ export class EstudiantePanelComponent implements AfterViewInit {
                   <i class="fa fa-calendar text-primary me-1"></i> ${curso.horario || 'Horario flexible'}
                 </div>
                 <div style="font-size: 12px; color: #64748b; height: 20px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                  <i class="fa fa-file-text-o text-muted me-1"></i> Comprobante: <strong>${correlativoStr}</strong>
+                  <i class="fa fa-file-text-o text-muted me-1"></i> Comprobante: <a href="/mis-comprobantes" style="color: #1a2d62; font-weight: 800; text-decoration: underline;">${correlativoStr}</a>
                 </div>
               </div>
               

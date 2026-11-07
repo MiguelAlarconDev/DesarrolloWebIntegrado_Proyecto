@@ -418,8 +418,8 @@ export class CatalogoComponent implements AfterViewInit, OnDestroy {
                 <img src="${imgUrl}" alt="${c.titulo}" style="width: 100%; height: 210px; object-fit: cover;">
               </a>
               ${enrolledTag}
-              <div class="course-date">
-                <span class="month" style="font-weight: 700; font-size: 16px;">S/ ${Number(c.precio).toFixed(2)}</span>
+              <div class="course-date course-price-wrap">
+                <span class="course-price-badge"><span class="price-currency">S/</span><span class="price-amount">${Number(c.precio).toFixed(2)}</span></span>
               </div>
             </div>
             <div class="course-content" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 25px;">

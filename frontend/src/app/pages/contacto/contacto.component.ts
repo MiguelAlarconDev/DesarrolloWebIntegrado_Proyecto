@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { NotificationService } from '../../services/notification.service';
@@ -112,10 +113,24 @@ import { NotificationService } from '../../services/notification.service';
 	<!-- END CONTACT SECTION -->
   `
 })
-export class ContactoComponent implements AfterViewInit {
+export class ContactoComponent implements OnInit, AfterViewInit {
+  private router = inject(Router);
   private authService = inject(AuthService);
   private cartService = inject(CartService);
   private notifications = inject(NotificationService);
+
+  ngOnInit(): void {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      if (user.rol === 'ESTUDIANTE') {
+        this.router.navigateByUrl('/mis-cursos');
+      } else if (user.rol === 'DOCENTE') {
+        this.router.navigateByUrl('/portal-docente');
+      } else if (user.rol === 'ADMIN') {
+        this.router.navigateByUrl('/portal-admin');
+      }
+    }
+  }
 
   ngAfterViewInit(): void {
     this.authService.updateNavbar();
