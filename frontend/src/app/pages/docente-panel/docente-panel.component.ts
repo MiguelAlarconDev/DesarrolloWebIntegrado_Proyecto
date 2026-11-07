@@ -7,6 +7,8 @@ import { CursoService } from '../../services/curso.service';
 import { PedidoService } from '../../services/pedido.service';
 import { NotificationService } from '../../services/notification.service';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 @Component({
   selector: 'app-docente-panel',
   standalone: true,
@@ -218,6 +220,7 @@ export class DocentePanelComponent implements AfterViewInit {
       (window as any).abrirModalEnlace = (id: string, url: string) => this.abrirModalEnlace(id, url);
       (window as any).abrirModalAula = (id: string, sede: string, aula: string) => this.abrirModalAula(id, sede, aula);
       (window as any).verAlumnosDirecto = (id: string) => this.verAlumnosDirecto(id);
+      (window as any).gestionarMateriales = (id: string) => this.gestionarMateriales(id);
     }
     this.initPortalDocente();
   }
@@ -341,6 +344,11 @@ export class DocentePanelComponent implements AfterViewInit {
       const safeEnlace = (c.enlaceClase || '').replace(/'/g, "\\'");
       const safeSede = (c.direccionClase || '').replace(/'/g, "\\'");
       const safeAula = (c.aula || '').replace(/'/g, "\\'");
+      // Solo se inyecta el id si es un UUID valido (nunca contenido libre).
+      const aulaBtn = UUID_RE.test(String(c.id)) ? `
+                <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="window.gestionarMateriales('${c.id}')">
+                  <i class="fa fa-folder-open me-1"></i> Gestionar materiales
+                </button>` : '';
 
       return `
         <div class="col-lg-6 col-12 mb-4">
@@ -383,6 +391,7 @@ export class DocentePanelComponent implements AfterViewInit {
                   <i class="fa fa-pencil me-1"></i> Actualizar Sede/Aula
                 </button>
               `}
+              ${aulaBtn}
               <button type="button" class="btn btn-sm btn-success fw-bold" onclick="window.verAlumnosDirecto('${c.id}')">
                 <i class="fa fa-users me-1"></i> Ver Alumnos (${inscritos})
               </button>
@@ -546,6 +555,11 @@ export class DocentePanelComponent implements AfterViewInit {
         </tr>
       `;
     }).join('');
+  }
+
+  gestionarMateriales(cursoId: string): void {
+    if (!UUID_RE.test(cursoId)) return;
+    this.router.navigate(['/portal-docente/aula', cursoId]);
   }
 
   verAlumnosDirecto(cursoId: string): void {

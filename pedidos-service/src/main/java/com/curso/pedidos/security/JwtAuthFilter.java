@@ -47,7 +47,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
         AuthPrincipal principal;
         try {
-            principal = jwtVerifier.validate(authorization.substring(7).trim());
+            String token = authorization.substring(7).trim();
+            principal = request.getRequestURI().startsWith("/api/pedidos/interno")
+                    ? jwtVerifier.validateMatricula(token) : jwtVerifier.validate(token);
         } catch (JwtVerifier.InvalidTokenException ex) {
             write(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
             return;
@@ -61,6 +63,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     static boolean roleAllowed(String method, String path, AuthPrincipal p) {
+        if (path.startsWith("/api/pedidos/interno")) {
+            return "GET".equalsIgnoreCase(method) && p.isService() && "cursos-service".equals(p.subject());
+        }
         if (p.isService()) {
             return "GET".equalsIgnoreCase(method);
         }

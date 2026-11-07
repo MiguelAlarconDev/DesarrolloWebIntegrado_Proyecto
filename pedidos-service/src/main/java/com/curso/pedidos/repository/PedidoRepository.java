@@ -16,6 +16,8 @@ import java.util.UUID;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, UUID> {
 
+    boolean existsByCursoIdAndEstudianteIdAndEstado(UUID cursoId, UUID estudianteId, EstadoPedido estado);
+
     Optional<Pedido> findByCodigoOrden(String codigoOrden);
 
     List<Pedido> findByEstudianteId(UUID estudianteId);
