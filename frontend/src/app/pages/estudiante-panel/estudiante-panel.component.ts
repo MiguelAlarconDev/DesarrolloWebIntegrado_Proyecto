@@ -59,15 +59,8 @@ export class EstudiantePanelComponent implements AfterViewInit {
   }
 
   async cargarAlumnoDemoMisCursos(): Promise<void> {
-    try {
-      this.notifications.showToast('Autenticando alumno en el sistema...', 'info');
-      const res = await this.authService.login('estudiante@cursos.com', '123456');
-      this.notifications.showToast(`¡Bienvenido, ${res.user.nombres}! Cargando tus clases...`, 'success');
-      this.authService.updateNavbar();
-      await this.initMisCursos();
-    } catch (err: any) {
-      this.notifications.showToast('Error al cargar alumno: ' + err?.message, 'error');
-    }
+    // Sin credenciales incrustadas: el alumno inicia sesion con su propia cuenta.
+    await this.router.navigateByUrl('/login?redirect=mis-cursos');
   }
 
   cerrarSesionMisCursos(): void {

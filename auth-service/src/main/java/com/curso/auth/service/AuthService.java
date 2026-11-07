@@ -101,8 +101,7 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo())
                 .orElseThrow(() -> new AuthenticationException("Credenciales invalidas"));
 
-        boolean passwordMatches = passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash())
-                || request.getPassword().equals(usuario.getPasswordHash());
+        boolean passwordMatches = passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash());
         if (!passwordMatches) {
             throw new AuthenticationException("Credenciales invalidas");
         }
@@ -116,10 +115,17 @@ public class AuthService {
             usuario.setCodigo2fa(codigoOtp);
             usuario.setCodigo2faExpiraEn(LocalDateTime.now().plusMinutes(5));
             usuarioRepository.save(usuario);
-            whatsappOtpClient.sendOtp(usuario.getWhatsapp(), codigoOtp);
+            try {
+                whatsappOtpClient.sendOtp(usuario.getWhatsapp(), codigoOtp);
+            } catch (com.curso.auth.exception.ServiceUnavailableException ex) {
+                usuario.setCodigo2fa(null);
+                usuario.setCodigo2faExpiraEn(null);
+                usuarioRepository.save(usuario);
+                throw ex;
+            }
 
             AuthResponse response = new AuthResponse();
-            response.setMensaje("Se requiere verificacion 2FA. Codigo OTP de acceso: " + codigoOtp);
+            response.setMensaje("Se requiere verificacion 2FA. Revise el codigo enviado por WhatsApp (vigencia: 5 minutos).");
             response.setStatus("REQUIRES_2FA");
             response.setUsuarioId(usuario.getId());
             response.setNombres(usuario.getNombres() + " " + usuario.getApellidos());

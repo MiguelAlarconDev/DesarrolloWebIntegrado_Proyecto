@@ -36,14 +36,14 @@ public class JwtService {
     @Autowired
     public JwtService(
             ObjectMapper objectMapper,
-            @Value("${security.jwt.secret:${JWT_SECRET:dev-secret-change-me-please-32-chars}}") String secret,
+            @Value("${security.jwt.secret}") String secret,
             @Value("${security.jwt.expiration-minutes:${JWT_EXPIRATION_MINUTES:60}}") long expirationMinutes) {
         this(objectMapper, Clock.systemUTC(), secret, Duration.ofMinutes(expirationMinutes));
     }
 
     JwtService(ObjectMapper objectMapper, Clock clock, String secret, Duration expiration) {
-        if (secret == null || secret.isBlank()) {
-            throw new IllegalArgumentException("La clave JWT no puede estar vacia");
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalArgumentException("JWT_SECRET debe estar definido y tener al menos 32 caracteres");
         }
         this.objectMapper = objectMapper;
         this.clock = clock;
@@ -69,6 +69,31 @@ public class JwtService {
 
         String unsignedToken = encodeJson(header) + "." + encodeJson(payload);
         return unsignedToken + "." + sign(unsignedToken);
+    }
+
+    /**
+     * Valida firma HS256 y expiracion y devuelve (sub, rol). Acepta tambien tokens de
+     * servicio (rol SERVICE) firmados con el mismo secreto por otros microservicios.
+     */
+    public AccessPrincipal validateAccessToken(String token) {
+        String[] parts = token != null ? token.split("\\.") : new String[0];
+        if (parts.length != 3) {
+            throw new AuthenticationException("Token JWT invalido");
+        }
+        Map<String, Object> header = decodePayload(parts[0]);
+        if (!"HS256".equals(header.get("alg"))) {
+            throw new AuthenticationException("Algoritmo JWT no permitido");
+        }
+        String expectedSignature = sign(parts[0] + "." + parts[1]);
+        if (!MessageDigest.isEqual(expectedSignature.getBytes(StandardCharsets.UTF_8), parts[2].getBytes(StandardCharsets.UTF_8))) {
+            throw new AuthenticationException("Firma JWT invalida");
+        }
+        Map<String, Object> claims = decodePayload(parts[1]);
+        Instant expirationTime = Instant.ofEpochSecond(asLong(claims.get("exp"), "exp"));
+        if (!expirationTime.isAfter(Instant.now(clock))) {
+            throw new AuthenticationException("Token JWT expirado");
+        }
+        return new AccessPrincipal(asString(claims.get("sub"), "sub"), asString(claims.get("rol"), "rol"));
     }
 
     public JwtClaims validateAndExtractClaims(String token) {

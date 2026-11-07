@@ -1,6 +1,10 @@
 package com.curso.auth.controller;
 
 import com.curso.auth.dto.AuthResponse;
+import com.curso.auth.entity.RolUsuario;
+import com.curso.auth.exception.ForbiddenException;
+import com.curso.auth.security.AccessPrincipal;
+import jakarta.servlet.http.HttpServletRequest;
 import com.curso.auth.dto.LoginRequest;
 import com.curso.auth.dto.RegistroUsuarioRequest;
 import com.curso.auth.dto.UsuarioResponse;
@@ -15,7 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+
 public class AuthController {
 
     private final AuthService authService;
@@ -26,7 +30,14 @@ public class AuthController {
 
     @PostMapping("/registro")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthResponse registrar(@Valid @RequestBody RegistroUsuarioRequest request) {
+    public AuthResponse registrar(@Valid @RequestBody RegistroUsuarioRequest request, HttpServletRequest http) {
+        // El registro publico solo crea ESTUDIANTES; ADMIN/DOCENTE requiere un token ADMIN.
+        if (request.getRol() != null && request.getRol() != RolUsuario.ESTUDIANTE) {
+            AccessPrincipal principal = AccessPrincipal.fromOrNull(http);
+            if (principal == null || !principal.isAdmin()) {
+                throw new ForbiddenException("Solo un administrador puede crear cuentas " + request.getRol());
+            }
+        }
         return authService.registrar(request);
     }
 

@@ -22,36 +22,6 @@ export class AuthService {
   private router = inject(Router);
   private navHashBound = false;
 
-  readonly DEMO_USERS: Record<string, UserProfile> = {
-    'admin@cursos.com': {
-      id: 'a0000000-0000-0000-0000-000000000001',
-      nombres: 'Admin General',
-      apellidos: 'Administrador',
-      dni: '10000001',
-      correo: 'admin@cursos.com',
-      rol: 'ADMIN',
-      whatsapp: '+51999111222'
-    },
-    'docente@cursos.com': {
-      id: 'a0000000-0000-0000-0000-000000000002',
-      nombres: 'Roberto Docente',
-      apellidos: 'Mendoza',
-      dni: '20000002',
-      correo: 'docente@cursos.com',
-      rol: 'DOCENTE',
-      whatsapp: '+51999333444'
-    },
-    'estudiante@cursos.com': {
-      id: 'a0000000-0000-0000-0000-000000000003',
-      nombres: 'Carlos Estudiante',
-      apellidos: 'Alarcón',
-      dni: '30000003',
-      correo: 'estudiante@cursos.com',
-      rol: 'ESTUDIANTE',
-      whatsapp: '+51999555666'
-    }
-  };
-
   constructor() {
     if (typeof window !== 'undefined') {
       (window as any).__ngAuthLogout = () => this.logout('/');
@@ -103,13 +73,7 @@ export class AuthService {
         throw new Error('Correo o contraseña incorrectos.');
       }
       if (err.status) throw err;
-
-      const demo = this.DEMO_USERS[correo];
-      if (demo && password === '123456') {
-        console.warn('[AuthService] Backend no disponible, usando cuenta demo local.');
-        this.saveSession('mock-jwt-token-' + demo.rol.toLowerCase(), { ...demo });
-        return { success: true, user: this.getCurrentUser() };
-      }
+      // Sin backend no se crean sesiones locales ni tokens ficticios.
       throw new Error('No pudimos conectar con el servidor. Inténtalo en unos segundos.');
     }
   }

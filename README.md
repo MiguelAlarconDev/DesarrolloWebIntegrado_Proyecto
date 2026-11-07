@@ -32,17 +32,30 @@ El sistema está compuesto por servicios independientes que se comunican mediant
 
 Los microservicios comparten la base de datos `cursos_db` en PostgreSQL:
 
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/cursos_db
-spring.datasource.username=postgres
-spring.datasource.password=Joseelmer31
+La conexión se configura **solo por variables de entorno** (nunca en archivos versionados):
+
+```powershell
+$env:DB_URL      = "jdbc:postgresql://<host>:5432/postgres?sslmode=require"   # Supabase: Session pooler
+$env:DB_USERNAME = "postgres.<ref-proyecto>"
+# DB_PASSWORD la solicita iniciar_servicios.ps1 sin eco; JWT_SECRET (>= 32 caracteres) es obligatorio.
 ```
+
+`spring.jpa.hibernate.ddl-auto` es `none` por defecto: los servicios **no modifican el esquema**. Ver [`.env.example`](.env.example) para el resto de variables (Mercado Pago, SMTP, Meta).
 
 > [!NOTE]
 > Para inicializar la base de datos con las tablas y los 3 cursos semilla, ejecuta el script ubicado en:
 > [`database/schema_local.sql`](database/schema_local.sql)
 
 ---
+
+## ⚡ Arranque rápido (Windows PowerShell)
+
+```powershell
+.\iniciar_servicios.ps1      # verifica dependencias y puertos, pide la contraseña sin eco y levanta los 7 servicios
+.\detener_servicios.ps1      # detiene solo los procesos lanzados por el script (.run\pids.json)
+```
+
+Logs en `.run\logs\`. Puertos: Gateway 8080, Auth 8081, Cursos 8082, Pedidos 8083, Comprobantes 8084, WhatsApp 8085, Angular 4200.
 
 ## 🚀 Ejecución de los Servicios
 

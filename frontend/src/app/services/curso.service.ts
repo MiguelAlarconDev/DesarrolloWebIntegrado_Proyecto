@@ -34,11 +34,16 @@ export class CursoService {
     return this.filterByModalidad(cursos, modalidad);
   }
 
+  /** true solo si la ultima carga del catalogo vino del backend. */
+  lastLoadFromBackend = false;
+
   async getCursos(modalidad = 'TODOS'): Promise<CursoModel[]> {
     let cursos: CursoModel[] = [];
+    this.lastLoadFromBackend = false;
     try {
       const data = await this.api.request<any[]>('/cursos');
       if (Array.isArray(data) && data.length > 0) {
+        this.lastLoadFromBackend = true;
         cursos = this.normalizeCursos(data);
         this.memCache = cursos;
         localStorage.setItem('app_cursos_cache', JSON.stringify(cursos));

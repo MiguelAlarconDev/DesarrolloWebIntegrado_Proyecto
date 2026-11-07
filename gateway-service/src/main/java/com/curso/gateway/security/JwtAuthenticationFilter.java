@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authorization = request.getHeader("Authorization");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token JWT requerido");
+            GatewayErrors.write(response, HttpServletResponse.SC_UNAUTHORIZED, "Token JWT requerido");
             return;
         }
 
@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             request.setAttribute("jwt.claims", claims);
             filterChain.doFilter(request, response);
         } catch (Exception ex) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token JWT invalido o expirado");
+            GatewayErrors.write(response, HttpServletResponse.SC_UNAUTHORIZED, "Token JWT invalido o expirado");
         }
     }
 

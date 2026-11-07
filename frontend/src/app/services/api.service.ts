@@ -86,10 +86,10 @@ export class ApiService {
       return data;
     } catch (gatewayError: any) {
       const status = gatewayError?.status || 0;
+      // Reintento directo solo para lecturas cuando el Gateway no responde: nunca se
+      // repiten operaciones que modifican estado ni se esquiva un 401/403.
       const isGatewayRoutingError =
-        status === 0 ||
-        [404, 502, 503, 504].includes(status) ||
-        (status === 401 && endpoint.startsWith('/auth/usuarios'));
+        method === 'GET' && (status === 0 || [502, 504].includes(status));
 
       if (status && !isGatewayRoutingError) {
         throw gatewayError;

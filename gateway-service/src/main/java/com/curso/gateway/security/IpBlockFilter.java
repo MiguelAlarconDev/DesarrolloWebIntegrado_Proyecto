@@ -36,7 +36,7 @@ public class IpBlockFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String clientIp = clientIpResolver.resolve(request);
         if (blockedIps.contains(clientIp)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "IP bloqueada");
+            GatewayErrors.write(response, HttpServletResponse.SC_FORBIDDEN, "IP bloqueada");
             return;
         }
 

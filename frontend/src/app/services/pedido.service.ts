@@ -40,7 +40,10 @@ export class PedidoService {
 
   async crearPedido(cursoId: string, estudianteId?: string): Promise<any> {
     const user = this.authService.getCurrentUser();
-    const estId = estudianteId || (user && user.id) || 'a0000000-0000-0000-0000-000000000003';
+    const estId = estudianteId || (user && user.id);
+    if (!estId) {
+      throw new Error('Inicia sesión para registrar tu matrícula.');
+    }
     const curso = await this.cursoService.getCursoById(cursoId);
 
     try {
@@ -57,36 +60,22 @@ export class PedidoService {
           curso: curso
         };
       }
+      throw new Error('El servidor no devolvio un pedido valido.');
     } catch (err: any) {
-      console.warn('[PedidoService] Creando orden en modo resiliente local:', err?.message);
+      // Sin backend no se crea una orden local: evitaria matriculas/aforos ficticios.
+      throw new Error('No se pudo registrar el pedido en el servidor: ' + (err?.message || 'error desconocido'));
     }
-
-    await this.cursoService.descontarAforo(cursoId);
-
-    const ordenLocal = {
-      id: this.generateUUID(),
-      codigoOrden: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
-      estudianteId: estId,
-      cursoId: cursoId,
-      curso: curso,
-      monto: Number(curso.precio || 150.00),
-      estado: 'REGISTRADO',
-      mpPreferenceId: 'MP-PREF-' + Date.now(),
-      reservaExpiraEn: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-      createdAt: new Date().toISOString()
-    };
-
-    this.saveOrderToHistory(ordenLocal);
-    return ordenLocal;
   }
 
   async procesarPagoMercadoPago(pedido: any, datosPago: any = {}): Promise<any> {
-    const mpPaymentId = 'MP-PAY-' + Math.floor(100000000 + Math.random() * 900000000);
+    // Solo se confirma con un payment_id real devuelto por Mercado Pago.
+    const mpPaymentId = datosPago.mpPaymentId;
+    if (!mpPaymentId) {
+      throw new Error('Mercado Pago aun no confirma el pago (falta payment_id).');
+    }
     const tipoComprobante = datosPago.tipoComprobante || 'BOLETA';
-    const serie = tipoComprobante === 'FACTURA' ? 'F001' : 'B001';
-    const correlativo = Math.floor(1000 + Math.random() * 9000);
 
-    let backendPedido = null;
+    let backendPedido: any = null;
     try {
       backendPedido = await this.api.request<any>(`/pedidos/${pedido.id}/pagar`, {
         method: 'PUT',
@@ -102,8 +91,14 @@ export class PedidoService {
         }
       });
     } catch (err: any) {
-      console.warn('[PedidoService] Confirmando pago en pasarela local:', err?.message);
+      throw new Error('El servidor no confirmo el pago: ' + (err?.message || 'error desconocido'));
     }
+    if (!backendPedido || backendPedido.estado !== 'PAGADO') {
+      throw new Error('El servidor no registro el pedido como PAGADO.');
+    }
+    const compBackend = backendPedido.comprobante || null;
+    const serie = compBackend?.serie || null;
+    const correlativo = compBackend?.numeroCorrelativo ?? null;
 
     const montoTotal = Number(pedido.monto || (pedido.curso && pedido.curso.precio) || 150.00);
     const subtotal = +(montoTotal / 1.18).toFixed(2);
@@ -111,21 +106,23 @@ export class PedidoService {
 
     const curso = pedido.curso || await this.cursoService.getCursoById(pedido.cursoId);
     const user = this.authService.getCurrentUser() || {
-      nombres: datosPago.clienteNombres || 'Carlos Estudiante',
-      dni: datosPago.docIdentidad || '30000003',
-      whatsapp: datosPago.whatsapp || '+51999555666',
-      correo: datosPago.correo || 'estudiante@cursos.com'
+      nombres: datosPago.clienteNombres || '',
+      dni: datosPago.docIdentidad || '',
+      whatsapp: datosPago.whatsapp || '',
+      correo: datosPago.correo || ''
     };
 
-    const telefonoDestino = datosPago.whatsapp || user.whatsapp || '+51999555666';
-    const correoDestino = datosPago.correo || user.correo || 'estudiante@cursos.com';
-    const mensajeWhatsApp = this.buildWhatsAppMessage(user, curso, pedido.codigoOrden, `${serie}-${correlativo}`);
+    const telefonoDestino = datosPago.whatsapp || user.whatsapp || '';
+    const correoDestino = datosPago.correo || user.correo || '';
+    const correlativoStr = serie && correlativo != null
+      ? `${serie}-${String(correlativo).padStart(8, '0')}`
+      : 'PENDIENTE DE EMISION';
+    const mensajeWhatsApp = this.buildWhatsAppMessage(user, curso, pedido.codigoOrden, correlativoStr);
 
     const ordenConfirmada = {
       ...pedido,
-      ...(backendPedido || {}),
+      ...backendPedido,
       curso,
-      estado: 'PAGADO',
       mpPaymentId,
       metodoPago: datosPago.metodoPago || 'Mercado Pago (Tarjeta / Yape)',
       fechaPago: new Date().toLocaleString('es-PE'),
@@ -133,21 +130,24 @@ export class PedidoService {
         tipo: tipoComprobante,
         serie,
         numero: correlativo,
-        correlativo: `${serie}-${String(correlativo).padStart(8, '0')}`,
+        correlativo: correlativoStr,
         cliente: datosPago.razonSocial || datosPago.clienteNombres || user.nombres,
-        docIdentidad: datosPago.ruc || datosPago.docIdentidad || user.dni || '30000003',
+        docIdentidad: datosPago.ruc || datosPago.docIdentidad || user.dni || '',
         clienteCorreo: correoDestino,
         clienteTelefono: telefonoDestino,
         subtotal: subtotal.toFixed(2),
         igv: igv.toFixed(2),
         total: montoTotal.toFixed(2),
-        estadoSunat: 'ACEPTADO',
-        pdfUrl: `/api/comprobantes/descargar/${pedido.codigoOrden}.pdf`
+        // Sin integracion SUNAT real: no se declara aceptado.
+        estadoSunat: 'NO ENVIADO A SUNAT',
+        estadoEmail: compBackend?.estadoEmail || 'PENDIENTE',
+        pdfUrl: compBackend?.pdfUrl || null
       },
       notificacionWhatsApp: {
         canal: 'WHATSAPP',
         telefono: telefonoDestino,
-        estado: 'ENVIADO',
+        // El backend despacha en segundo plano; aqui no hay confirmacion de entrega.
+        estado: 'PENDIENTE',
         fechaEnvio: new Date().toLocaleTimeString('es-PE'),
         mensaje: mensajeWhatsApp
       }
@@ -172,10 +172,9 @@ export class PedidoService {
   async cancelarPedido(pedidoId: string, cursoId?: string): Promise<void> {
     try {
       await this.api.request(`/pedidos/${pedidoId}/cancelar`, { method: 'PUT' });
-    } catch (_) {
-      if (cursoId) {
-        await this.cursoService.liberarAforo(cursoId);
-      }
+    } catch (err: any) {
+      // El backend libera el aforo al cancelar; no se simula localmente.
+      console.warn('[PedidoService] No se pudo cancelar el pedido en el servidor:', err?.message);
     }
     sessionStorage.removeItem('paid_course_ids');
   }
