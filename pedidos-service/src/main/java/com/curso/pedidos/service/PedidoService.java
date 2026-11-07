@@ -16,7 +16,12 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -27,19 +32,29 @@ public class PedidoService {
     private final AuthClient authClient;
     private final CursoClient cursoClient;
     private final MercadoPagoClient mercadoPagoClient;
+    private final NotificacionEmailService notificacionEmailService;
+    private final WhatsAppCloudService whatsAppCloudService;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ComprobanteRepository comprobanteRepository,
                          NotificacionRepository notificacionRepository,
                          AuthClient authClient,
                          CursoClient cursoClient,
-                         MercadoPagoClient mercadoPagoClient) {
+                         MercadoPagoClient mercadoPagoClient,
+                         NotificacionEmailService notificacionEmailService,
+                         WhatsAppCloudService whatsAppCloudService) {
         this.pedidoRepository = pedidoRepository;
         this.comprobanteRepository = comprobanteRepository;
         this.notificacionRepository = notificacionRepository;
         this.authClient = authClient;
         this.cursoClient = cursoClient;
         this.mercadoPagoClient = mercadoPagoClient;
+        this.notificacionEmailService = notificacionEmailService;
+        this.whatsAppCloudService = whatsAppCloudService;
+    }
+
+    public WhatsAppCloudService getWhatsAppCloudService() {
+        return whatsAppCloudService;
     }
 
     @Transactional
@@ -68,13 +83,7 @@ public class PedidoService {
         guardado.setInitPoint(pref.getInitPoint());
 
         // Enriquecer datos para la respuesta
-        guardado.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
-        guardado.setCursoTitulo(cursoActualizado.getTitulo());
-        guardado.setHorario(cursoActualizado.getHorario());
-        guardado.setModalidad(cursoActualizado.getModalidad());
-        guardado.setEnlaceClase(cursoActualizado.getEnlaceClase());
-        guardado.setDireccionClase(cursoActualizado.getDireccionClase());
-        guardado.setAula(cursoActualizado.getAula());
+        enriquecerPedido(guardado, estudiante, cursoActualizado);
 
         System.out.printf("[PEDIDOS-SERVICE] Pedido %s creado para el estudiante %s. Vacante reservada. MP Preference: %s%n",
                 guardado.getCodigoOrden(), estudiante.getNombres(), guardado.getMpPreferenceId());
@@ -130,16 +139,45 @@ public class PedidoService {
 
         // Obtener datos del estudiante y curso para comprobante y notificación
         UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+        if (request != null) {
+            if (request.getWhatsapp() != null && !request.getWhatsapp().isBlank()) {
+                estudiante.setWhatsapp(request.getWhatsapp().trim());
+            }
+            if (request.getCorreo() != null && !request.getCorreo().isBlank()) {
+                estudiante.setCorreo(request.getCorreo().trim());
+            }
+            if (request.getClienteNombres() != null && !request.getClienteNombres().isBlank()) {
+                estudiante.setNombres(request.getClienteNombres().trim());
+                estudiante.setApellidos("");
+            }
+        }
         CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
 
-        // Generar comprobante electrónico
-        generarComprobante(pedidoActualizado, estudiante, request);
+        // Generar comprobante electrónico y disparar envío por correo en segundo plano
+        generarComprobante(pedidoActualizado, estudiante, curso, request);
 
-        // Despachar notificación de WhatsApp
+        // Despachar / preparar notificación de WhatsApp mediante Meta Cloud API en segundo plano
         enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
 
         enriquecerPedido(pedidoActualizado, estudiante, curso);
+        comprobanteRepository.findByPedidoId(pedidoActualizado.getId()).ifPresent(pedidoActualizado::setComprobante);
         return pedidoActualizado;
+    }
+
+    @Transactional
+    public boolean reenviarWhatsApp(UUID pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+        List<Notificacion> previas = notificacionRepository.findByPedidoId(pedidoId);
+        if (!previas.isEmpty()) {
+            String ultimoDestinatario = previas.get(previas.size() - 1).getDestinatario();
+            if (ultimoDestinatario != null && !ultimoDestinatario.isBlank()) {
+                estudiante.setWhatsapp(ultimoDestinatario);
+            }
+        }
+        CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
+        enviarNotificacionWhatsApp(pedido, estudiante, curso);
+        return true;
     }
 
     @Transactional
@@ -166,7 +204,7 @@ public class PedidoService {
 
     public List<Pedido> listar() {
         List<Pedido> pedidos = pedidoRepository.findAll();
-        pedidos.forEach(this::enriquecerSilenciosamente);
+        enriquecerListaPedidos(pedidos);
         return pedidos;
     }
 
@@ -179,14 +217,48 @@ public class PedidoService {
 
     public List<Pedido> listarPorEstudiante(UUID estudianteId) {
         List<Pedido> pedidos = pedidoRepository.findByEstudianteId(estudianteId);
-        pedidos.forEach(this::enriquecerSilenciosamente);
+        enriquecerListaPedidos(pedidos);
         return pedidos;
     }
 
     public List<Pedido> listarParticipantesPorCurso(UUID cursoId) {
         List<Pedido> pedidos = pedidoRepository.findByCursoIdAndEstado(cursoId, EstadoPedido.PAGADO);
-        pedidos.forEach(this::enriquecerSilenciosamente);
+        enriquecerListaPedidos(pedidos);
         return pedidos;
+    }
+
+    /**
+     * Enriquecimiento en lote (Batch): evita el problema N+1 de consultas HTTP y SQL.
+     */
+    private void enriquecerListaPedidos(List<Pedido> pedidos) {
+        if (pedidos == null || pedidos.isEmpty()) {
+            return;
+        }
+
+        try {
+            Set<UUID> pedidoIds = pedidos.stream().map(Pedido::getId).filter(Objects::nonNull).collect(Collectors.toSet());
+            Set<UUID> estudianteIds = pedidos.stream().map(Pedido::getEstudianteId).filter(Objects::nonNull).collect(Collectors.toSet());
+            Set<UUID> cursoIds = pedidos.stream().map(Pedido::getCursoId).filter(Objects::nonNull).collect(Collectors.toSet());
+
+            Map<UUID, Comprobante> comprobantesMap = comprobanteRepository.findByPedidoIdIn(pedidoIds)
+                    .stream()
+                    .collect(Collectors.toMap(Comprobante::getPedidoId, Function.identity(), (a, b) -> a));
+
+            Map<UUID, UsuarioDto> usuariosMap = authClient.obtenerUsuariosPorIds(estudianteIds);
+            Map<UUID, CursoDto> cursosMap = cursoClient.obtenerCursosPorIds(cursoIds);
+
+            for (Pedido pedido : pedidos) {
+                UsuarioDto estudiante = usuariosMap.get(pedido.getEstudianteId());
+                CursoDto curso = cursosMap.get(pedido.getCursoId());
+                enriquecerPedido(pedido, estudiante, curso);
+                Comprobante comp = comprobantesMap.get(pedido.getId());
+                if (comp != null) {
+                    pedido.setComprobante(comp);
+                }
+            }
+        } catch (Exception ex) {
+            pedidos.forEach(this::enriquecerSilenciosamente);
+        }
     }
 
     private void enriquecerSilenciosamente(Pedido pedido) {
@@ -194,13 +266,15 @@ public class PedidoService {
             UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
             CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
             enriquecerPedido(pedido, estudiante, curso);
+            comprobanteRepository.findByPedidoId(pedido.getId()).ifPresent(pedido::setComprobante);
         } catch (Exception ignored) {
         }
     }
 
     private void enriquecerPedido(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         if (estudiante != null) {
-            pedido.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
+            pedido.setEstudiante(estudiante);
+            pedido.setEstudianteNombre((estudiante.getNombres() + " " + (estudiante.getApellidos() != null ? estudiante.getApellidos() : "")).trim());
         }
         if (curso != null) {
             pedido.setCursoTitulo(curso.getTitulo());
@@ -212,7 +286,7 @@ public class PedidoService {
         }
     }
 
-    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, PagarPedidoRequest request) {
+    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, CursoDto curso, PagarPedidoRequest request) {
         if (comprobanteRepository.findByPedidoId(pedido.getId()).isPresent()) {
             return;
         }
@@ -234,24 +308,34 @@ public class PedidoService {
         comprobante.setMontoIgv(montoIgv);
         comprobante.setMontoTotal(montoTotal);
         comprobante.setPdfUrl("/api/comprobantes/descargar/" + pedido.getId());
-        comprobante.setEstadoEmail("ENVIADO");
+        comprobante.setEstadoEmail("PENDIENTE");
 
         if (tipo == TipoComprobante.FACTURA && request != null) {
             comprobante.setRucCliente(request.getRucCliente());
             comprobante.setRazonSocial(request.getRazonSocial());
         }
 
-        comprobanteRepository.save(comprobante);
+        Comprobante guardado = comprobanteRepository.save(comprobante);
+        pedido.setComprobante(guardado);
 
-        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. RUC: %s. Enviado al correo %s%n",
-                tipo, comprobante.getSerie(), comprobante.getNumeroCorrelativo(), pedido.getCodigoOrden(),
-                montoTotal, comprobante.getRucCliente() != null ? comprobante.getRucCliente() : "N/A", estudiante.getCorreo());
+        // Envío asíncrono por correo vía JavaMailSender para no bloquear la respuesta HTTP
+        CompletableFuture.runAsync(() -> {
+            try {
+                notificacionEmailService.enviarComprobanteMatricula(pedido, estudiante, curso, guardado);
+                comprobanteRepository.save(guardado);
+            } catch (Exception ignored) {
+            }
+        });
+
+        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. Correo: %s%n",
+                tipo, guardado.getSerie(), guardado.getNumeroCorrelativo(), pedido.getCodigoOrden(),
+                montoTotal, estudiante.getCorreo());
     }
 
     private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         String datosClase = obtenerDatosClase(curso);
-        String mensaje = String.format("Hola %s! Tu matricula en el curso '%s' ha sido confirmada con exito. Horario: %s. %s",
-                estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), datosClase);
+        String mensaje = String.format("🎉 Hola %s! Tu matrícula en el curso '%s' ha sido confirmada con éxito.\n\n📅 Horario: %s\n%s\n🔖 Código: %s\n🏛️ Acceso aula: http://localhost:4200/mis-cursos.html",
+                estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), datosClase, pedido.getCodigoOrden());
 
         Notificacion notificacion = new Notificacion();
         notificacion.setPedidoId(pedido.getId());
@@ -259,13 +343,22 @@ public class PedidoService {
         notificacion.setDestinatario(estudiante.getWhatsapp());
         notificacion.setTipo("BIENVENIDA");
         notificacion.setMensaje(mensaje);
-        notificacion.setEstado("ENVIADO");
+        notificacion.setEstado("PENDIENTE");
         notificacion.setIntentos(1);
 
-        notificacionRepository.save(notificacion);
+        Notificacion guardada = notificacionRepository.save(notificacion);
 
-        System.out.printf("[WHATSAPP NOTIFICACION] Mensaje enviado a %s (%s): %s%n",
-                estudiante.getNombres(), estudiante.getWhatsapp(), mensaje);
+        // Despacho asíncrono mediante Meta WhatsApp Cloud API para no bloquear la transacción
+        CompletableFuture.runAsync(() -> {
+            try {
+                boolean enviado = whatsAppCloudService.enviarNotificacionBienvenida(pedido, estudiante, curso, guardada);
+                if (enviado) {
+                    guardada.setEstado("ENVIADO");
+                }
+                notificacionRepository.save(guardada);
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     private String obtenerDatosClase(CursoDto curso) {

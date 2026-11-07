@@ -1,0 +1,9 @@
+{
+  "explorer.compactFolders": true,
+  "files.exclude": {
+    "**/target": true,
+    "**/.mvn": true,
+    "**/.git": true
+  },
+  "java.dependency.packageRepresentation": "hierarchical"
+}

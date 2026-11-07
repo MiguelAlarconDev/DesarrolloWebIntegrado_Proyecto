@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,6 +56,33 @@ public class CorsFilter extends OncePerRequestFilter {
             return;
         }
 
-        filterChain.doFilter(request, response);
+        // El Gateway es el único responsable de CORS: se ignoran las cabeceras CORS que
+        // devuelvan los microservicios (p. ej. @CrossOrigin("*")), ya que una respuesta con
+        // dos valores en Access-Control-Allow-Origin es rechazada por el navegador.
+        filterChain.doFilter(request, new IgnoreDownstreamCorsResponse(response));
+    }
+
+    private static boolean isCorsHeader(String name) {
+        return name != null && name.toLowerCase(Locale.ROOT).startsWith("access-control-");
+    }
+
+    private static final class IgnoreDownstreamCorsResponse extends HttpServletResponseWrapper {
+        IgnoreDownstreamCorsResponse(HttpServletResponse response) {
+            super(response);
+        }
+
+        @Override
+        public void setHeader(String name, String value) {
+            if (!isCorsHeader(name)) {
+                super.setHeader(name, value);
+            }
+        }
+
+        @Override
+        public void addHeader(String name, String value) {
+            if (!isCorsHeader(name)) {
+                super.addHeader(name, value);
+            }
+        }
     }
 }

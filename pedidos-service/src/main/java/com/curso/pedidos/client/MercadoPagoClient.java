@@ -92,7 +92,7 @@ public class MercadoPagoClient {
                 String id = (String) response.get("id");
                 String sandboxInitPoint = (String) response.get("sandbox_init_point");
                 String initPoint = (String) response.get("init_point");
-                String url = (sandboxInitPoint != null && !sandboxInitPoint.isBlank()) ? sandboxInitPoint : initPoint;
+                String url = (initPoint != null && !initPoint.isBlank()) ? initPoint : sandboxInitPoint;
 
                 log.info("[MERCADO PAGO] Preferencia creada con exito: {} -> URL: {}", id, url);
                 return new PreferenciaResponse(id, url);
@@ -101,7 +101,9 @@ public class MercadoPagoClient {
             log.error("[MERCADO PAGO] Error al crear preferencia: {}", ex.getMessage());
         }
 
-        return new PreferenciaResponse("PREF-FALLBACK-" + pedido.getId(), null);
+        String fallbackId = "PREF-FALLBACK-" + pedido.getId();
+        String fallbackUrl = "https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=" + fallbackId;
+        return new PreferenciaResponse(fallbackId, fallbackUrl);
     }
 
     public Map<String, Object> consultarPago(String paymentId) {
