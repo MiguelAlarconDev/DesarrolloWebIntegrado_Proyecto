@@ -4,7 +4,9 @@ import com.curso.pedidos.client.AuthClient;
 import com.curso.pedidos.client.ComprobanteClient;
 import com.curso.pedidos.client.CursoClient;
 import com.curso.pedidos.client.MercadoPagoClient;
+import com.curso.pedidos.dto.CrearPedidoRequest;
 import com.curso.pedidos.dto.CursoDto;
+import com.curso.pedidos.dto.PreferenciaResponse;
 import com.curso.pedidos.dto.PagarPedidoRequest;
 import com.curso.pedidos.dto.UsuarioDto;
 import com.curso.pedidos.entity.EstadoPedido;
@@ -54,6 +56,10 @@ class PagoVerificacionTest {
     private final AtomicInteger comprobantesEmitidos = new AtomicInteger();
     private final AtomicInteger consultasMp = new AtomicInteger();
     private Function<String, Map<String, Object>> respuestaMp;
+    private boolean mpConfigurado;
+    private PreferenciaResponse preferencia;
+    private final AtomicInteger aforoDescontado = new AtomicInteger();
+    private final AtomicInteger aforoLiberado = new AtomicInteger();
     private PedidoService service;
 
     @SuppressWarnings("unchecked")
@@ -81,6 +87,8 @@ class PagoVerificacionTest {
         pedido.setEstado(EstadoPedido.REGISTRADO);
         otroConMismoPago = null;
         respuestaMp = id -> pagoMp("approved", pedido.getId().toString(), "150.0", "PEN");
+        mpConfigurado = true;
+        preferencia = new PreferenciaResponse("pref-123", "https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=pref-123");
 
         PedidoRepository pedidos = repo(PedidoRepository.class, name -> switch (name) {
             case "findByIdForUpdate", "findById" -> args -> pedido.getId().equals(args[0]) ? Optional.of(pedido) : Optional.empty();
@@ -114,6 +122,7 @@ class PagoVerificacionTest {
         curso.setId(pedido.getCursoId());
         curso.setTitulo("Curso");
         curso.setModalidad("VIRTUAL");
+        curso.setPrecio(new BigDecimal("180.00"));
 
         AuthClient auth = new AuthClient("http://auth.invalid", JWT) {
             @Override
@@ -126,12 +135,34 @@ class PagoVerificacionTest {
             public CursoDto obtenerCurso(UUID cursoId) {
                 return curso;
             }
+
+            @Override
+            public CursoDto descontarAforo(UUID cursoId) {
+                aforoDescontado.incrementAndGet();
+                return curso;
+            }
+
+            @Override
+            public CursoDto liberarAforo(UUID cursoId) {
+                aforoLiberado.incrementAndGet();
+                return curso;
+            }
         };
         MercadoPagoClient mp = new MercadoPagoClient(RestClient.create(), "TEST-ficticio", "s", "f", "p") {
             @Override
             public Map<String, Object> consultarPago(String paymentId) {
                 consultasMp.incrementAndGet();
                 return respuestaMp.apply(paymentId);
+            }
+
+            @Override
+            public boolean isConfigurado() {
+                return mpConfigurado;
+            }
+
+            @Override
+            public PreferenciaResponse crearPreferencia(Pedido p, UsuarioDto e, CursoDto c) {
+                return preferencia;
             }
         };
         ComprobanteClient comprobanteClient = new ComprobanteClient("http://pdf.invalid") {
@@ -302,6 +333,39 @@ class PagoVerificacionTest {
         assertThatThrownBy(() -> service.procesarPagoMercadoPago(PAYMENT_ID))
                 .isInstanceOf(PagoRechazadoException.class);
         assertThat(pedidoSaves).hasValue(0);
+    }
+
+    private CrearPedidoRequest checkoutRequest() {
+        CrearPedidoRequest r = new CrearPedidoRequest();
+        r.setEstudianteId(pedido.getEstudianteId());
+        r.setCursoId(pedido.getCursoId());
+        return r;
+    }
+
+    @Test
+    void checkoutSinMercadoPagoNoReservaNiCreaPedido() {
+        mpConfigurado = false;
+        assertThatThrownBy(() -> service.crear(checkoutRequest())).isInstanceOf(PagoNoVerificableException.class);
+        assertThat(aforoDescontado).hasValue(0);
+        assertThat(pedidoSaves).hasValue(0);
+    }
+
+    @Test
+    void checkoutConPreferenciaFallidaLiberaVacanteYFalla() {
+        preferencia = new PreferenciaResponse(null, null);
+        assertThatThrownBy(() -> service.crear(checkoutRequest())).isInstanceOf(PagoNoVerificableException.class);
+        assertThat(aforoDescontado).hasValue(1);
+        assertThat(aforoLiberado).hasValue(1);
+    }
+
+    @Test
+    void checkoutDevuelvePreferenciaEInitPoint() {
+        Pedido creado = service.crear(checkoutRequest());
+        assertThat(creado.getMpPreferenceId()).isEqualTo("pref-123");
+        assertThat(creado.getInitPoint()).startsWith("https://www.mercadopago.com.pe/");
+        assertThat(creado.getEstado()).isEqualTo(EstadoPedido.REGISTRADO);
+        assertThat(creado.getMonto()).isEqualByComparingTo("180.00");
+        assertThat(aforoLiberado).hasValue(0);
     }
 
     private void assertRechazadoSinEfectos() {
