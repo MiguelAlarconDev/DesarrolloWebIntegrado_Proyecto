@@ -49,6 +49,12 @@ public class Pedido {
     private String estudianteNombre;
 
     @Transient
+    private String estudianteWhatsapp;
+
+    @Transient
+    private String mensajeNotificacion;
+
+    @Transient
     private String cursoTitulo;
 
     @Transient
@@ -168,6 +174,22 @@ public class Pedido {
 
     public void setEstudianteNombre(String estudianteNombre) {
         this.estudianteNombre = estudianteNombre;
+    }
+
+    public String getEstudianteWhatsapp() {
+        return estudianteWhatsapp;
+    }
+
+    public void setEstudianteWhatsapp(String estudianteWhatsapp) {
+        this.estudianteWhatsapp = estudianteWhatsapp;
+    }
+
+    public String getMensajeNotificacion() {
+        return mensajeNotificacion;
+    }
+
+    public void setMensajeNotificacion(String mensajeNotificacion) {
+        this.mensajeNotificacion = mensajeNotificacion;
     }
 
     public String getCursoTitulo() {

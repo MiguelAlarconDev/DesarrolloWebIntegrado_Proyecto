@@ -10,22 +10,22 @@ echo.
 cd /d "%~dp0"
 
 echo [1/5] Levantando Gateway Service (Puerto 8080)...
-start "1. Gateway Service (8080)" cmd /k mvnw.cmd spring-boot:run -pl gateway-service
+start "1. Gateway Service (8080)" cmd /k call mvnw.cmd spring-boot:run -pl gateway-service
 
 ping -n 3 127.0.0.1 >nul
 
 echo [2/5] Levantando Auth Service (Puerto 8081)...
-start "2. Auth Service (8081)" cmd /k mvnw.cmd spring-boot:run -pl auth-service
+start "2. Auth Service (8081)" cmd /k call mvnw.cmd spring-boot:run -pl auth-service
 
 ping -n 3 127.0.0.1 >nul
 
 echo [3/5] Levantando Cursos Service (Puerto 8082)...
-start "3. Cursos Service (8082)" cmd /k mvnw.cmd spring-boot:run -pl cursos-service
+start "3. Cursos Service (8082)" cmd /k call mvnw.cmd spring-boot:run -pl cursos-service
 
 ping -n 3 127.0.0.1 >nul
 
 echo [4/5] Levantando Pedidos Service (Puerto 8083)...
-start "4. Pedidos Service (8083)" cmd /k mvnw.cmd spring-boot:run -pl pedidos-service
+start "4. Pedidos Service (8083)" cmd /k call mvnw.cmd spring-boot:run -pl pedidos-service
 
 ping -n 3 127.0.0.1 >nul
 

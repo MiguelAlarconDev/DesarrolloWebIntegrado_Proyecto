@@ -4960,3 +4960,81 @@ app-root > div > main {
   }
 }
 
+
+
+/* ==========================================================================
+   ALINEACIÓN Y ENCAJE PERFECTO DE LA SECCIÓN DE BENEFICIOS / TOP PROMO
+   Integra las 3 tarjetas dentro del contenedor del diseño con tarjeta unificada
+   ========================================================================== */
+
+.tp_feature {
+  padding: 40px 0 60px 0 !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+.tp_feature .container {
+  width: 90% !important;
+  max-width: 1180px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.tp_promo_box {
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08) !important;
+  border: 1px solid #eef2f6 !important;
+  overflow: hidden !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+.tp_promo_box .single_tp {
+  background: #ffffff !important;
+  padding: 45px 35px !important;
+  margin-bottom: 0 !important;
+  height: 100% !important;
+  border-right: 1px solid #f1f5f9 !important;
+  box-shadow: none !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+.tp_promo_box .col-lg-4:last-child .single_tp,
+.tp_promo_box > div:last-child .single_tp {
+  border-right: none !important;
+}
+
+.tp_promo_box .single_tp:hover {
+  background: #f8fafc !important;
+  transform: translateY(-2px) !important;
+}
+
+.tp_promo_box .single_tp h3 {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  margin-bottom: 15px !important;
+  line-height: 1.35 !important;
+}
+
+.tp_promo_box .single_tp p {
+  font-size: 14px !important;
+  color: #64748b !important;
+  line-height: 1.6 !important;
+  margin-bottom: 30px !important;
+}
+
+@media (max-width: 991.98px) {
+  .tp_promo_box .single_tp {
+    border-right: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 35px 25px !important;
+  }
+  .tp_promo_box > div:last-child .single_tp {
+    border-bottom: none !important;
+  }
+}

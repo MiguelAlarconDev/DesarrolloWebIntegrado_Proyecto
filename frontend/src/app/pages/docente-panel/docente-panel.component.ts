@@ -1,297 +1,728 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { CursoModel } from '../../services/config.data';
+import { AuthService, UserProfile } from '../../services/auth.service';
 import { CursoService } from '../../services/curso.service';
 import { PedidoService } from '../../services/pedido.service';
-import { AuthService } from '../../services/auth.service';
-import { Curso } from '../../models/curso.model';
-import { Pedido } from '../../models/pedido.model';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-docente-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
+  encapsulation: ViewEncapsulation.None,
   template: `
-    <div class="flex-1 py-8">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Header -->
-        <div class="pb-6 border-b border-slate-200 mb-8">
-          <nav class="flex items-center gap-2 text-xs text-slate-500 mb-1">
-            <span>Campus Docente</span>
-            <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            <span class="text-slate-800 font-medium">Gestión Académica</span>
-          </nav>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 class="font-heading font-extrabold text-2xl text-slate-900">
-                Panel del Docente - Gestión de Cursos y Alumnos
-              </h1>
-              <p class="text-xs text-slate-500">
-                Bienvenido, Prof. Roberto. Administra tus enlaces de videoconferencia y consulta la lista oficial de inscritos.
-              </p>
-            </div>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 self-start sm:self-center">
-              <i class="fa-solid fa-shield-halved text-emerald-600"></i> Sesión 2FA Verificada
-            </span>
-          </div>
-        </div>
+	<!-- START SECTION TOP  -->
+	<section class="section-top">
+		<div class="container">
+			<div class="col-lg-10 offset-lg-1 text-center">
+				<div class="section-top-title">
+					<h1><i class="fa fa-briefcase me-2"></i>Portal del Docente</h1>
+					<ul>
+						<li><a href="/">Inicio</a></li>
+						<li> / Gestión de Cursos y Aulas</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>	
+	<!-- END SECTION TOP -->
 
-        <!-- 3 KPIs -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 text-brand-700 flex items-center justify-center text-xl">
-              <i class="fa-solid fa-chalkboard-user"></i>
-            </div>
-            <div>
-              <span class="text-xs font-semibold text-slate-500 block">Cursos a Cargo</span>
-              <span class="font-heading font-extrabold text-2xl text-slate-900">{{ cursos.length }}</span>
-            </div>
-          </div>
+	<!-- CONTENIDO DEL PORTAL DOCENTE -->
+	<div class="section-padding" style="background: #f8fafc; min-height: 70vh;">
+		<div class="container">
+			
+			<!-- PERFIL DOCENTE Y MÉTRICAS (DISEÑO ABIERTO Y HUMANO) -->
+			<div class="row mb-4">
+				<div class="col-12">
+					<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-3 border-bottom" style="border-color: #e2e8f0 !important;">
+						<div class="d-flex align-items-center gap-3">
+							<div style="width: 48px; height: 48px; border-radius: 50%; background: #dcfce7; color: #16a34a; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+								<i class="fa fa-user"></i>
+							</div>
+							<div>
+								<div class="d-flex align-items-center gap-2">
+									<h3 id="docente-nombre-header" style="font-size: 19px; font-weight: 800; color: #0f172a; margin: 0;">Prof. Roberto Mendoza</h3>
+									<span class="badge bg-success bg-opacity-10 text-success fw-bold" style="font-size: 11px;">Docente Oficial</span>
+								</div>
+								<span id="docente-correo-header" style="font-size: 13.5px; color: #64748b;">docente@cursos.com</span>
+							</div>
+						</div>
+						<div class="d-flex align-items-center gap-4">
+							<div>
+								<span class="text-muted text-uppercase" style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">Cursos a Cargo</span>
+								<div id="docente-total-cursos" style="font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.1;">-</div>
+							</div>
+							<div style="width: 1px; height: 30px; background: #e2e8f0;"></div>
+							<div>
+								<span class="text-muted text-uppercase" style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">Alumnos Inscritos</span>
+								<div id="docente-total-alumnos" style="font-size: 22px; font-weight: 800; color: #16a34a; line-height: 1.1;">-</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
-              <i class="fa-solid fa-users"></i>
-            </div>
-            <div>
-              <span class="text-xs font-semibold text-slate-500 block">Alumnos en Curso Seleccionado</span>
-              <span class="font-heading font-extrabold text-2xl text-slate-900">{{ participantes.length }}</span>
-            </div>
-          </div>
+			<!-- PESTAÑAS DE TRABAJO (SUBRAYADO MINIMALISTA) -->
+			<div class="row mb-3">
+				<div class="col-12">
+					<div class="platform-tabs-wrapper">
+						<div class="platform-tabs-nav" role="tablist">
+							<button type="button" class="platform-tab-btn active" id="tab-btn-cursos" (click)="switchDocenteTab('cursos')">
+								<i class="fa fa-book me-1"></i>
+								<span>Mis Cursos Asignados</span>
+								<span class="platform-tab-badge" id="docente-tab-badge-cursos">-</span>
+							</button>
+							<button type="button" class="platform-tab-btn" id="tab-btn-alumnos" (click)="switchDocenteTab('alumnos')">
+								<i class="fa fa-users me-1"></i>
+								<span>Lista de Alumnos Matriculados</span>
+								<span class="platform-tab-badge" id="docente-tab-badge-alumnos">-</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
-          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
-              <i class="fa-solid fa-chart-pie"></i>
-            </div>
-            <div>
-              <span class="text-xs font-semibold text-slate-500 block">Ocupación Promedio</span>
-              <span class="font-heading font-extrabold text-2xl text-slate-900">92%</span>
-            </div>
-          </div>
-        </div>
+			<!-- SECCIÓN 1: MIS CURSOS ASIGNADOS -->
+			<div id="seccion-cursos-docente">
+				<div class="row" id="docente-cursos-container">
+					<div class="col-12 text-center py-5">
+						<i class="fa fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+						<p class="text-muted">Cargando tus cursos asignados...</p>
+					</div>
+				</div>
+			</div>
 
-        <!-- Section 1: Cursos Asignados -->
-        <div class="mb-10">
-          <h2 class="font-heading font-bold text-lg text-slate-900 mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-book text-brand-600"></i> Cursos Asignados y Configuración de Salas
-          </h2>
+			<!-- SECCIÓN 2: LISTA DE ALUMNOS MATRICULADOS -->
+			<div id="seccion-alumnos-docente" style="display: none;">
+				<div class="clean-surface">
+					<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+						<div>
+							<h4 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">
+								<i class="fa fa-users text-success me-2"></i>Nómina Real de Estudiantes Matriculados
+							</h4>
+							<p class="text-muted" style="font-size: 13.5px; margin: 0;">Estudiantes reales registrados en la base de datos con matrícula confirmada:</p>
+						</div>
+						<div class="d-flex flex-wrap align-items-center gap-2">
+							<div class="input-group input-group-sm" style="width: 260px;">
+								<span class="input-group-text bg-white border-end-0"><i class="fa fa-search text-muted"></i></span>
+								<input type="text" id="buscador-alumnos-docente" class="form-control border-start-0" placeholder="Buscar por alumno, DNI o correo..." (input)="filtrarAlumnosDocenteEnTabla($any($event.target).value)">
+							</div>
+							<select id="select-curso-participantes" class="form-select form-select-sm" style="min-width: 260px; font-weight: 600;" (change)="cargarAlumnosDeCurso($any($event.target).value)">
+								<option value="TODOS">-- Todos mis cursos asignados --</option>
+							</select>
+							<button type="button" class="btn btn-sm btn-outline-secondary" (click)="imprimirNomina()" title="Imprimir lista">
+								<i class="fa fa-print"></i> Imprimir
+							</button>
+						</div>
+					</div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            @for (c of cursos; track c.id) {
-              <div 
-                class="bg-white rounded-xl border-2 p-5 shadow-sm transition flex flex-col justify-between"
-                [ngClass]="cursoSeleccionado?.id === c.id ? 'border-brand-700 ring-2 ring-brand-100' : 'border-slate-200 hover:border-slate-300'">
-                <div>
-                  <div class="flex items-center justify-between gap-2 mb-2">
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-brand-700 uppercase">
-                      {{ c.modalidad }}
-                    </span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                      {{ c.estado }}
-                    </span>
-                  </div>
+					<div class="table-responsive">
+						<table class="table table-hover align-middle" style="font-size: 13.5px;">
+							<thead style="background: #f8fafc; color: #475569; font-weight: 700;">
+								<tr>
+									<th style="width: 40px;">#</th>
+									<th>Estudiante</th>
+									<th>Curso Asignado</th>
+									<th>Correo Electrónico</th>
+									<th>WhatsApp</th>
+									<th>Fecha de Matrícula</th>
+									<th>Estado</th>
+									<th>Comprobante</th>
+								</tr>
+							</thead>
+							<tbody id="tabla-participantes-body">
+								<tr>
+									<td colspan="8" class="text-center py-4 text-muted">
+										<i class="fa fa-spinner fa-spin me-2"></i>Cargando nómina oficial de alumnos...
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
 
-                  <h3 class="font-heading font-bold text-sm text-slate-900 mb-1 leading-snug">
-                    {{ c.titulo }}
-                  </h3>
-                  <p class="text-[11px] text-slate-500 mb-3">{{ c.horario }}</p>
+		</div>
+	</div>
 
-                  <!-- Aforo Progress -->
-                  <div class="mb-4">
-                    <div class="flex justify-between text-[11px] text-slate-500 mb-1 font-medium">
-                      <span>Inscritos:</span>
-                      <span class="font-bold text-slate-800">{{ c.aforoMaximo - c.aforoDisponible }} / {{ c.aforoMaximo }}</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                      <div 
-                        class="h-1.5 bg-emerald-500 rounded-full"
-                        [style.width.%]="((c.aforoMaximo - c.aforoDisponible) / c.aforoMaximo) * 100">
-                      </div>
-                    </div>
-                  </div>
+	<!-- MODAL: ACTUALIZAR ENLACE DE CLASE (VIRTUAL) -->
+	<div id="modal-actualizar-enlace" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 500px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);">
+			<h4 style="font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+				<i class="fa fa-video-camera text-primary me-2"></i>Actualizar Enlace de Clase en Vivo
+			</h4>
+			<p class="text-muted" style="font-size: 13px;">Los alumnos matriculados verán este enlace de inmediato en su portal para conectarse a clase.</p>
+			
+			<input type="hidden" id="edit-enlace-curso-id">
+			
+			<div class="form-group mb-3">
+				<label for="edit-enlace-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Enlace de Zoom / Google Meet / Teams *</label>
+				<input type="url" id="edit-enlace-input" class="form-control" placeholder="https://meet.google.com/..." required>
+			</div>
 
-                  <!-- Enlace actual -->
-                  <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs mb-3">
-                    <span class="text-[10px] text-slate-400 block font-bold">Enlace Meet activo:</span>
-                    <span class="font-mono text-blue-700 text-[11px] truncate block">
-                      {{ c.enlaceClase || 'No configurado' }}
-                    </span>
-                  </div>
-                </div>
+			<div class="d-flex justify-content-end gap-2 mt-4">
+				<button type="button" class="btn btn-outline-secondary btn-sm" (click)="cerrarModalEnlace()">Cancelar</button>
+				<button type="button" class="btn btn-primary btn-sm fw-bold px-3" id="btn-guardar-enlace" (click)="guardarEnlaceClase()">
+					<i class="fa fa-save me-1"></i> Guardar Enlace
+				</button>
+			</div>
+		</div>
+	</div>
 
-                <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
-                  <button 
-                    (click)="seleccionarCurso(c)"
-                    class="flex-1 py-1.5 bg-brand-900 hover:bg-brand-800 text-white font-bold text-xs rounded-lg transition">
-                    Ver Participantes
-                  </button>
-                  <button 
-                    (click)="abrirModalEnlace(c)" 
-                    title="Editar enlace de Meet"
-                    class="px-2.5 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs rounded-lg transition">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
+	<!-- MODAL: ACTUALIZAR DATOS DE SEDE Y AULA (PRESENCIAL) -->
+	<div id="modal-actualizar-aula" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 500px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);">
+			<h4 style="font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+				<i class="fa fa-building text-warning me-2"></i>Actualizar Sede y Aula Física
+			</h4>
+			<p class="text-muted" style="font-size: 13px;">Informa a tus estudiantes la dirección exacta del campus y el aula o laboratorio asignado.</p>
+			
+			<input type="hidden" id="edit-aula-curso-id">
+			
+			<div class="form-group mb-3">
+				<label for="edit-sede-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Dirección de Sede / Campus *</label>
+				<input type="text" id="edit-sede-input" class="form-control" placeholder="Ej: Av. Universitaria 1234, Lima" required>
+			</div>
 
-        <!-- Section 2: Lista Oficial de Participantes -->
-        <div>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-4 gap-2">
-            <div>
-              <h2 class="font-heading font-bold text-lg text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-users text-brand-600"></i> 
-                Participantes: {{ cursoSeleccionado?.titulo || 'Selecciona un curso' }}
-              </h2>
-              <p class="text-xs text-slate-500">Lista oficial de estudiantes con pago confirmado en Mercado Pago.</p>
-            </div>
-            <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 self-start sm:self-auto">
-              Total: {{ participantes.length }} inscritos
-            </span>
-          </div>
+			<div class="form-group mb-3">
+				<label for="edit-aula-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Aula o Laboratorio *</label>
+				<input type="text" id="edit-aula-input" class="form-control" placeholder="Ej: Laboratorio 204" required>
+			</div>
 
-          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs text-slate-600">
-                <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-700 uppercase text-[10px] tracking-wider">
-                  <tr>
-                    <th class="px-6 py-3">Estudiante</th>
-                    <th class="px-6 py-3">Código Orden</th>
-                    <th class="px-6 py-3">Monto Pagado</th>
-                    <th class="px-6 py-3">Estado</th>
-                    <th class="px-6 py-3 text-right">Contacto</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 font-medium">
-                  @if (participantes.length === 0) {
-                    <tr>
-                      <td colspan="5" class="px-6 py-8 text-center text-slate-400">
-                        No hay participantes registrados o aún no se ha seleccionado un curso.
-                      </td>
-                    </tr>
-                  } @else {
-                    @for (p of participantes; track p.id) {
-                      <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4">
-                          <div class="font-bold text-slate-800">{{ p.estudianteNombre || 'Estudiante Registrado' }}</div>
-                          <div class="text-[11px] text-slate-400">ID: {{ p.estudianteId }}</div>
-                        </td>
-                        <td class="px-6 py-4 font-mono font-bold text-slate-700">{{ p.codigoOrden }}</td>
-                        <td class="px-6 py-4 font-extrabold text-slate-900">S/ {{ p.monto | number:'1.2-2' }}</td>
-                        <td class="px-6 py-4">
-                          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                            {{ p.estado }}
-                          </span>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                          <a 
-                            href="https://wa.me/51999555666" 
-                            target="_blank"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold rounded-lg text-xs hover:bg-emerald-100 transition">
-                            <i class="fa-brands fa-whatsapp text-emerald-600"></i> WhatsApp
-                          </a>
-                        </td>
-                      </tr>
-                    }
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Modal para editar enlace Meet -->
-        @if (mostrarModal) {
-          <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-              <h3 class="font-heading font-bold text-base text-slate-900 mb-2">
-                Actualizar Enlace de Clase Virtual
-              </h3>
-              <p class="text-xs text-slate-500 mb-4">
-                El nuevo enlace se actualizará inmediatamente en el panel de todos los alumnos matriculados.
-              </p>
-
-              <div class="mb-4 text-xs">
-                <label class="block font-semibold text-slate-700 mb-1">Enlace de Google Meet / Zoom</label>
-                <input 
-                  type="url" 
-                  [(ngModel)]="nuevoEnlace" 
-                  placeholder="https://meet.google.com/xyz-uvwx-rst"
-                  class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-brand-600 focus:bg-white font-mono">
-              </div>
-
-              <div class="flex justify-end gap-2">
-                <button (click)="mostrarModal = false" class="px-4 py-2 border border-slate-200 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-100">
-                  Cancelar
-                </button>
-                <button (click)="guardarEnlace()" class="px-4 py-2 bg-brand-900 text-white text-xs font-bold rounded-lg hover:bg-brand-800">
-                  Guardar Enlace
-                </button>
-              </div>
-            </div>
-          </div>
-        }
-
-      </div>
-    </div>
+			<div class="d-flex justify-content-end gap-2 mt-4">
+				<button type="button" class="btn btn-outline-secondary btn-sm" (click)="cerrarModalAula()">Cancelar</button>
+				<button type="button" class="btn btn-primary btn-sm fw-bold px-3" id="btn-guardar-aula" (click)="guardarAulaSede()">
+					<i class="fa fa-save me-1"></i> Guardar Cambios
+				</button>
+			</div>
+		</div>
+	</div>
   `
 })
-export class DocentePanelComponent implements OnInit {
+export class DocentePanelComponent implements AfterViewInit {
+  private router = inject(Router);
+  private authService = inject(AuthService);
   private cursoService = inject(CursoService);
   private pedidoService = inject(PedidoService);
-  private auth = inject(AuthService);
-  private cdr = inject(ChangeDetectorRef);
+  private notifications = inject(NotificationService);
 
-  cursos: Curso[] = [];
-  cursoSeleccionado: Curso | null = null;
-  participantes: Pedido[] = [];
+  misCursosDocente: CursoModel[] = [];
+  misAlumnosCargados: any[] = [];
+  activeDocente: UserProfile | null = null;
 
-  mostrarModal = false;
-  cursoAEditar: Curso | null = null;
-  nuevoEnlace = '';
-
-  ngOnInit(): void {
-    const docenteId = this.auth.currentUser()?.id || 'a0000000-0000-0000-0000-000000000002';
-    this.cursoService.listarPorDocente(docenteId).subscribe({
-      next: (data) => {
-        this.cursos = data;
-        if (data.length > 0) {
-          this.seleccionarCurso(data[0]);
-        }
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error(err)
-    });
+  ngAfterViewInit(): void {
+    if (typeof window !== 'undefined') {
+      (window as any).switchDocenteTab = (tab: string) => this.switchDocenteTab(tab);
+      (window as any).abrirModalEnlace = (id: string, url: string) => this.abrirModalEnlace(id, url);
+      (window as any).abrirModalAula = (id: string, sede: string, aula: string) => this.abrirModalAula(id, sede, aula);
+      (window as any).verAlumnosDirecto = (id: string) => this.verAlumnosDirecto(id);
+    }
+    this.initPortalDocente();
   }
 
-  seleccionarCurso(curso: Curso): void {
-    this.cursoSeleccionado = curso;
-    this.pedidoService.listarParticipantesPorCurso(curso.id).subscribe({
-      next: (data) => {
-        this.participantes = data;
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error(err)
-    });
+  imprimirNomina(): void {
+    if (typeof window !== 'undefined') window.print();
   }
 
-  abrirModalEnlace(curso: Curso): void {
-    this.cursoAEditar = curso;
-    this.nuevoEnlace = curso.enlaceClase || 'https://meet.google.com/abc-defg-hij';
-    this.mostrarModal = true;
+  async initPortalDocente(): Promise<void> {
+    this.activeDocente = this.authService.getCurrentUser();
+
+    if (!this.activeDocente) {
+      this.notifications.showToast('Por favor inicia sesión con tu cuenta de docente.', 'info');
+      setTimeout(() => {
+        this.router.navigateByUrl('/login?redirect=portal-docente.html');
+      }, 400);
+      return;
+    }
+
+    if (this.activeDocente.rol !== 'DOCENTE' && this.activeDocente.rol !== 'ADMIN') {
+      this.notifications.showToast('Acceso restringido: Esta sección es exclusiva para docentes.', 'warning');
+      setTimeout(() => {
+        this.router.navigateByUrl('/mis-cursos');
+      }, 500);
+      return;
+    }
+
+    const elNombre = document.getElementById('docente-nombre-header');
+    const elCorreo = document.getElementById('docente-correo-header');
+    if (elNombre) elNombre.textContent = this.activeDocente.nombres + (this.activeDocente.apellidos ? ' ' + this.activeDocente.apellidos : '');
+    if (elCorreo) elCorreo.textContent = this.activeDocente.correo;
+
+    this.authService.updateNavbar();
+
+    const hashTab = (window.location.hash || '').replace('#', '').toLowerCase();
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryTab = (urlParams.get('tab') || '').toLowerCase();
+    const initialTab = hashTab || queryTab || 'cursos';
+    this.switchDocenteTab(initialTab, false);
+
+    await this.cargarCursosDelDocente();
   }
 
-  guardarEnlace(): void {
-    if (this.cursoAEditar && this.nuevoEnlace) {
-      this.cursoService.actualizarEnlace(this.cursoAEditar.id, this.nuevoEnlace).subscribe({
-        next: (updated) => {
-          this.cursoAEditar!.enlaceClase = updated.enlaceClase;
-          this.mostrarModal = false;
-        },
-        error: (err) => console.error(err)
+  async cargarCursosDelDocente(): Promise<void> {
+    const container = document.getElementById('docente-cursos-container');
+    const selectParticipantes = document.getElementById('select-curso-participantes') as HTMLSelectElement | null;
+
+    try {
+      const docenteId = this.activeDocente?.id || 'a0000000-0000-0000-0000-000000000002';
+      this.misCursosDocente = await this.cursoService.obtenerCursosDocente(docenteId);
+
+      const totalCursosEl = document.getElementById('docente-total-cursos');
+      const totalAlumnosEl = document.getElementById('docente-total-alumnos');
+
+      let totalInscritos = 0;
+      this.misCursosDocente.forEach(c => {
+        const max = Number(c.aforoMaximo || 30);
+        const disp = Number(c.aforoDisponible !== undefined ? c.aforoDisponible : max);
+        totalInscritos += Math.max(0, max - disp);
       });
+
+      if (totalCursosEl) totalCursosEl.textContent = String(this.misCursosDocente.length);
+      const bDocCursos = document.getElementById('docente-tab-badge-cursos');
+      if (bDocCursos) bDocCursos.textContent = String(this.misCursosDocente.length);
+
+      if (totalAlumnosEl) totalAlumnosEl.textContent = String(totalInscritos);
+      const bDocAlumnos = document.getElementById('docente-tab-badge-alumnos');
+      if (bDocAlumnos) bDocAlumnos.textContent = String(totalInscritos);
+
+      if (selectParticipantes) {
+        selectParticipantes.innerHTML = `
+          <option value="TODOS" selected>-- Todos mis cursos asignados --</option>
+          ${this.misCursosDocente.map(c => `<option value="${c.id}">${c.titulo} (${c.modalidad})</option>`).join('')}
+        `;
+      }
+
+      const curHashInit = (window.location.hash || '').replace('#', '').toLowerCase();
+      if (curHashInit === 'alumnos') {
+        this.cargarAlumnosDeCurso('TODOS');
+      }
+
+      this.renderCursosDocente(this.misCursosDocente);
+    } catch (err: any) {
+      if (container) {
+        container.innerHTML = `
+          <div class="col-12 text-center py-4">
+            <p class="text-danger">No se pudieron cargar los cursos del docente: ${err?.message}</p>
+          </div>
+        `;
+      }
+    }
+  }
+
+  private renderCursosDocente(lista: CursoModel[]): void {
+    const container = document.getElementById('docente-cursos-container');
+    if (!container) return;
+
+    if (!lista || lista.length === 0) {
+      container.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <div style="max-width: 450px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <i class="fa fa-folder-open-o fa-3x text-muted mb-2"></i>
+            <h5 style="color: #0f172a; font-weight: 700;">No tienes cursos asignados</h5>
+            <p class="text-muted" style="font-size: 13.5px;">Comunícate con el administrador para vincular tus cursos de especialización.</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = lista.map(c => {
+      const isVirtual = c.modalidad === 'VIRTUAL';
+      const max = Number(c.aforoMaximo || 30);
+      const disp = Number(c.aforoDisponible !== undefined ? c.aforoDisponible : max);
+      const inscritos = Math.max(0, max - disp);
+
+      const badgeMod = isVirtual
+        ? `<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 11.5px; font-weight: 700;"><i class="fa fa-video-camera me-1"></i> Virtual en Vivo</span>`
+        : `<span class="badge" style="background: #fefce8; color: #a16207; border: 1px solid #fef08a; font-size: 11.5px; font-weight: 700;"><i class="fa fa-building me-1"></i> Presencial</span>`;
+
+      const safeEnlace = (c.enlaceClase || '').replace(/'/g, "\\'");
+      const safeSede = (c.direccionClase || '').replace(/'/g, "\\'");
+      const safeAula = (c.aula || '').replace(/'/g, "\\'");
+
+      return `
+        <div class="col-lg-6 col-12 mb-4">
+          <div style="background: #ffffff; border: 1px solid #eef2f6; border-top: 3px solid #2eca7f; border-radius: 10px; padding: 22px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                ${badgeMod}
+                <span class="badge bg-light text-dark border font-monospace" style="font-size: 12px;">
+                  <i class="fa fa-users text-success me-1"></i> ${inscritos} / ${max} Alumnos
+                </span>
+              </div>
+              <h4 style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">
+                ${c.titulo}
+              </h4>
+              <p class="text-muted" style="font-size: 13px; line-height: 1.45; margin-bottom: 14px;">
+                ${c.descripcion || 'Especialización oficial con certificación.'}
+              </p>
+
+              <div class="mb-3 pt-2 border-top" style="font-size: 12.5px; color: #475569;">
+                <div class="mb-1"><i class="fa fa-calendar text-muted me-2"></i><strong>Horario:</strong> ${c.horario || 'Por coordinar'}</div>
+                ${isVirtual ? `
+                  <div class="text-truncate">
+                    <i class="fa fa-link text-success me-2"></i><strong>Enlace en vivo:</strong> 
+                    <a href="${c.enlaceClase || '#'}" target="_blank" class="fw-bold text-success">${c.enlaceClase || 'No asignado todavía'}</a>
+                  </div>
+                ` : `
+                  <div class="mb-1"><i class="fa fa-map-marker text-danger me-2"></i><strong>Sede:</strong> ${c.direccionClase || 'Campus Central'}</div>
+                  <div><i class="fa fa-graduation-cap text-warning me-2"></i><strong>Aula:</strong> ${c.aula || 'Laboratorio 204'}</div>
+                `}
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 pt-3 border-top justify-content-between align-items-center">
+              ${isVirtual ? `
+                <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" onclick="window.abrirModalEnlace('${c.id}', '${safeEnlace}')">
+                  <i class="fa fa-pencil me-1"></i> Actualizar Enlace
+                </button>
+              ` : `
+                <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" onclick="window.abrirModalAula('${c.id}', '${safeSede}', '${safeAula}')">
+                  <i class="fa fa-pencil me-1"></i> Actualizar Sede/Aula
+                </button>
+              `}
+              <button type="button" class="btn btn-sm btn-success fw-bold" onclick="window.verAlumnosDirecto('${c.id}')">
+                <i class="fa fa-users me-1"></i> Ver Alumnos (${inscritos})
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  switchDocenteTab(tab: string, updateHash = true): void {
+    if (!['cursos', 'alumnos'].includes(tab)) tab = 'cursos';
+
+    const seccionCursos = document.getElementById('seccion-cursos-docente');
+    const seccionAlumnos = document.getElementById('seccion-alumnos-docente');
+    const btnCursos = document.getElementById('tab-btn-cursos');
+    const btnAlumnos = document.getElementById('tab-btn-alumnos');
+
+    if (tab === 'cursos') {
+      if (seccionCursos) seccionCursos.style.display = 'block';
+      if (seccionAlumnos) seccionAlumnos.style.display = 'none';
+      if (btnCursos) {
+        btnCursos.classList.add('active');
+        btnCursos.setAttribute('aria-selected', 'true');
+      }
+      if (btnAlumnos) {
+        btnAlumnos.classList.remove('active');
+        btnAlumnos.setAttribute('aria-selected', 'false');
+      }
+    } else {
+      if (seccionCursos) seccionCursos.style.display = 'none';
+      if (seccionAlumnos) seccionAlumnos.style.display = 'block';
+      if (btnCursos) {
+        btnCursos.classList.remove('active');
+        btnCursos.setAttribute('aria-selected', 'false');
+      }
+      if (btnAlumnos) {
+        btnAlumnos.classList.add('active');
+        btnAlumnos.setAttribute('aria-selected', 'true');
+      }
+      if (!this.misAlumnosCargados || this.misAlumnosCargados.length === 0) {
+        const select = document.getElementById('select-curso-participantes') as HTMLSelectElement | null;
+        const targetVal = select ? (select.value || 'TODOS') : 'TODOS';
+        this.cargarAlumnosDeCurso(targetVal);
+      }
+    }
+
+    document.querySelectorAll('#main-menu a, #mobile_menu a').forEach(a => a.classList.remove('active'));
+    const navLink = document.getElementById('nav-docente-' + tab);
+    if (navLink) navLink.classList.add('active');
+
+    if (updateHash && typeof history !== 'undefined' && history.replaceState) {
+      history.replaceState(null, '', '#' + tab);
+    }
+  }
+
+  filtrarAlumnosDocenteEnTabla(keyword: string): void {
+    const q = (keyword || '').toLowerCase().trim();
+    if (!q) {
+      this.renderTablaAlumnosDocente(this.misAlumnosCargados);
+      return;
+    }
+
+    const filtrados = this.misAlumnosCargados.filter(p => {
+      const est = p.estudiante || {};
+      const nombre = (est.nombres && est.apellidos) ? `${est.nombres} ${est.apellidos}` : (p.estudianteNombre || '');
+      const dni = est.dni || '';
+      const correo = est.correo || '';
+      const curso = p.cursoTitulo || '';
+      return nombre.toLowerCase().includes(q) || dni.toLowerCase().includes(q) || correo.toLowerCase().includes(q) || curso.toLowerCase().includes(q);
+    });
+
+    this.renderTablaAlumnosDocente(filtrados);
+  }
+
+  private renderTablaAlumnosDocente(pedidos: any[]): void {
+    const tbody = document.getElementById('tabla-participantes-body');
+    if (!tbody) return;
+
+    if (!pedidos || !Array.isArray(pedidos) || pedidos.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="text-center py-5">
+            <i class="fa fa-info-circle text-muted fa-2x mb-2 d-block"></i>
+            <span class="text-muted fw-bold">No se encontraron estudiantes matriculados para este criterio.</span>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = pedidos.map((p, idx) => {
+      const est = p.estudiante || {};
+      const comp = p.comprobante || {};
+      const nombreCompleto = (est.nombres && est.apellidos)
+        ? `${est.nombres} ${est.apellidos}`
+        : (p.estudianteNombre || 'Estudiante Registrado');
+      const dni = est.dni || '72481930';
+      const correo = est.correo || 'correo@estudiante.edu.pe';
+      const rawWhatsapp = est.whatsapp || '+51999555666';
+      const cleanWhatsapp = rawWhatsapp.replace(/[^0-9]/g, '');
+
+      const rawFecha = p.fechaRegistro || p.createdAt || p.fechaActualizacion;
+      const fechaStr = rawFecha
+        ? new Date(rawFecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })
+        : 'Reciente';
+
+      const tituloCurso = p.cursoTitulo || 'Curso Especializado';
+      const mod = p.modalidad || 'VIRTUAL';
+      const modBadge = mod === 'PRESENCIAL'
+        ? '<span class="badge bg-warning text-dark ms-1" style="font-size: 10px;">Presencial</span>'
+        : '<span class="badge bg-info text-dark ms-1" style="font-size: 10px;">Virtual</span>';
+
+      const compText = (comp.serie && comp.numeroCorrelativo)
+        ? `${comp.serie}-${String(comp.numeroCorrelativo).padStart(6, '0')}`
+        : (p.codigoOrden || 'ORD-MAT');
+
+      const iniciales = nombreCompleto.split(' ').map((n: string) => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'AL';
+
+      return `
+        <tr>
+          <td class="text-muted fw-bold">${idx + 1}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div style="width: 34px; height: 34px; border-radius: 50%; background: rgba(46, 202, 127, 0.15); color: #16a34a; font-weight: 800; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                ${iniciales}
+              </div>
+              <div>
+                <strong style="color: #0f172a; font-size: 14px; display: block;">${nombreCompleto}</strong>
+                <span class="text-muted" style="font-size: 11.5px;"><i class="fa fa-id-card-o me-1"></i>DNI: ${dni}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="fw-bold" style="color: #1e293b; font-size: 13px;">${tituloCurso}</span>
+            ${modBadge}
+          </td>
+          <td>
+            <a href="mailto:${correo}" class="text-decoration-none text-secondary" style="font-size: 13px;">
+              <i class="fa fa-envelope-o me-1 text-muted"></i>${correo}
+            </a>
+          </td>
+          <td>
+            <a href="https://wa.me/${cleanWhatsapp}" target="_blank" rel="noopener noreferrer" class="badge bg-light text-success text-decoration-none border px-2 py-1" style="font-size: 12px;" title="Chatear en WhatsApp">
+              <i class="fa fa-whatsapp text-success me-1"></i>${rawWhatsapp}
+            </a>
+          </td>
+          <td class="text-muted" style="font-size: 13px;">
+            <i class="fa fa-calendar-o me-1"></i>${fechaStr}
+          </td>
+          <td>
+            <span class="status-pill-success" style="font-size: 11.5px; padding: 4px 10px;">
+              <i class="fa fa-check-circle me-1"></i>Pagado
+            </span>
+          </td>
+          <td>
+            <span class="font-monospace text-primary fw-bold" style="font-size: 12px; background: #eff6ff; padding: 3px 8px; border-radius: 6px; border: 1px solid #dbeafe;">
+              ${compText}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  verAlumnosDirecto(cursoId: string): void {
+    this.switchDocenteTab('alumnos');
+    const select = document.getElementById('select-curso-participantes') as HTMLSelectElement | null;
+    if (select) {
+      select.value = cursoId;
+      this.cargarAlumnosDeCurso(cursoId);
+    }
+  }
+
+  async cargarAlumnosDeCurso(cursoId: string): Promise<void> {
+    const tbody = document.getElementById('tabla-participantes-body');
+    if (!tbody) return;
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center py-4 text-muted">
+          <i class="fa fa-spinner fa-spin me-2 text-success"></i>Consultando participantes matriculados...
+        </td>
+      </tr>
+    `;
+
+    try {
+      let pedidos: any[] = [];
+
+      if (!cursoId || cursoId === 'TODOS') {
+        if (!this.misCursosDocente || this.misCursosDocente.length === 0) {
+          const docId = this.activeDocente?.id || 'a0000000-0000-0000-0000-000000000002';
+          this.misCursosDocente = await this.cursoService.obtenerCursosDocente(docId);
+        }
+
+        const cursosMap = new Map((this.misCursosDocente || []).map(c => [c.id, c]));
+        const todosPedidos = await this.pedidoService.obtenerTodosPedidos();
+        pedidos = (todosPedidos || []).filter(p => p.estado === 'PAGADO' && (cursosMap.size === 0 || cursosMap.has(p.cursoId)));
+        pedidos.forEach(p => {
+          const c = cursosMap.get(p.cursoId);
+          if (c) {
+            if (!p.cursoTitulo) p.cursoTitulo = c.titulo;
+            if (!p.modalidad) p.modalidad = c.modalidad;
+          }
+        });
+      } else {
+        pedidos = await this.pedidoService.obtenerParticipantesCurso(cursoId);
+        const curso = (this.misCursosDocente || []).find(c => c.id === cursoId);
+        if (curso) {
+          (pedidos || []).forEach(p => {
+            if (!p.cursoTitulo) p.cursoTitulo = curso.titulo;
+            if (!p.modalidad) p.modalidad = curso.modalidad;
+          });
+        }
+      }
+
+      this.misAlumnosCargados = pedidos || [];
+
+      if (!cursoId || cursoId === 'TODOS') {
+        const bDocAlumnos = document.getElementById('docente-tab-badge-alumnos');
+        if (bDocAlumnos) bDocAlumnos.textContent = String(this.misAlumnosCargados.length);
+        const totalAlumnosEl = document.getElementById('docente-total-alumnos');
+        if (totalAlumnosEl) totalAlumnosEl.textContent = String(this.misAlumnosCargados.length);
+      }
+
+      const sInput = document.getElementById('buscador-alumnos-docente') as HTMLInputElement | null;
+      if (sInput) sInput.value = '';
+
+      this.renderTablaAlumnosDocente(this.misAlumnosCargados);
+    } catch (err: any) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="text-center py-4 text-danger">
+            <i class="fa fa-exclamation-triangle me-1"></i>No se pudieron cargar los alumnos: ${err?.message}
+          </td>
+        </tr>
+      `;
+    }
+  }
+
+  abrirModalEnlace(cursoId: string, enlaceActual: string): void {
+    const modal = document.getElementById('modal-actualizar-enlace');
+    const inputId = document.getElementById('edit-enlace-curso-id') as HTMLInputElement | null;
+    const inputUrl = document.getElementById('edit-enlace-input') as HTMLInputElement | null;
+    if (inputId) inputId.value = cursoId;
+    if (inputUrl) inputUrl.value = enlaceActual || '';
+    if (modal) modal.style.display = 'flex';
+  }
+
+  cerrarModalEnlace(): void {
+    const modal = document.getElementById('modal-actualizar-enlace');
+    if (modal) modal.style.display = 'none';
+  }
+
+  async guardarEnlaceClase(): Promise<void> {
+    const inputId = document.getElementById('edit-enlace-curso-id') as HTMLInputElement | null;
+    const inputUrl = document.getElementById('edit-enlace-input') as HTMLInputElement | null;
+    const btn = document.getElementById('btn-guardar-enlace') as HTMLButtonElement | null;
+
+    const cursoId = inputId ? inputId.value : null;
+    const enlace = inputUrl ? inputUrl.value.trim() : '';
+
+    if (!cursoId || !enlace) {
+      this.notifications.showToast('Ingresa un enlace válido de clase (Zoom / Meet).', 'warning');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Guardando...`;
+    }
+
+    try {
+      await this.cursoService.actualizarEnlace(cursoId, enlace);
+      this.notifications.showToast('¡Enlace de clase actualizado exitosamente!', 'success');
+      this.cerrarModalEnlace();
+      await this.cargarCursosDelDocente();
+    } catch (err: any) {
+      this.notifications.showToast('Error al actualizar enlace: ' + err?.message, 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa fa-save me-1"></i> Guardar Enlace`;
+      }
+    }
+  }
+
+  abrirModalAula(cursoId: string, sedeActual: string, aulaActual: string): void {
+    const modal = document.getElementById('modal-actualizar-aula');
+    const inputId = document.getElementById('edit-aula-curso-id') as HTMLInputElement | null;
+    const inputSede = document.getElementById('edit-sede-input') as HTMLInputElement | null;
+    const inputAula = document.getElementById('edit-aula-input') as HTMLInputElement | null;
+
+    if (inputId) inputId.value = cursoId;
+    if (inputSede) inputSede.value = sedeActual || '';
+    if (inputAula) inputAula.value = aulaActual || '';
+    if (modal) modal.style.display = 'flex';
+  }
+
+  cerrarModalAula(): void {
+    const modal = document.getElementById('modal-actualizar-aula');
+    if (modal) modal.style.display = 'none';
+  }
+
+  async guardarAulaSede(): Promise<void> {
+    const inputId = document.getElementById('edit-aula-curso-id') as HTMLInputElement | null;
+    const inputSede = document.getElementById('edit-sede-input') as HTMLInputElement | null;
+    const inputAula = document.getElementById('edit-aula-input') as HTMLInputElement | null;
+    const btn = document.getElementById('btn-guardar-aula') as HTMLButtonElement | null;
+
+    const cursoId = inputId ? inputId.value : null;
+    const sede = inputSede ? inputSede.value.trim() : '';
+    const aula = inputAula ? inputAula.value.trim() : '';
+
+    if (!cursoId || !sede || !aula) {
+      this.notifications.showToast('Por favor completa tanto la sede como el aula.', 'warning');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Guardando...`;
+    }
+
+    try {
+      await this.cursoService.actualizarDatosClase(cursoId, {
+        modalidad: 'PRESENCIAL',
+        direccionClase: sede,
+        aula
+      });
+      this.notifications.showToast('¡Datos de sede y aula actualizados exitosamente!', 'success');
+      this.cerrarModalAula();
+      await this.cargarCursosDelDocente();
+    } catch (err: any) {
+      this.notifications.showToast('Error al actualizar datos: ' + err?.message, 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa fa-save me-1"></i> Guardar Cambios`;
+      }
     }
   }
 }

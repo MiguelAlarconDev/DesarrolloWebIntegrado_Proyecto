@@ -15,6 +15,9 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(IllegalArgumentException ex) {
+        if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("credenciales")) {
+            return respuesta(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        }
         return respuesta(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 

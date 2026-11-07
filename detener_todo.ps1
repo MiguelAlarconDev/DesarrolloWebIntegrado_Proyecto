@@ -7,6 +7,7 @@ if ($conns) {
     $pids = $conns | Select-Object -ExpandProperty OwningProcess -Unique
     foreach ($p in $pids) {
         try {
+            taskkill /F /T /PID $p 2>$null
             Stop-Process -Id $p -Force -ErrorAction SilentlyContinue
             Write-Host "Proceso $p detenido." -ForegroundColor Green
         } catch {
@@ -17,6 +18,5 @@ if ($conns) {
     Write-Host "No habia puertos activos ocupados." -ForegroundColor Cyan
 }
 
-# Limpiar posibles cmd asociados huerfanos si los hay
 Get-Process -Name java -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Write-Host "Servicios detenidos completamente." -ForegroundColor Green

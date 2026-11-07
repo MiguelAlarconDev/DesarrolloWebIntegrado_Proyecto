@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,28 +59,29 @@ public class MercadoPagoClient {
             String tituloCurso = (curso != null && curso.getTitulo() != null) ? curso.getTitulo() : "Curso Plataforma";
             String descCurso = (curso != null && curso.getDescripcion() != null) ? curso.getDescripcion() : tituloCurso;
 
-            Map<String, Object> body = Map.of(
-                    "items", List.of(Map.of(
-                            "id", pedido.getCursoId().toString(),
-                            "title", tituloCurso,
-                            "description", descCurso,
-                            "quantity", 1,
-                            "unit_price", pedido.getMonto(),
-                            "currency_id", "PEN"
-                    )),
-                    "payer", Map.of(
-                            "name", nombrePayer,
-                            "surname", apellidoPayer,
-                            "email", correoPayer
-                    ),
-                    "back_urls", Map.of(
-                            "success", backUrlSuccess,
-                            "failure", backUrlFailure,
-                            "pending", backUrlPending
-                    ),
-                    "auto_return", "approved",
-                    "external_reference", pedido.getId().toString()
-            );
+            Map<String, Object> body = new HashMap<>();
+            body.put("items", List.of(Map.of(
+                    "id", pedido.getCursoId().toString(),
+                    "title", tituloCurso,
+                    "description", descCurso,
+                    "quantity", 1,
+                    "unit_price", pedido.getMonto(),
+                    "currency_id", "PEN"
+            )));
+            body.put("payer", Map.of(
+                    "name", nombrePayer,
+                    "surname", apellidoPayer,
+                    "email", correoPayer
+            ));
+            body.put("back_urls", Map.of(
+                    "success", backUrlSuccess,
+                    "failure", backUrlFailure,
+                    "pending", backUrlPending
+            ));
+            if (backUrlSuccess != null && backUrlSuccess.toLowerCase().startsWith("https://")) {
+                body.put("auto_return", "approved");
+            }
+            body.put("external_reference", pedido.getId().toString());
 
             Map<String, Object> response = restClient.post()
                     .uri("/checkout/preferences")
@@ -102,7 +104,8 @@ public class MercadoPagoClient {
             log.error("[MERCADO PAGO] Error al crear preferencia: {}", ex.getMessage());
         }
 
-        return new PreferenciaResponse("PREF-FALLBACK-" + pedido.getId(), null);
+        String fallbackUrl = "https://sandbox.mercadopago.com.pe/checkout/v1/redirect?pref_id=" + pedido.getId();
+        return new PreferenciaResponse("PREF-FALLBACK-" + pedido.getId(), fallbackUrl);
     }
 
     public Map<String, Object> consultarPago(String paymentId) {

@@ -1,268 +1,263 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule],
+  encapsulation: ViewEncapsulation.None,
   template: `
-    <div class="flex-1 min-h-[calc(100vh-4rem)] flex items-stretch">
-      <div class="w-full grid grid-cols-1 lg:grid-cols-2">
-        
-        <!-- Left Panel: Corporate Security Showcase (50%) -->
-        <div class="hidden lg:flex flex-col justify-between bg-gradient-to-br from-brand-950 via-brand-900 to-slate-900 text-white p-12">
-          <div>
-            <div class="flex items-center gap-3 mb-8">
-              <div class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
-                <i class="fa-solid fa-graduation-cap"></i>
-              </div>
-              <span class="font-heading font-extrabold text-2xl tracking-tight">Cursos<span class="text-brand-400">Pro</span></span>
-            </div>
+	<!-- START SECTION TOP  -->
+	<section class="section-top">
+		<div class="container">
+			<div class="col-lg-10 offset-lg-1 text-center">
+				<div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s">
+					<h1>Ingreso de Alumnos</h1>
+					<ul>
+						<li><a href="/">Inicio</a></li>
+						<li> / Iniciar Sesión</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>	
+	<!-- END SECTION TOP -->
 
-            <div class="max-w-md">
-              <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30 inline-block mb-4">
-                CAMPUS VIRTUAL SEGURO
-              </span>
-              <h2 class="font-heading text-3xl font-extrabold leading-tight mb-4">
-                Acceso al Entorno Académico y Gestión Docente
-              </h2>
-              <p class="text-sm text-slate-300 leading-relaxed mb-6">
-                Protección avanzada con verificación en dos pasos (2FA OTP) para docentes y administradores.
-              </p>
+	<!-- START LOGIN  -->
+	<section class="login_register section-padding">
+		<div class="container">
+			<div class="row">				
+				<div class="col-lg-6 offset-lg-3 col-xs-12">
+					<div class="login">
+						<h4 class="login_register_title">Ingreso al Sistema Multirrol:</h4>
+						<p class="text-muted" style="font-size: 13.5px; margin-top: -10px; margin-bottom: 20px;">
+							Accede directamente a tu plataforma especializada: <strong>Estudiante</strong>, <strong>Docente</strong> o <strong>Administrador</strong>.
+						</p>
 
-              <div class="space-y-3 pt-6 border-t border-slate-800 text-xs text-slate-300">
-                <div class="flex items-center gap-2.5">
-                  <i class="fa-solid fa-shield-halved text-emerald-400"></i> Autenticación multifactor con código de 6 dígitos
-                </div>
-                <div class="flex items-center gap-2.5">
-                  <i class="fa-solid fa-clock text-amber-400"></i> Tokens OTP con vigencia dinámica de 5 minutos
-                </div>
-                <div class="flex items-center gap-2.5">
-                  <i class="fa-solid fa-lock text-brand-400"></i> Cifrado de canal SSL y sesiones aisladas
-                </div>
-              </div>
-            </div>
-          </div>
+						<!-- Accesos Rápidos por Perfil -->
+						<div class="mb-4 p-3" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
+							<span class="d-block text-muted mb-2" style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+								<i class="fa fa-bolt text-warning me-1"></i> Accesos Rápidos de Prueba (1 Clic)
+							</span>
+							<div class="d-grid gap-2">
+								<button type="button" class="btn btn-sm text-start py-2 px-3" (click)="cargarDemo('estudiante@cursos.com')" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 8px; font-weight: 600; font-size: 13px;">
+									<i class="fa fa-graduation-cap me-2 text-primary"></i> <strong>Portal Estudiante:</strong> Carlos Alarcón
+								</button>
+								<button type="button" class="btn btn-sm text-start py-2 px-3" (click)="cargarDemo('docente@cursos.com')" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; border-radius: 8px; font-weight: 600; font-size: 13px;">
+									<i class="fa fa-briefcase me-2 text-success"></i> <strong>Portal Docente:</strong> Prof. Roberto Mendoza
+								</button>
+								<button type="button" class="btn btn-sm text-start py-2 px-3" (click)="cargarDemo('admin@cursos.com')" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; border-radius: 8px; font-weight: 600; font-size: 13px;">
+									<i class="fa fa-shield me-2 text-purple" style="color: #9333ea;"></i> <strong>Portal Administrador:</strong> Admin General
+								</button>
+							</div>
+						</div>
 
-          <div class="text-xs text-slate-400 border-t border-slate-800 pt-6">
-            © 2026 CursosPro • Marcos de Desarrollo Web Integrado
-          </div>
-        </div>
+						<form id="login-form" (submit)="hacerLogin($event)">
+							<div class="form-group mb-3">
+								<label for="login-email">Correo Electrónico *</label>
+								<input type="email" id="login-email" class="form-control requiredField input-label" required placeholder="tu@correo.com">
+							</div>
+							<div class="form-group mb-3">
+								<label for="login-pwd">Contraseña *</label>
+								<input type="password" id="login-pwd" class="form-control requiredField input-label" required placeholder="Tu contraseña">
+							</div>
+							<div class="form-group col-lg-12">
+								<button class="btn_one w-100" type="submit" id="btn-login">Iniciar Sesión</button>
+							</div>
+						</form>
 
-        <!-- Right Panel: Login & 2FA Container (50%) -->
-        <div class="flex items-center justify-center p-6 sm:p-12 bg-slate-50">
-          <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
-            
-            @if (!requiere2fa) {
-              
-              <!-- State 1: Credenciales Estándar -->
-              <div>
-                <div class="text-center mb-6">
-                  <h2 class="font-heading font-extrabold text-2xl text-slate-900 mb-1">Iniciar Sesión</h2>
-                  <p class="text-xs text-slate-500">Ingresa tus credenciales institucionales</p>
-                </div>
+						<p class="mt-4 text-center">¿Eres nuevo estudiante? <a href="/registro" class="fw-bold text-success">Regístrate aquí</a></p>
+					</div>
 
-                <!-- Credenciales demo rápidas -->
-                <div class="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200 text-[11px] text-slate-600 space-y-1">
-                  <div class="font-bold text-slate-700">Cuentas preconfiguradas (Seed):</div>
-                  <div>• <strong>Docente (con 2FA):</strong> docente&#64;cursos.com | 123456</div>
-                  <div>• <strong>Admin (con 2FA):</strong> admin&#64;cursos.com | 123456</div>
-                  <div>• <strong>Estudiante:</strong> estudiante&#64;cursos.com | 123456</div>
-                </div>
+					<!-- MODAL DE VERIFICACIÓN 2FA -->
+					<div id="modal-2fa" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+						<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 440px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); border: 1px solid #e2e8f0; animation: toastSlideInRight 0.3s ease;">
+							<div class="text-center mb-3">
+								<div style="width: 52px; height: 52px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px;">
+									<i class="fa fa-shield"></i>
+								</div>
+								<h4 style="font-weight: 800; color: #0f172a; margin-bottom: 4px;">Verificación 2FA</h4>
+								<p class="text-muted" style="font-size: 13.5px; margin: 0;">Ingresa tu código de seguridad para acceder a tu portal.</p>
+							</div>
 
-                @if (errorMensaje) {
-                  <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 mb-4">
-                    {{ errorMensaje }}
-                  </div>
-                }
+							<div id="modal-2fa-msg"></div>
 
-                <form (ngSubmit)="iniciarSesion()" class="space-y-4 text-xs">
-                  <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Correo Electrónico</label>
-                    <input 
-                      type="email" 
-                      [(ngModel)]="correo" 
-                      name="correo" 
-                      required
-                      placeholder="usuario@cursos.com" 
-                      class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-brand-600 focus:bg-white text-xs">
-                  </div>
+							<div class="form-group mb-3">
+								<label for="otp-code-input" style="font-size: 12.5px; font-weight: 700; color: #334155;">Código OTP (6 Dígitos):</label>
+								<input type="text" id="otp-code-input" class="form-control text-center" maxlength="6" placeholder="Ej: 123456" style="font-size: 22px; font-weight: 800; letter-spacing: 6px; height: 48px; border: 2px solid #cbd5e1; border-radius: 8px;">
+							</div>
 
-                  <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Contraseña</label>
-                    <input 
-                      type="password" 
-                      [(ngModel)]="password" 
-                      name="password" 
-                      required
-                      placeholder="••••••••" 
-                      class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-brand-600 focus:bg-white text-xs">
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    [disabled]="cargando"
-                    class="w-full py-3 bg-brand-900 hover:bg-brand-800 disabled:bg-slate-300 text-white font-bold text-xs rounded-lg shadow-sm transition">
-                    @if (cargando) {
-                      <i class="fa-solid fa-circle-notch fa-spin"></i> Validando credenciales...
-                    } @else {
-                      Ingresar al Campus
-                    }
-                  </button>
-                </form>
-
-                <div class="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
-                  ¿Aún no tienes cuenta? 
-                  <a routerLink="/registro" class="font-bold text-brand-700 hover:text-brand-900">Regístrate como estudiante</a>
-                </div>
-              </div>
-
-            } @else {
-
-              <!-- State 2: Verificación 2FA OTP -->
-              <div>
-                <div class="text-center mb-6">
-                  <div class="w-12 h-12 rounded-full bg-blue-100 text-brand-900 flex items-center justify-center text-xl mx-auto mb-3 shadow-2xs">
-                    <i class="fa-solid fa-shield-halved"></i>
-                  </div>
-                  <h2 class="font-heading font-extrabold text-xl text-slate-900 mb-1">Verificación en Dos Pasos (2FA)</h2>
-                  <p class="text-xs text-slate-500">Se requiere confirmación para usuarios con rol Docente o Admin</p>
-                </div>
-
-                <!-- OTP Display notice -->
-                <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl text-xs text-blue-900 mb-4">
-                  <div class="flex items-center gap-1.5 font-bold mb-1">
-                    <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i> Código OTP generado
-                  </div>
-                  <p class="text-[11px] text-blue-800 leading-relaxed">
-                    Hemos generado el código para <strong>{{ correo }}</strong>. (Para fines de prueba, el código es: <strong class="text-brand-900 font-mono text-sm">{{ codigo2faGenerado }}</strong>).
-                  </p>
-                </div>
-
-                <div class="flex items-center justify-center gap-2 mb-2 p-2 bg-amber-50 rounded-lg text-xs font-bold text-amber-900">
-                  <i class="fa-solid fa-stopwatch text-amber-600"></i>
-                  <span>Código válido por 5 minutos</span>
-                </div>
-
-                @if (errorMensaje) {
-                  <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 mb-4">
-                    {{ errorMensaje }}
-                  </div>
-                }
-
-                <form (ngSubmit)="verificarOtp()" class="space-y-4 text-xs">
-                  <div>
-                    <label class="block font-semibold text-slate-700 mb-1 text-center">Ingresa el código de 6 dígitos</label>
-                    <input 
-                      type="text" 
-                      maxlength="6"
-                      [(ngModel)]="codigoOtp" 
-                      name="codigoOtp" 
-                      required
-                      placeholder="000000" 
-                      class="w-full tracking-widest text-center font-mono text-xl font-bold py-2.5 bg-slate-50 border-2 border-brand-800 rounded-lg focus:outline-none focus:bg-white text-brand-950">
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    [disabled]="cargando"
-                    class="w-full py-3 bg-brand-900 hover:bg-brand-800 disabled:bg-slate-300 text-white font-bold text-xs rounded-lg shadow-sm transition">
-                    @if (cargando) {
-                      <i class="fa-solid fa-circle-notch fa-spin"></i> Verificando OTP...
-                    } @else {
-                      Verificar y Acceder al Panel
-                    }
-                  </button>
-                </form>
-
-                <div class="mt-6 pt-4 border-t border-slate-100 text-center text-xs">
-                  <button (click)="requiere2fa = false" class="text-slate-500 hover:text-slate-800">
-                    ← Volver a inicio de sesión
-                  </button>
-                </div>
-              </div>
-
-            }
-
-          </div>
-        </div>
-
-      </div>
-    </div>
+							<div class="d-grid gap-2">
+								<button type="button" id="btn-confirmar-2fa" class="btn_one w-100" (click)="confirmar2fa()">
+									<i class="fa fa-unlock-alt me-1"></i> Verificar y Entrar al Portal
+								</button>
+								<button type="button" class="btn btn-outline-secondary btn-sm" (click)="cerrarModal2fa()" style="border-radius: 6px; font-weight: 600;">
+									Cancelar
+								</button>
+							</div>
+						</div>
+					</div>
+				</div><!--- END COL -->	
+			</div><!--- END ROW -->
+		</div><!--- END CONTAINER -->
+	</section>
+	<!-- END LOGIN -->
   `
 })
-export class LoginComponent {
-  private auth = inject(AuthService);
+export class LoginComponent implements AfterViewInit {
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
+  private cartService = inject(CartService);
+  private notifications = inject(NotificationService);
 
-  correo = '';
-  password = '';
-  codigoOtp = '';
-  codigo2faGenerado = '';
+  pending2faCorreo = '';
 
-  requiere2fa = false;
-  cargando = false;
-  errorMensaje = '';
+  ngAfterViewInit(): void {
+    this.authService.updateNavbar();
+    this.cartService.updateBadge();
+    const params = new URLSearchParams(window.location.search);
+    const redirectUrl = params.get('redirect');
+    if (redirectUrl) {
+      this.notifications.showToast('Ingresa con tu usuario para completar tu inscripción.', 'info');
+      const linkReg = document.querySelector('a[href="/registro"]') as HTMLAnchorElement | null;
+      if (linkReg) {
+        linkReg.href = '/registro?redirect=' + encodeURIComponent(redirectUrl);
+      }
+    }
+  }
 
-  iniciarSesion(): void {
-    if (!this.correo || !this.password) {
-      this.errorMensaje = 'Por favor ingrese correo y contraseña.';
+  async hacerLogin(e?: Event): Promise<void> {
+    if (e && e.preventDefault) e.preventDefault();
+    const emailEl = document.getElementById('login-email') as HTMLInputElement | null;
+    const pwdEl = document.getElementById('login-pwd') as HTMLInputElement | null;
+    const btn = document.getElementById('btn-login') as HTMLButtonElement | null;
+
+    const email = emailEl ? emailEl.value.trim() : '';
+    const pwd = pwdEl ? pwdEl.value.trim() : '';
+
+    if (!email || !pwd) {
+      this.notifications.showToast('Por favor ingresa tu correo y contraseña.', 'warning');
       return;
     }
 
-    this.cargando = true;
-    this.errorMensaje = '';
-    this.cdr.detectChanges();
-
-    this.auth.login({ correo: this.correo, password: this.password }).subscribe({
-      next: (res) => {
-        this.cargando = false;
-        if (res.status === 'REQUIRES_2FA') {
-          this.requiere2fa = true;
-          this.codigo2faGenerado = res.codigo2faGenerado || '';
-          this.codigoOtp = '';
-          this.cdr.detectChanges();
-        } else {
-          this.redirigirSegunRol(res.rol);
-        }
-      },
-      error: (err) => {
-        this.cargando = false;
-        this.errorMensaje = 'Error al iniciar sesión: ' + (err.error?.message || err.message);
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  verificarOtp(): void {
-    this.cargando = true;
-    this.errorMensaje = '';
-    this.cdr.detectChanges();
-
-    this.auth.verificar2fa({ correo: this.correo, codigo2fa: this.codigoOtp }).subscribe({
-      next: (res) => {
-        this.cargando = false;
-        this.redirigirSegunRol(res.rol);
-      },
-      error: (err) => {
-        this.cargando = false;
-        this.errorMensaje = 'Código incorrecto o expirado: ' + (err.error?.message || err.message);
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  private redirigirSegunRol(rol?: string): void {
-    if (rol === 'DOCENTE') {
-      this.router.navigate(['/docente']);
-    } else if (rol === 'ADMIN') {
-      this.router.navigate(['/admin']);
-    } else {
-      this.router.navigate(['/mis-cursos']);
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Iniciando Sesión...`;
     }
+
+    try {
+      const res = await this.authService.login(email, pwd);
+
+      if (res.requires2fa) {
+        this.pending2faCorreo = res.correo;
+        this.mostrarModal2fa(res);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `Iniciar Sesión`;
+        }
+        return;
+      }
+
+      this.loginExitoso(res.user);
+    } catch (err: any) {
+      this.notifications.showToast(err?.message || 'Error al iniciar sesión.', 'error');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `Iniciar Sesión`;
+      }
+    }
+  }
+
+  mostrarModal2fa(data: any): void {
+    const modal = document.getElementById('modal-2fa');
+    const boxMsg = document.getElementById('modal-2fa-msg');
+    const inputOtp = document.getElementById('otp-code-input') as HTMLInputElement | null;
+
+    const codeMatch = (data.mensaje || '').match(/\b\d{6}\b/);
+    const code = codeMatch ? codeMatch[0] : '';
+
+    if (boxMsg) {
+      boxMsg.innerHTML = `
+        <div class="alert alert-info py-2 px-3 mb-3" style="font-size: 13px; border-radius: 8px;">
+          <i class="fa fa-shield me-1"></i> Se requiere autenticación 2FA para <strong>${data.nombres || data.correo}</strong> (${data.rol || 'Docente/Admin'}).
+          ${code ? `<div class="mt-2 pt-2 border-top"><strong>Código OTP generado:</strong> <span class="badge bg-dark fs-6 font-monospace ms-1">${code}</span></div>` : ''}
+        </div>
+      `;
+    }
+
+    if (inputOtp && code) {
+      inputOtp.value = code;
+    }
+
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  }
+
+  cerrarModal2fa(): void {
+    const modal = document.getElementById('modal-2fa');
+    if (modal) modal.style.display = 'none';
+  }
+
+  async confirmar2fa(): Promise<void> {
+    const inputOtp = document.getElementById('otp-code-input') as HTMLInputElement | null;
+    const btn = document.getElementById('btn-confirmar-2fa') as HTMLButtonElement | null;
+    const codigo = inputOtp ? inputOtp.value.trim() : '';
+
+    if (!codigo || codigo.length < 4) {
+      this.notifications.showToast('Por favor ingresa el código de 6 dígitos.', 'warning');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Verificando...`;
+    }
+
+    try {
+      const res = await this.authService.verificar2fa(this.pending2faCorreo, codigo);
+      this.cerrarModal2fa();
+      this.loginExitoso(res.user);
+    } catch (err: any) {
+      this.notifications.showToast(err?.message || 'Código 2FA inválido.', 'error');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `Verificar y Entrar`;
+      }
+    }
+  }
+
+  private loginExitoso(user: any): void {
+    this.notifications.showToast(`¡Bienvenido, ${user.nombres}! Accediendo al portal...`, 'success');
+    this.authService.updateNavbar();
+
+    const params = new URLSearchParams(window.location.search);
+    const explicitRedirect = params.get('redirect');
+
+    let destUrl = this.authService.getPortalUrlForRole(user.rol);
+    if (explicitRedirect) {
+      const isStudentUrl = explicitRedirect.includes('mis-cursos') || explicitRedirect.includes('carrito');
+      if ((user.rol === 'ADMIN' || user.rol === 'DOCENTE') && isStudentUrl) {
+        destUrl = this.authService.getPortalUrlForRole(user.rol);
+      } else {
+        destUrl = explicitRedirect;
+      }
+    }
+
+    setTimeout(() => {
+      this.router.navigateByUrl('/' + destUrl.replace(/^\//, ''));
+    }, 350);
+  }
+
+  async cargarDemo(correo: string): Promise<void> {
+    const emailEl = document.getElementById('login-email') as HTMLInputElement | null;
+    const pwdEl = document.getElementById('login-pwd') as HTMLInputElement | null;
+    if (emailEl) emailEl.value = correo;
+    if (pwdEl) pwdEl.value = '123456';
+    await this.hacerLogin();
   }
 }

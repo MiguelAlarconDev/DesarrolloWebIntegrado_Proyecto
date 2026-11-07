@@ -7,6 +7,7 @@ export interface Pedido {
   estado: 'REGISTRADO' | 'PENDIENTE_PAGO' | 'PAGADO' | 'CONFIRMADO' | 'CANCELADO';
   mpPreferenceId?: string;
   mpPaymentId?: string;
+  initPoint?: string;
   reservaExpiraEn?: string;
   fechaRegistro?: string;
   
@@ -37,6 +38,10 @@ export interface PagarPedidoRequest {
   tipoComprobante?: 'BOLETA' | 'FACTURA';
   rucCliente?: string;
   razonSocial?: string;
+  whatsapp?: string;
+  correo?: string;
+  clienteNombres?: string;
+  metodoPago?: string;
 }
 
 export interface Comprobante {

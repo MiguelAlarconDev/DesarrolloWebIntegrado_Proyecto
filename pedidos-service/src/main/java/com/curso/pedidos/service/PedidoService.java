@@ -3,6 +3,7 @@ package com.curso.pedidos.service;
 import com.curso.pedidos.client.AuthClient;
 import com.curso.pedidos.client.CursoClient;
 import com.curso.pedidos.client.MercadoPagoClient;
+import com.curso.pedidos.client.WhatsAppClient;
 import com.curso.pedidos.dto.*;
 import com.curso.pedidos.entity.*;
 import com.curso.pedidos.repository.ComprobanteRepository;
@@ -28,6 +29,7 @@ public class PedidoService {
     private final CursoClient cursoClient;
     private final MercadoPagoClient mercadoPagoClient;
     private final com.curso.pedidos.client.ComprobanteClient comprobanteClient;
+    private final WhatsAppClient whatsAppClient;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ComprobanteRepository comprobanteRepository,
@@ -35,7 +37,8 @@ public class PedidoService {
                          AuthClient authClient,
                          CursoClient cursoClient,
                          MercadoPagoClient mercadoPagoClient,
-                         com.curso.pedidos.client.ComprobanteClient comprobanteClient) {
+                         com.curso.pedidos.client.ComprobanteClient comprobanteClient,
+                         WhatsAppClient whatsAppClient) {
         this.pedidoRepository = pedidoRepository;
         this.comprobanteRepository = comprobanteRepository;
         this.notificacionRepository = notificacionRepository;
@@ -43,6 +46,7 @@ public class PedidoService {
         this.cursoClient = cursoClient;
         this.mercadoPagoClient = mercadoPagoClient;
         this.comprobanteClient = comprobanteClient;
+        this.whatsAppClient = whatsAppClient;
     }
 
     @Transactional
@@ -72,6 +76,7 @@ public class PedidoService {
 
         // Enriquecer datos para la respuesta
         guardado.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
+        guardado.setEstudianteWhatsapp(estudiante.getWhatsapp());
         guardado.setCursoTitulo(cursoActualizado.getTitulo());
         guardado.setHorario(cursoActualizado.getHorario());
         guardado.setModalidad(cursoActualizado.getModalidad());
@@ -138,8 +143,8 @@ public class PedidoService {
         // Generar comprobante electrónico
         generarComprobante(pedidoActualizado, estudiante, curso, request);
 
-        // Despachar notificación de WhatsApp
-        enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
+        // Despachar notificación de WhatsApp (CallMeBot)
+        enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso, request);
 
         enriquecerPedido(pedidoActualizado, estudiante, curso);
         return pedidoActualizado;
@@ -204,6 +209,9 @@ public class PedidoService {
     private void enriquecerPedido(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         if (estudiante != null) {
             pedido.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
+            if (pedido.getEstudianteWhatsapp() == null) {
+                pedido.setEstudianteWhatsapp(estudiante.getWhatsapp());
+            }
         }
         if (curso != null) {
             pedido.setCursoTitulo(curso.getTitulo());
@@ -261,24 +269,37 @@ public class PedidoService {
                 montoTotal, comprobante.getRucCliente() != null ? comprobante.getRucCliente() : "N/A", estudiante.getCorreo());
     }
 
-    private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
+    private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso, PagarPedidoRequest request) {
         String datosClase = obtenerDatosClase(curso);
-        String mensaje = String.format("Hola %s! Tu matricula en el curso '%s' ha sido confirmada con exito. Horario: %s. %s",
+        String mensaje = String.format("🎉 Hola %s! Tu matricula en el curso '%s' ha sido confirmada con exito. 📅 Horario: %s. %s",
                 estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), datosClase);
+
+        String telefonoDestino = (request != null && request.getWhatsapp() != null && !request.getWhatsapp().isBlank())
+                ? request.getWhatsapp()
+                : (estudiante != null ? estudiante.getWhatsapp() : null);
 
         Notificacion notificacion = new Notificacion();
         notificacion.setPedidoId(pedido.getId());
         notificacion.setCanal("WHATSAPP");
-        notificacion.setDestinatario(estudiante.getWhatsapp());
+        notificacion.setDestinatario(telefonoDestino != null ? telefonoDestino : "N/A");
         notificacion.setTipo("BIENVENIDA");
         notificacion.setMensaje(mensaje);
-        notificacion.setEstado("ENVIADO");
+
+        // Despachar a través de WhatsAppClient (CallMeBot)
+        boolean enviado = whatsAppClient.enviarMensaje(telefonoDestino, mensaje);
+        notificacion.setEstado(enviado ? "ENVIADO" : "FALLIDO");
         notificacion.setIntentos(1);
+        if (!enviado) {
+            notificacion.setUltimoError("Error al contactar con API CallMeBot");
+        }
 
         notificacionRepository.save(notificacion);
 
+        pedido.setEstudianteWhatsapp(telefonoDestino);
+        pedido.setMensajeNotificacion(mensaje);
+
         System.out.printf("[WHATSAPP NOTIFICACION] Mensaje enviado a %s (%s): %s%n",
-                estudiante.getNombres(), estudiante.getWhatsapp(), mensaje);
+                estudiante.getNombres(), telefonoDestino, mensaje);
     }
 
     private String obtenerDatosClase(CursoDto curso) {

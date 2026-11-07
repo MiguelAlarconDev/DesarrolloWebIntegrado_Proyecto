@@ -7,6 +7,7 @@ from email.message import EmailMessage
 from pathlib import Path
 from uuid import UUID
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr, Field, model_validator
@@ -15,6 +16,9 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(ENV_PATH)
 
 
 class ComprobanteRequest(BaseModel):
@@ -56,7 +60,7 @@ app = FastAPI(
     description="Generacion y envio de constancias de pago para la POC de cursos.",
 )
 
-OUTPUT_DIR = Path(os.getenv("PDF_OUTPUT_DIR", "generated"))
+OUTPUT_DIR = Path(__file__).resolve().parent.parent / "generated"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -125,21 +129,24 @@ def enviar_correo(datos: ComprobanteRequest, pdf_path: Path) -> None:
     host = os.getenv("SMTP_HOST")
     port = int(os.getenv("SMTP_PORT", "587"))
     username = os.getenv("SMTP_USERNAME")
-    password = os.getenv("SMTP_PASSWORD")
+    password = (os.getenv("SMTP_PASSWORD") or "").replace(" ", "")
     remitente = os.getenv("SMTP_FROM", username or "")
 
     if not host or not username or not password or not remitente:
         raise RuntimeError("Configuracion SMTP incompleta")
 
     mensaje = EmailMessage()
-    mensaje["Subject"] = f"Constancia de pago {datos.codigoOrden}"
+    mensaje["Subject"] = f"Constancia de pago {datos.codigoOrden} - Matricula Confirmada"
     mensaje["From"] = remitente
     mensaje["To"] = str(datos.correo)
     mensaje.set_content(
         f"Hola {datos.estudiante},\n\n"
-        f"Adjuntamos la constancia demostrativa de tu matricula en {datos.curso}.\n"
-        f"Orden: {datos.codigoOrden}\nTotal: S/ {datos.monto:.2f}\n\n"
-        "Este documento se genero como parte de una POC academica."
+        f"Tu matricula en el curso '{datos.curso}' ha sido confirmada con exito.\n"
+        f"Orden: {datos.codigoOrden}\n"
+        f"Total Pagado: S/ {datos.monto:.2f}\n\n"
+        "Adjuntamos a este correo tu constancia y comprobante oficial de pago en formato PDF.\n\n"
+        "Saludos cordiales,\n"
+        "Equipo de Gestion de Cursos"
     )
     mensaje.add_attachment(
         pdf_path.read_bytes(),
@@ -165,19 +172,23 @@ def health():
 def crear_y_enviar_comprobante(datos: ComprobanteRequest):
     nombre_archivo = f"comprobante-{datos.pedidoId}.pdf"
     pdf_path = OUTPUT_DIR / nombre_archivo
+    generar_pdf(datos, pdf_path)
+
+    correo_enviado = False
     try:
-        generar_pdf(datos, pdf_path)
         enviar_correo(datos, pdf_path)
-    except (OSError, RuntimeError, smtplib.SMTPException) as exc:
-        raise HTTPException(status_code=502, detail=f"No se pudo enviar el comprobante: {exc}") from exc
+        correo_enviado = True
+        print(f"[COMPROBANTES] Correo enviado exitosamente a {datos.correo}")
+    except Exception as exc:
+        print(f"[COMPROBANTES] Error al enviar correo SMTP: {exc}. PDF generado correctamente.")
 
     return ComprobanteResponse(
         success=True,
         pedidoId=datos.pedidoId,
-        estado="ENVIADO",
+        estado="ENVIADO" if correo_enviado else "PDF_GENERADO",
         archivo=nombre_archivo,
         destinatario=datos.correo,
-        mensaje="PDF generado y correo enviado correctamente",
+        mensaje="PDF generado y correo enviado correctamente" if correo_enviado else "PDF generado listo para descarga",
     )
 
 
