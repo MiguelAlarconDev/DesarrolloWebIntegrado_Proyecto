@@ -87,6 +87,23 @@ if (-not $env:JWT_SECRET -or $env:JWT_SECRET.Length -lt 32) {
     Write-Host '    JWT_SECRET generado aleatoriamente para esta sesion.' -ForegroundColor DarkGray
 }
 
+# Mercado Pago (opcional): sin token, el checkout responde 503 y no crea pedidos ni reserva vacantes.
+if (-not $env:MERCADOPAGO_ACCESS_TOKEN) {
+    $mpSec = Read-Host 'Access Token de PRUEBA de Mercado Pago (Enter para omitir; no se mostrara)' -AsSecureString
+    $mpB = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($mpSec)
+    try { $mpTok = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($mpB) }
+    finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($mpB) }
+    if ($mpTok) { $env:MERCADOPAGO_ACCESS_TOKEN = $mpTok }
+    $mpTok = $null
+}
+if ($env:MERCADOPAGO_ACCESS_TOKEN) {
+    if (-not $env:MERCADOPAGO_ACCESS_TOKEN.StartsWith('TEST-')) {
+        Write-Host '    AVISO: el token no es de PRUEBA (TEST-); los cobros serian reales.' -ForegroundColor Red
+    }
+} else {
+    Write-Host '    Mercado Pago sin configurar: el checkout quedara deshabilitado (503).' -ForegroundColor Yellow
+}
+
 # --- 5. Arranque --------------------------------------------------------------------------------
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 $servicios = @(
@@ -114,7 +131,7 @@ try {
 finally {
     # Los procesos ya heredaron las variables; se retiran de esta sesion.
     $dbPassword = $null
-    Remove-Item Env:DB_PASSWORD, Env:SPRING_DATASOURCE_PASSWORD -ErrorAction SilentlyContinue
+    Remove-Item Env:DB_PASSWORD, Env:SPRING_DATASOURCE_PASSWORD, Env:MERCADOPAGO_ACCESS_TOKEN -ErrorAction SilentlyContinue
 }
 
 # --- 6. Espera de puertos ----------------------------------------------------------------------

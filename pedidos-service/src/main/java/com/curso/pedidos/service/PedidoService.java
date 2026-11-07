@@ -5,6 +5,7 @@ import com.curso.pedidos.client.ComprobanteClient;
 import com.curso.pedidos.client.CursoClient;
 import com.curso.pedidos.client.MercadoPagoClient;
 import com.curso.pedidos.dto.*;
+import com.curso.pedidos.exception.PagoNoVerificableException;
 import com.curso.pedidos.exception.PagoRechazadoException;
 import com.curso.pedidos.entity.*;
 import com.curso.pedidos.repository.ComprobanteRepository;
@@ -61,6 +62,11 @@ public class PedidoService {
 
     @Transactional
     public Pedido crear(CrearPedidoRequest request) {
+        // 0. Sin Mercado Pago no se puede pagar: no reservar vacante ni crear pedidos huerfanos.
+        if (!mercadoPagoClient.isConfigurado()) {
+            throw new PagoNoVerificableException("Mercado Pago no esta configurado: no es posible iniciar el pago");
+        }
+
         // 1. Validar existencia del estudiante en auth-service
         UsuarioDto estudiante = authClient.obtenerUsuario(request.getEstudianteId());
 
@@ -80,6 +86,15 @@ public class PedidoService {
 
         // 4. Crear preferencia real en Mercado Pago Sandbox
         PreferenciaResponse pref = mercadoPagoClient.crearPreferencia(guardado, estudiante, cursoActualizado);
+        if (pref == null || pref.getId() == null || pref.getInitPoint() == null || pref.getInitPoint().isBlank()) {
+            // Compensacion: la vacante se reservo en cursos-service (remoto); el pedido se revierte con la transaccion.
+            try {
+                cursoClient.liberarAforo(cursoActualizado.getId());
+            } catch (RuntimeException ignored) {
+                // Se informa igualmente el fallo de pago; la vacante quedaria por liberar manualmente.
+            }
+            throw new PagoNoVerificableException("No se pudo crear la preferencia de pago en Mercado Pago");
+        }
         guardado.setMpPreferenceId(pref.getId());
         guardado = pedidoRepository.save(guardado);
         guardado.setInitPoint(pref.getInitPoint());

@@ -16,9 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
@@ -116,10 +118,27 @@ public class MercadoPagoClient {
                 log.info("[MERCADO PAGO] Preferencia creada para el pedido {}", pedido.getId());
                 return new PreferenciaResponse(id, url);
             }
+            log.error("[MERCADO PAGO] Respuesta de preferencia sin id para el pedido {}", pedido.getId());
+        } catch (RestClientResponseException ex) {
+            // Codigo HTTP y mensaje del proveedor (sin cabeceras ni token).
+            log.error("[MERCADO PAGO] Preferencia rechazada para el pedido {}: HTTP {} - {}",
+                    pedido.getId(), ex.getStatusCode().value(), mensajeProveedor(ex.getResponseBodyAsString()));
         } catch (Exception ex) {
-            log.error("[MERCADO PAGO] Error al crear preferencia: {}", ex.getClass().getSimpleName());
+            log.error("[MERCADO PAGO] Error al crear preferencia para el pedido {}: {}",
+                    pedido.getId(), ex.getClass().getSimpleName());
         }
         return new PreferenciaResponse(null, null);
+    }
+
+    /** Extrae "message"/"error" del cuerpo de error de Mercado Pago, acotado y en una linea. */
+    static String mensajeProveedor(String body) {
+        if (body == null || body.isBlank()) {
+            return "(sin cuerpo)";
+        }
+        Matcher m = Pattern.compile("\"(message|error)\"\\s*:\\s*\"([^\"]{0,200})\"").matcher(body);
+        String texto = m.find() ? m.group(2) : body;
+        texto = texto.replaceAll("[\\r\\n]+", " ");
+        return texto.length() > 200 ? texto.substring(0, 200) : texto;
     }
 
     /**
