@@ -1,26 +1,23 @@
-# Script para detener los servicios de la plataforma
-Write-Host "==========================================================" -ForegroundColor Yellow
-Write-Host "   Deteniendo Servicios de Gestion de Cursos..." -ForegroundColor Yellow
-Write-Host "==========================================================" -ForegroundColor Yellow
+<#
+.SYNOPSIS
+  Detiene SOLO los procesos lanzados por iniciar_servicios.ps1 (registrados en .run\pids.json),
+  incluyendo sus procesos hijos (java, node, python). No toca otros procesos del equipo.
+#>
+$pidFile = Join-Path $PSScriptRoot '.run\pids.json'
 
-$ports = @(3000, 8080, 8081, 8082, 8083)
-
-foreach ($port in $ports) {
-    $connections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
-    if ($connections) {
-        $pids = $connections | Select-Object -ExpandProperty OwningProcess -Unique
-        foreach ($procId in $pids) {
-            try {
-                $p = Get-Process -Id $procId -ErrorAction SilentlyContinue
-                if ($p) {
-                    Write-Host "Terminando proceso $($p.ProcessName) (PID: $procId) en puerto $port..." -ForegroundColor Red
-                    Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
-                }
-            } catch {}
-        }
-    } else {
-        Write-Host "Puerto $port ya esta libre." -ForegroundColor DarkGray
-    }
+if (-not (Test-Path $pidFile)) {
+    Write-Host 'No hay servicios registrados (.run\pids.json no existe).' -ForegroundColor DarkGray
+    exit 0
 }
 
-Write-Host "`nServicios detenidos correctamente." -ForegroundColor Green
+$registrados = @(Get-Content $pidFile -Raw | ConvertFrom-Json)
+foreach ($s in $registrados) {
+    if (Get-Process -Id $s.pid -ErrorAction SilentlyContinue) {
+        Write-Host "Deteniendo $($s.name) (PID $($s.pid)) y sus procesos hijos..." -ForegroundColor Yellow
+        & taskkill.exe /PID $s.pid /T /F | Out-Null
+    } else {
+        Write-Host "$($s.name) ya no estaba en ejecucion." -ForegroundColor DarkGray
+    }
+}
+Remove-Item $pidFile -Force
+Write-Host 'Servicios del proyecto detenidos.' -ForegroundColor Green

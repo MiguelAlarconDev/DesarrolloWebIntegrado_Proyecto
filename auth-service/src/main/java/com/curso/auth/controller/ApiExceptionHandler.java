@@ -25,6 +25,11 @@ public class ApiExceptionHandler {
         return respuesta(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
+    @ExceptionHandler(com.curso.auth.exception.ForbiddenException.class)
+    public ResponseEntity<Map<String, Object>> handleForbidden(com.curso.auth.exception.ForbiddenException ex) {
+        return respuesta(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
     @ExceptionHandler(ServiceUnavailableException.class)
     public ResponseEntity<Map<String, Object>> handleServiceUnavailable(ServiceUnavailableException ex) {
         return respuesta(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());

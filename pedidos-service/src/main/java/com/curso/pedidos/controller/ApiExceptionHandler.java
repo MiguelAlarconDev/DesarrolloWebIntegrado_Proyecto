@@ -13,6 +13,26 @@ import java.util.Map;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+    @ExceptionHandler(com.curso.pedidos.exception.RemoteServiceException.class)
+    public ResponseEntity<Map<String, Object>> handleRemote(com.curso.pedidos.exception.RemoteServiceException ex) {
+        return respuesta(HttpStatus.BAD_GATEWAY, ex.getMessage());
+    }
+
+    @ExceptionHandler(com.curso.pedidos.security.AuthPrincipal.ForbiddenException.class)
+    public ResponseEntity<Map<String, Object>> handleForbidden(RuntimeException ex) {
+        return respuesta(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(com.curso.pedidos.exception.PagoRechazadoException.class)
+    public ResponseEntity<Map<String, Object>> handlePagoRechazado(RuntimeException ex) {
+        return respuesta(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+    }
+
+    @ExceptionHandler(com.curso.pedidos.exception.PagoNoVerificableException.class)
+    public ResponseEntity<Map<String, Object>> handlePagoNoVerificable(RuntimeException ex) {
+        return respuesta(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(IllegalArgumentException ex) {
         return respuesta(HttpStatus.NOT_FOUND, ex.getMessage());

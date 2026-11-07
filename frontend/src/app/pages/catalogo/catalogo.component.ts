@@ -126,6 +126,12 @@ import { NotificationService } from '../../services/notification.service';
 				</div>
 			</div>
 
+			<!-- Aviso de conexion con reintento (oculto si el catalogo viene del backend) -->
+			<div id="catalogo-offline" class="alert alert-warning text-center d-none" role="alert">
+				No se pudo conectar con el servicio de cursos; se muestran cursos de ejemplo, no disponibles para matrícula.
+				<button type="button" class="btn btn-sm btn-outline-dark ms-2" (click)="reintentarCatalogo()">Reintentar</button>
+			</div>
+
 			<!-- Grid de Cursos -->
 			<div class="row" id="cursos-container"></div>
 		</div>
@@ -200,8 +206,19 @@ export class CatalogoComponent implements AfterViewInit, OnDestroy {
       })()
     ]);
 
+    const offline = !this.cursoService.lastLoadFromBackend;
+    document.getElementById('catalogo-offline')?.classList.toggle('d-none', !offline);
+    if (offline) {
+      this.notifications.showToast('Sin conexión con el servidor: se muestran cursos de ejemplo, no disponibles para matrícula real.', 'warning');
+    }
+
     this.applyFilter();
     this.actualizarEstadoNavbar();
+  }
+
+  async reintentarCatalogo(): Promise<void> {
+    this.cursoService.clearCache();
+    await this.initCursosPage();
   }
 
   private async cargarCursosPagadosAlumno(): Promise<void> {

@@ -1,6 +1,7 @@
 package com.curso.pedidos.client;
 
 import com.curso.pedidos.dto.UsuarioDto;
+import com.curso.pedidos.security.JwtVerifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -24,9 +25,14 @@ public class AuthClient {
 
     private record CachedEntry<T>(T value, long timestamp) {}
 
-    public AuthClient(@Value("${services.auth.url:http://127.0.0.1:8081}") String authUrl) {
+    public AuthClient(@Value("${services.auth.url:http://127.0.0.1:8081}") String authUrl, JwtVerifier jwtVerifier) {
+        // Llamadas internas autenticadas con un token de servicio de corta duracion.
         this.restClient = RestClient.builder()
                 .baseUrl(authUrl)
+                .requestInterceptor((request, body, execution) -> {
+                    request.getHeaders().setBearerAuth(jwtVerifier.serviceToken());
+                    return execution.execute(request, body);
+                })
                 .build();
     }
 

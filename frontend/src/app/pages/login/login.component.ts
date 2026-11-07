@@ -256,8 +256,11 @@ export class LoginComponent implements AfterViewInit {
   async cargarDemo(correo: string): Promise<void> {
     const emailEl = document.getElementById('login-email') as HTMLInputElement | null;
     const pwdEl = document.getElementById('login-pwd') as HTMLInputElement | null;
+    // Solo precarga el correo: las contrasenas nunca se incluyen en el frontend.
     if (emailEl) emailEl.value = correo;
-    if (pwdEl) pwdEl.value = '123456';
-    await this.hacerLogin();
+    if (pwdEl) {
+      pwdEl.value = '';
+      pwdEl.focus();
+    }
   }
 }

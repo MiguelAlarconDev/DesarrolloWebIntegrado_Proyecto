@@ -1,6 +1,10 @@
 package com.curso.pedidos.controller;
 
+import com.curso.pedidos.client.MercadoPagoWebhookVerifier;
 import com.curso.pedidos.dto.CrearPedidoRequest;
+import com.curso.pedidos.exception.PagoRechazadoException;
+import com.curso.pedidos.security.AuthPrincipal;
+import jakarta.servlet.http.HttpServletRequest;
 import com.curso.pedidos.dto.PagarPedidoRequest;
 import com.curso.pedidos.entity.Pedido;
 import com.curso.pedidos.service.NotificacionEmailService;
@@ -21,7 +25,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/pedidos")
-@CrossOrigin(origins = "*")
 public class PedidoController {
 
     private static final Logger log = LoggerFactory.getLogger(PedidoController.class);
@@ -29,70 +32,86 @@ public class PedidoController {
     private final PedidoService pedidoService;
     private final WhatsAppCloudService whatsAppCloudService;
     private final NotificacionEmailService notificacionEmailService;
+    private final MercadoPagoWebhookVerifier webhookVerifier;
 
-    @Value("${whatsapp.cloud.api.verify-token:cursos_meta_verify_token_2026}")
+    @Value("${whatsapp.cloud.api.verify-token:}")
     private String whatsappVerifyToken;
 
     public PedidoController(PedidoService pedidoService,
                             WhatsAppCloudService whatsAppCloudService,
-                            NotificacionEmailService notificacionEmailService) {
+                            NotificacionEmailService notificacionEmailService,
+                            MercadoPagoWebhookVerifier webhookVerifier) {
         this.pedidoService = pedidoService;
+        this.webhookVerifier = webhookVerifier;
         this.whatsAppCloudService = whatsAppCloudService;
         this.notificacionEmailService = notificacionEmailService;
     }
 
+    /**
+     * Webhook de Mercado Pago: exige firma x-signature valida (MERCADOPAGO_WEBHOOK_SECRET)
+     * y vuelve a consultar el pago al proveedor antes de aplicar cambios.
+     */
     @PostMapping("/webhook")
     public ResponseEntity<String> webhook(
+            @RequestHeader(value = "x-signature", required = false) String xSignature,
+            @RequestHeader(value = "x-request-id", required = false) String xRequestId,
             @RequestParam(value = "type", required = false) String paramType,
             @RequestParam(value = "topic", required = false) String topic,
             @RequestParam(value = "data.id", required = false) String paramDataId,
             @RequestParam(value = "id", required = false) String paramId,
             @RequestBody(required = false) Map<String, Object> body) {
 
-        String paymentId = null;
-        String type = paramType != null ? paramType : topic;
+        if (!webhookVerifier.isConfigurado()) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Webhook de Mercado Pago no configurado");
+        }
 
+        String paymentId = paramDataId != null ? paramDataId : paramId;
+        String type = paramType != null ? paramType : topic;
         if (body != null) {
             if (body.get("type") != null) {
                 type = body.get("type").toString();
             }
-            if (body.get("data") instanceof Map<?, ?> dataMap) {
-                Object idObj = dataMap.get("id");
-                if (idObj != null) {
-                    paymentId = idObj.toString();
-                }
+            if (paymentId == null && body.get("data") instanceof Map<?, ?> dataMap && dataMap.get("id") != null) {
+                paymentId = dataMap.get("id").toString();
             }
         }
 
-        if (paymentId == null) {
-            paymentId = paramDataId != null ? paramDataId : paramId;
+        if (!webhookVerifier.verificar(xSignature, xRequestId, paymentId)) {
+            log.warn("[MERCADO PAGO WEBHOOK] Notificacion rechazada: firma invalida");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Firma invalida");
         }
 
-        if (paymentId != null && ("payment".equalsIgnoreCase(type) || type == null)) {
+        if (paymentId == null || !(type == null || "payment".equalsIgnoreCase(type))) {
+            return ResponseEntity.ok("Evento ignorado");
+        }
+        try {
             Pedido pedido = pedidoService.procesarPagoMercadoPago(paymentId);
-            if (pedido != null) {
-                return ResponseEntity.ok("Pago " + paymentId + " procesado exitosamente para el pedido " + pedido.getId());
-            }
-            return ResponseEntity.ok("Pago " + paymentId + " consultado pero aún no se encuentra aprobado.");
+            return ResponseEntity.ok(pedido != null ? "Pago aplicado" : "Pago aun no aprobado");
+        } catch (PagoRechazadoException | IllegalStateException ex) {
+            // 200 para que el proveedor no reintente una notificacion que nunca sera valida.
+            log.warn("[MERCADO PAGO WEBHOOK] Pago {} no aplicado: {}", paymentId, ex.getMessage());
+            return ResponseEntity.ok("Pago no aplicado");
         }
-
-        return ResponseEntity.ok("Evento ignorado (tipo: " + type + ")");
     }
 
     @PostMapping("/checkout")
     @ResponseStatus(HttpStatus.CREATED)
-    public Pedido checkout(@Valid @RequestBody CrearPedidoRequest request) {
+    public Pedido checkout(@Valid @RequestBody CrearPedidoRequest request, HttpServletRequest http) {
+        AuthPrincipal.from(http).requireOwnerOrAdmin(request.getEstudianteId());
         return pedidoService.crear(request);
     }
 
     @PutMapping("/{id}/pagar")
     public Pedido pagar(@PathVariable UUID id,
-                        @RequestBody(required = false) PagarPedidoRequest request) {
-        return pedidoService.pagar(id, request);
+                        @RequestBody(required = false) PagarPedidoRequest request,
+                        HttpServletRequest http) {
+        AuthPrincipal.from(http).requireOwnerOrAdmin(pedidoService.buscarPorId(id).getEstudianteId());
+        return pedidoService.confirmarPagoVerificado(id, request);
     }
 
     @PutMapping("/{id}/cancelar")
-    public Pedido cancelar(@PathVariable UUID id) {
+    public Pedido cancelar(@PathVariable UUID id, HttpServletRequest http) {
+        AuthPrincipal.from(http).requireOwnerOrAdmin(pedidoService.buscarPorId(id).getEstudianteId());
         return pedidoService.cancelar(id);
     }
 
@@ -102,12 +121,15 @@ public class PedidoController {
     }
 
     @GetMapping("/{id}")
-    public Pedido buscar(@PathVariable UUID id) {
-        return pedidoService.buscarPorId(id);
+    public Pedido buscar(@PathVariable UUID id, HttpServletRequest http) {
+        Pedido pedido = pedidoService.buscarPorId(id);
+        AuthPrincipal.from(http).requireOwnerOrStaff(pedido.getEstudianteId());
+        return pedido;
     }
 
     @GetMapping("/estudiante/{estudianteId}")
-    public List<Pedido> listarPorEstudiante(@PathVariable UUID estudianteId) {
+    public List<Pedido> listarPorEstudiante(@PathVariable UUID estudianteId, HttpServletRequest http) {
+        AuthPrincipal.from(http).requireOwnerOrStaff(estudianteId);
         return pedidoService.listarPorEstudiante(estudianteId);
     }
 
@@ -127,7 +149,6 @@ public class PedidoController {
         status.put("configurado", whatsAppCloudService.isConfigurado());
         status.put("version", whatsAppCloudService.getVersion());
         status.put("phoneNumberId", whatsAppCloudService.getPhoneNumberId().isBlank() ? "NO_CONFIGURADO" : whatsAppCloudService.getPhoneNumberId());
-        status.put("verifyToken", whatsappVerifyToken);
         status.put("instrucciones", "Para conectar con WhatsApp real, define WHATSAPP_PHONE_NUMBER_ID y WHATSAPP_API_TOKEN en application.properties o variables de entorno.");
         return ResponseEntity.ok(status);
     }
@@ -171,14 +192,14 @@ public class PedidoController {
             @RequestParam(value = "hub.verify_token", required = false) String verifyToken,
             @RequestParam(value = "hub.challenge", required = false) String challenge) {
 
-        log.info("[META WEBHOOK] Verificación solicitada por Meta: mode={}, verify_token={}", mode, verifyToken);
+        log.info("[META WEBHOOK] Verificación solicitada por Meta: mode={}", mode);
 
-        if ("subscribe".equals(mode) && whatsappVerifyToken.equals(verifyToken)) {
+        if ("subscribe".equals(mode) && !whatsappVerifyToken.isBlank() && whatsappVerifyToken.equals(verifyToken)) {
             log.info("[META WEBHOOK] ✅ Webhook verificado exitosamente con Meta.");
             return ResponseEntity.ok(challenge);
         }
 
-        log.warn("[META WEBHOOK] ❌ Token de verificación inválido. Esperado: {}, Recibido: {}", whatsappVerifyToken, verifyToken);
+        log.warn("[META WEBHOOK] Token de verificación inválido.");
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Verification token mismatch");
     }
 
@@ -187,7 +208,7 @@ public class PedidoController {
      */
     @PostMapping("/whatsapp/webhook")
     public ResponseEntity<String> receiveWhatsAppWebhook(@RequestBody(required = false) Map<String, Object> payload) {
-        log.info("[META WEBHOOK] Evento de estado recibido de Meta: {}", payload);
+        log.info("[META WEBHOOK] Evento de estado recibido de Meta.");
         return ResponseEntity.ok("EVENT_RECEIVED");
     }
 

@@ -72,7 +72,7 @@ import { NotificationService } from '../../services/notification.service';
 							<div class="row g-2" style="font-size: 13px; color: #334155;">
 								<div class="col-sm-6 col-12"><strong>Alumno:</strong> <span id="rec-cliente">Carlos Alarcón</span></div>
 								<div class="col-sm-6 col-12"><strong>Documento:</strong> <span id="rec-doc">74859612</span></div>
-								<div class="col-sm-6 col-12"><strong>WhatsApp:</strong> <span id="rec-telefono">935300159</span></div>
+								<div class="col-sm-6 col-12"><strong>WhatsApp:</strong> <span id="rec-telefono">—</span></div>
 								<div class="col-sm-6 col-12"><strong>Correo:</strong> <span id="rec-correo">alumno@cursos.com</span></div>
 							</div>
 						</div>
@@ -222,11 +222,25 @@ export class ConfirmacionComponent implements AfterViewInit {
 
     const user = this.authService.getCurrentUser();
 
+    // No se muestra una matricula pagada sin un pedido PAGADO registrado.
+    if (!order || order.estado !== 'PAGADO') {
+      const container = document.querySelector('.container');
+      if (container) {
+        container.innerHTML = `
+          <div class="text-center py-5">
+            <h3>No hay una matrícula pagada para mostrar</h3>
+            <p class="text-muted">Tu pago aún no ha sido confirmado por el servidor.</p>
+            <a href="/cursos" class="btn_one mt-3">Ver Catálogo de Cursos</a>
+          </div>`;
+      }
+      return;
+    }
+
     if (!order) {
-      const defaultName = user ? `${user.nombres || ''} ${user.apellidos || ''}`.trim() : 'Jose Elmer Coronado';
-      const defaultDni = (user && user.dni) || '75187638';
-      const defaultWa = (user && user.whatsapp) || '935300159';
-      const defaultCorreo = (user && user.correo) || 'carlokasike333@gmail.com';
+      const defaultName = user ? `${user.nombres || ''} ${user.apellidos || ''}`.trim() : 'Alumno';
+      const defaultDni = (user && user.dni) || '—';
+      const defaultWa = (user && user.whatsapp) || '';
+      const defaultCorreo = (user && user.correo) || '—';
 
       order = {
         codigoOrden: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
@@ -265,8 +279,8 @@ export class ConfirmacionComponent implements AfterViewInit {
     const comp = order.comprobante || {
       tipo: 'BOLETA',
       correlativo: 'B001-00001042',
-      cliente: (user && user.nombres) ? `${user.nombres} ${user.apellidos || ''}`.trim() : 'Jose Elmer Coronado',
-      docIdentidad: (user && user.dni) || '75187638',
+      cliente: (user && user.nombres) ? `${user.nombres} ${user.apellidos || ''}`.trim() : 'Alumno',
+      docIdentidad: (user && user.dni) || '—',
       fechaEmision: fechaActual,
       subtotal: '127.12',
       igv: '22.88',
@@ -286,12 +300,12 @@ export class ConfirmacionComponent implements AfterViewInit {
     const elCliente = document.getElementById('rec-cliente');
     if (elCliente) elCliente.textContent = nombreTitular || 'Alumno Titular';
 
-    const dniTitular = comp.docIdentidad || comp.rucCliente || (user && user.dni) || '75187638';
+    const dniTitular = comp.docIdentidad || comp.rucCliente || (user && user.dni) || '—';
     const elDoc = document.getElementById('rec-doc');
     if (elDoc) elDoc.textContent = dniTitular;
 
-    const activeTelAlumno = (user && user.whatsapp) || (comp && comp.clienteTelefono) || (order.notificacionWhatsApp && order.notificacionWhatsApp.telefono) || '935300159';
-    const activeCorreoAlumno = (user && user.correo) || (comp && comp.clienteCorreo) || 'carlokasike333@gmail.com';
+    const activeTelAlumno = (user && user.whatsapp) || (comp && comp.clienteTelefono) || (order.notificacionWhatsApp && order.notificacionWhatsApp.telefono) || '';
+    const activeCorreoAlumno = (user && user.correo) || (comp && comp.clienteCorreo) || '—';
 
     const elTel = document.getElementById('rec-telefono');
     if (elTel) elTel.textContent = this.formatDisplayPhone(activeTelAlumno);

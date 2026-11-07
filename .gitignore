@@ -17,9 +17,10 @@ frontend/dist/
 
 # Prototypes & docs
 prototipo-frontend/
-comprobantes-service/
-whatsapp-service/
 *.pdf
 
 .DS_Store
 Thumbs.db
+
+# Arranque local (PIDs y logs)
+.run/

@@ -252,15 +252,15 @@ export class CheckoutComponent implements AfterViewInit, OnDestroy {
       if (card) card.innerHTML = '';
 
       const chkNom = document.getElementById('chk-nombres') as HTMLInputElement | null;
-      if (chkNom && !chkNom.value) chkNom.value = user.nombres || 'Carlos';
+      if (chkNom && !chkNom.value) chkNom.value = user.nombres || '';
       const chkApe = document.getElementById('chk-apellidos') as HTMLInputElement | null;
-      if (chkApe && !chkApe.value) chkApe.value = user.apellidos || 'Alarcón';
+      if (chkApe && !chkApe.value) chkApe.value = user.apellidos || '';
       const chkCorreo = document.getElementById('chk-correo') as HTMLInputElement | null;
-      if (chkCorreo && !chkCorreo.value) chkCorreo.value = user.correo || 'estudiante@cursos.com';
+      if (chkCorreo && !chkCorreo.value) chkCorreo.value = user.correo || '';
       const chkDni = document.getElementById('chk-dni') as HTMLInputElement | null;
-      if (chkDni && !chkDni.value) chkDni.value = user.dni || '30000003';
+      if (chkDni && !chkDni.value) chkDni.value = user.dni || '';
       const chkWa = document.getElementById('chk-whatsapp') as HTMLInputElement | null;
-      if (chkWa && !chkWa.value) chkWa.value = user.whatsapp ? user.whatsapp.replace('+51', '').trim() : '999555666';
+      if (chkWa && !chkWa.value) chkWa.value = user.whatsapp ? user.whatsapp.replace('+51', '').trim() : '';
     } else if (card) {
       card.innerHTML = `
         <div class="abmv mb-4">
@@ -356,16 +356,16 @@ export class CheckoutComponent implements AfterViewInit, OnDestroy {
       btn.textContent = 'Conectando con Mercado Pago...';
     }
 
-    const nombres = ((document.getElementById('chk-nombres') as HTMLInputElement)?.value?.trim() || '') || user.nombres || 'Carlos';
-    const apellidos = ((document.getElementById('chk-apellidos') as HTMLInputElement)?.value?.trim() || '') || user.apellidos || 'Alarcón';
-    const dni = ((document.getElementById('chk-dni') as HTMLInputElement)?.value?.trim() || '') || user.dni || '30000003';
-    const whatsapp = ((document.getElementById('chk-whatsapp') as HTMLInputElement)?.value?.trim() || '') || user.whatsapp || '999555666';
-    const correo = ((document.getElementById('chk-correo') as HTMLInputElement)?.value?.trim() || '') || user.correo || 'estudiante@cursos.com';
-    const rucVal = (document.getElementById('chk-ruc') as HTMLInputElement)?.value?.trim() || '20601234567';
+    const nombres = ((document.getElementById('chk-nombres') as HTMLInputElement)?.value?.trim() || '') || user.nombres || '';
+    const apellidos = ((document.getElementById('chk-apellidos') as HTMLInputElement)?.value?.trim() || '') || user.apellidos || '';
+    const dni = ((document.getElementById('chk-dni') as HTMLInputElement)?.value?.trim() || '') || user.dni || '';
+    const whatsapp = ((document.getElementById('chk-whatsapp') as HTMLInputElement)?.value?.trim() || '') || user.whatsapp || '';
+    const correo = ((document.getElementById('chk-correo') as HTMLInputElement)?.value?.trim() || '') || user.correo || '';
+    const rucVal = (document.getElementById('chk-ruc') as HTMLInputElement)?.value?.trim() || '';
     const razonVal = (document.getElementById('chk-razon') as HTMLInputElement)?.value?.trim() || '';
     const docIdent = this.tipoComp === 'FACTURA' ? rucVal : dni;
 
-    const estId = user.id || 'a0000000-0000-0000-0000-000000000003';
+    const estId = user.id;
 
     this.authService.updateProfile({
       nombres,
@@ -390,22 +390,13 @@ export class CheckoutComponent implements AfterViewInit, OnDestroy {
       };
 
       this.currentPendingMpOrder = { pedido, payInfo };
-      sessionStorage.setItem('pending_mp_order', JSON.stringify(this.currentPendingMpOrder));
+      localStorage.setItem('pending_mp_order', JSON.stringify(this.currentPendingMpOrder));
 
-      let prefData: any = null;
-      if (pedido && pedido.initPoint) {
-        prefData = { id: pedido.mpPreferenceId || pedido.codigoOrden, initPoint: pedido.initPoint };
-      } else {
-        prefData = await this.pedidoService.crearPreferenciaMp({
-          titulo: cart[0].titulo || 'Curso Gestión de Cursos',
-          cantidad: 1,
-          precio: parseFloat(String(cart[0].precio)) || 150.00
-        });
+      // Solo la preferencia ligada al pedido (external_reference) permite verificar el pago.
+      if (!pedido || !pedido.initPoint) {
+        throw new Error('No se pudo generar el pago en Mercado Pago. Intenta nuevamente más tarde.');
       }
-
-      if (!prefData || !prefData.initPoint) {
-        throw new Error('No se pudo generar la preferencia de Mercado Pago.');
-      }
+      const prefData = { id: pedido.mpPreferenceId || pedido.codigoOrden, initPoint: pedido.initPoint };
 
       const modalMp = document.getElementById('mp-modal-container');
       const btnOpen = document.getElementById('btn-mp-open-direct') as HTMLAnchorElement | null;
@@ -447,33 +438,27 @@ export class CheckoutComponent implements AfterViewInit, OnDestroy {
 
     let orderData = this.currentPendingMpOrder;
     if (!orderData) {
-      const saved = sessionStorage.getItem('pending_mp_order');
+      const saved = localStorage.getItem('pending_mp_order');
       if (saved) {
         try { orderData = JSON.parse(saved); } catch (_) {}
       }
     }
 
-    try {
-      if (orderData && orderData.pedido) {
-        await this.pedidoService.procesarPagoMercadoPago(orderData.pedido, orderData.payInfo);
-      } else {
-        const cart = this.cartService.getCart();
-        const user = this.authService.getCurrentUser();
-        if (cart.length > 0 && user) {
-          const nuevoPedido = await this.pedidoService.crearPedido(cart[0].id, user.id);
-          const payInfo = {
-            metodoPago: 'Mercado Pago',
-            tipoComprobante: this.tipoComp || 'BOLETA',
-            clienteNombres: `${user.nombres || ''} ${user.apellidos || ''}`.trim() || 'Alumno',
-            docIdentidad: user.dni || '30000003',
-            whatsapp: user.whatsapp || '999555666',
-            correo: user.correo || 'estudiante@cursos.com'
-          };
-          await this.pedidoService.procesarPagoMercadoPago(nuevoPedido, payInfo);
-        }
-      }
+    // Solo el retorno de Mercado Pago (status=approved + payment_id) confirma el pago.
+    const urlParams = new URLSearchParams(window.location.search);
+    const mpStatus = urlParams.get('status') || urlParams.get('collection_status');
+    const mpPaymentId = urlParams.get('payment_id') || urlParams.get('collection_id');
 
-      sessionStorage.removeItem('pending_mp_order');
+    try {
+      if (mpStatus !== 'approved' || !mpPaymentId) {
+        throw new Error('Mercado Pago aun no confirma el pago. Completa el pago en la ventana de Mercado Pago.');
+      }
+      if (!orderData || !orderData.pedido) {
+        throw new Error('No se encontro el pedido pendiente en esta sesion.');
+      }
+      await this.pedidoService.procesarPagoMercadoPago(orderData.pedido, { ...orderData.payInfo, mpPaymentId });
+
+      localStorage.removeItem('pending_mp_order');
       this.notifications.showToast('¡Pago recibido con éxito!', 'success');
       this.cartService.clearCart();
 

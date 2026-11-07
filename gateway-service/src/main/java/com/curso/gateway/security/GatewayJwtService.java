@@ -29,11 +29,14 @@ public class GatewayJwtService {
     @Autowired
     public GatewayJwtService(
             ObjectMapper objectMapper,
-            @Value("${security.jwt.secret:${JWT_SECRET:dev-secret-change-me-please-32-chars}}") String secret) {
+            @Value("${security.jwt.secret}") String secret) {
         this(objectMapper, Clock.systemUTC(), secret);
     }
 
     GatewayJwtService(ObjectMapper objectMapper, Clock clock, String secret) {
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalArgumentException("JWT_SECRET debe estar definido y tener al menos 32 caracteres");
+        }
         this.objectMapper = objectMapper;
         this.clock = clock;
         this.secret = secret;
