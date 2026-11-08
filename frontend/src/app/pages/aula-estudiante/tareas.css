@@ -1,0 +1,27 @@
+/* Tareas y entregas del aula (E.5). */
+.aula-vacio { color: #94a3b8; font-size: 13px; margin: 0; font-style: italic; }
+.aula-tipo { display: inline-block; min-width: 46px; text-align: center; font-size: 11px; font-weight: 800; border-radius: 6px;
+  padding: 3px 6px; color: #334155; background: #e2e8f0; }
+
+.tareas { margin-top: 16px; border-top: 1px solid #f1f5f9; padding-top: 12px; }
+.tareas-toggle { background: none; border: 0; padding: 0; font-weight: 800; font-size: 14px; color: #0f172a; margin-bottom: 10px; }
+.tareas-toggle .fa { width: 14px; color: #2eca7f; }
+.tarea-item { border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 10px; background: #fff; }
+.tarea-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.tarea-info { min-width: 0; flex: 1; }
+.tarea-info strong { display: block; color: #0f172a; overflow-wrap: anywhere; }
+.tarea-info small { color: #64748b; font-size: 12px; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tarea-acciones { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
+.tarea-consigna, .entrega-texto { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; color: #334155; margin: 8px 0 0; }
+.tarea-form, .calificar-form { margin-top: 10px; padding: 12px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px; }
+.entregas-panel { margin-top: 12px; padding: 12px; background: #f8fafc; border-radius: 10px; }
+.entrega-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px; }
+.entrega-item code { font-size: 11px; overflow-wrap: anywhere; }
+.nota-box { display: flex; gap: 14px; align-items: flex-start; margin-top: 10px; padding: 10px; background: #ecfdf5;
+  border: 1px solid #bbf7d0; border-radius: 8px; }
+.nota-valor { font-size: 28px; font-weight: 800; color: #15803d; line-height: 1; }
+.nota-valor small { font-size: 13px; color: #64748b; }
+@media (max-width: 767px) {
+  .tarea-acciones { width: 100%; }
+  .tarea-acciones .btn { flex: 1; }
+}

@@ -102,6 +102,17 @@ public class JwtVerifier {
         return cachedServiceToken;
     }
 
+    /** Scoped token used only for enrollment checks in pedidos-service. */
+    public String matriculaToken() {
+        Instant now = Instant.now(clock);
+        Map<String, Object> header = Map.of("alg", "HS256", "typ", "JWT");
+        Map<String, Object> payload = Map.of("sub", serviceName, "rol", AuthPrincipal.ROL_SERVICE,
+                "aud", "pedidos-service:matriculas", "iat", now.getEpochSecond(),
+                "exp", now.plus(SERVICE_TOKEN_TTL).getEpochSecond());
+        String unsigned = encode(header) + "." + encode(payload);
+        return unsigned + "." + sign(unsigned);
+    }
+
     private Map<String, Object> decode(String part) {
         try {
             return objectMapper.readValue(URL_DECODER.decode(part), new TypeReference<>() {

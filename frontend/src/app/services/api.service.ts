@@ -8,6 +8,8 @@ export interface ApiRequestOptions {
   body?: any;
   headers?: Record<string, string>;
   noCache?: boolean;
+  /** Tiempo maximo en ms (por defecto 4500). Las subidas de archivos usan uno mayor. */
+  timeoutMs?: number;
 }
 
 @Injectable({
@@ -59,8 +61,10 @@ export class ApiService {
     const token = localStorage.getItem(APP_CONFIG.STORAGE_KEYS.TOKEN);
     const isRealJwt = token && token.includes('.');
 
+    const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+    // Con FormData el navegador fija Content-Type multipart con su boundary.
     const headerMap: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       'Accept': 'application/json',
       ...(options.headers || {})
     };
@@ -70,7 +74,7 @@ export class ApiService {
     }
 
     const headers = new HttpHeaders(headerMap);
-    const bodyObj = typeof options.body === 'string'
+    const bodyObj = isFormData ? options.body : typeof options.body === 'string'
       ? JSON.parse(options.body)
       : options.body;
 
@@ -79,7 +83,7 @@ export class ApiService {
       : `${APP_CONFIG.API_BASE_URL}${endpoint}`;
 
     try {
-      const data = await this.callHttpClient<T>(method, gatewayUrl, bodyObj, headers);
+      const data = await this.callHttpClient<T>(method, gatewayUrl, bodyObj, headers, options.timeoutMs);
       if (method === 'GET') {
         this.getCache.set(endpoint, { data, ts: Date.now() });
       }
@@ -107,12 +111,12 @@ export class ApiService {
     }
   }
 
-  private async callHttpClient<T>(method: string, url: string, body: any, headers: HttpHeaders): Promise<T> {
+  private async callHttpClient<T>(method: string, url: string, body: any, headers: HttpHeaders, timeoutMs = 4500): Promise<T> {
     try {
       const obs$ = this.http.request<T>(method, url, {
         body: method !== 'GET' && method !== 'DELETE' ? body : undefined,
         headers
-      }).pipe(timeout(4500));
+      }).pipe(timeout(timeoutMs));
 
       return await firstValueFrom(obs$);
     } catch (err: any) {

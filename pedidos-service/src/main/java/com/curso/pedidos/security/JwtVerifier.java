@@ -81,6 +81,26 @@ public class JwtVerifier {
         return new AuthPrincipal(sub.toString(), rol.toString());
     }
 
+    /** Additional validation only for the internal enrollment endpoint. */
+    public AuthPrincipal validateMatricula(String token) {
+        try {
+            AuthPrincipal principal = validate(token);
+            Map<String, Object> claims = decode(token.split("\\.")[1]);
+            long now = Instant.now(clock).getEpochSecond();
+            if (!"pedidos-service:matriculas".equals(claims.get("aud"))
+                    || !(claims.get("iat") instanceof Number issued)
+                    || !(claims.get("exp") instanceof Number expires)
+                    || issued.longValue() > now || issued.longValue() < now - 300
+                    || expires.longValue() <= issued.longValue()
+                    || expires.longValue() - issued.longValue() > 300) {
+                throw new InvalidTokenException("Token interno de matricula invalido");
+            }
+            return principal;
+        } catch (java.time.DateTimeException | ArithmeticException ex) {
+            throw new InvalidTokenException("Token interno de matricula invalido");
+        }
+    }
+
     /** Token interno (rol SERVICE) para llamar a auth-service y cursos-service. */
     public String serviceToken() {
         Instant now = Instant.now(clock);

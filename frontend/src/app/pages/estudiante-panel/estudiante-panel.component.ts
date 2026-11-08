@@ -7,6 +7,8 @@ import { CartService } from '../../services/cart.service';
 import { PedidoService } from '../../services/pedido.service';
 import { NotificationService } from '../../services/notification.service';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 @Component({
   selector: 'app-estudiante-panel',
   standalone: true,
@@ -54,6 +56,7 @@ export class EstudiantePanelComponent implements AfterViewInit {
     if (typeof window !== 'undefined') {
       (window as any).cargarAlumnoDemoMisCursos = () => this.cargarAlumnoDemoMisCursos();
       (window as any).cerrarSesionMisCursos = () => this.cerrarSesionMisCursos();
+      (window as any).abrirAulaVirtual = (id: string) => this.abrirAulaVirtual(id);
     }
     this.initMisCursos();
   }
@@ -61,6 +64,11 @@ export class EstudiantePanelComponent implements AfterViewInit {
   async cargarAlumnoDemoMisCursos(): Promise<void> {
     // Sin credenciales incrustadas: el alumno inicia sesion con su propia cuenta.
     await this.router.navigateByUrl('/login?redirect=mis-cursos');
+  }
+
+  abrirAulaVirtual(cursoId: string): void {
+    if (!UUID_RE.test(cursoId)) return;
+    this.router.navigate(['/mis-cursos/aula', cursoId]);
   }
 
   cerrarSesionMisCursos(): void {
@@ -315,6 +323,13 @@ export class EstudiantePanelComponent implements AfterViewInit {
               </div>
               
               ${accessAction}
+
+              ${UUID_RE.test(String(curso.id)) ? `
+              <a href="/mis-cursos/aula/${curso.id}" onclick="window.abrirAulaVirtual('${curso.id}'); return false;"
+                 class="btn_one w-100 text-center d-flex align-items-center justify-content-center gap-2 mb-2"
+                 style="font-size: 12.5px; padding: 9px 14px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+                <i class="fa fa-folder-open"></i> Aula Virtual
+              </a>` : ''}
 
               <div class="card-footer-fixed">
                 <a href="/curso-detalle?id=${curso.id || ''}" class="c_btn" style="text-decoration: none; font-size: 12px;">

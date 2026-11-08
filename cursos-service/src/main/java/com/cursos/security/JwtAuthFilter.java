@@ -10,7 +10,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Catalogo (GET) publico. Operaciones que modifican estado requieren JWT:
+ * Catalogo (GET) publico excepto el subarbol privado /{cursoId}/aula.
+ * Aula requiere JWT de DOCENTE/ESTUDIANTE y autorizacion por recurso en AulaService.
+ * Operaciones que modifican estado fuera del aula requieren JWT:
  *  - descontar/liberar aforo: SERVICE (pedidos-service) o ADMIN
  *  - crear curso, enlace, datos de clase, estado: ADMIN o DOCENTE
  */
@@ -26,13 +28,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String method = request.getMethod();
-        return "OPTIONS".equalsIgnoreCase(method) || "GET".equalsIgnoreCase(method)
+        return "OPTIONS".equalsIgnoreCase(method) || ("GET".equalsIgnoreCase(method) && !isAula(request.getRequestURI()))
                 || !request.getRequestURI().startsWith("/api/cursos");
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        if (isAula(request.getRequestURI())) {
+            // Respuestas del aula (incluidos 401/403) nunca deben cachearse.
+            response.setHeader("Cache-Control", "no-store");
+        }
         String authorization = request.getHeader("Authorization");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             write(response, HttpServletResponse.SC_UNAUTHORIZED, "Token JWT requerido");
@@ -54,10 +60,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     static boolean allowed(String path, AuthPrincipal p) {
+        if (isAula(path)) {
+            return "DOCENTE".equals(p.rol()) || "ESTUDIANTE".equals(p.rol());
+        }
         if (path.endsWith("/descontar-aforo") || path.endsWith("/liberar-aforo")) {
             return p.isService() || p.isAdmin();
         }
         return p.isStaff();
+    }
+
+    private static boolean isAula(String path) {
+        // Protect the whole subtree, including future material endpoints and path parameters.
+        return path.matches("^/api/cursos/[^/]+/aula(?:[/;].*)?$");
     }
 
     private static void write(HttpServletResponse response, int status, String message) throws IOException {
