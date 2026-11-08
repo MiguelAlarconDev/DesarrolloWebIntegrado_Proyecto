@@ -58,6 +58,34 @@ export class CursoService {
     return this.filterByModalidad(cursos, modalidad);
   }
 
+  /** Consulta para el detalle: nunca confirma existencia con cache ni semillas. */
+  async getCursoDetalle(id: string): Promise<CursoModel> {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+      throw Object.assign(new Error('Curso no encontrado'), { status: 404 });
+    }
+    const item = await this.api.request<any>(`/cursos/${encodeURIComponent(id)}`, { noCache: true });
+    const numero = (value: unknown): boolean =>
+      (typeof value === 'number' || (typeof value === 'string' && value.trim() !== ''))
+      && Number.isFinite(Number(value)) && Number(value) >= 0;
+    if (!item || typeof item.id !== 'string' || item.id.toLowerCase() !== id.toLowerCase()
+        || typeof item.titulo !== 'string' || !item.titulo.trim()
+        || !numero(item.precio) || !numero(item.aforoMaximo) || !numero(item.aforoDisponible)
+        || !Number.isInteger(Number(item.aforoMaximo)) || !Number.isInteger(Number(item.aforoDisponible))
+        || Number(item.aforoDisponible) > Number(item.aforoMaximo)) {
+      throw Object.assign(new Error('Respuesta de curso invalida'), { status: 422 });
+    }
+    const texto = (value: unknown): string => typeof value === 'string' ? value : '';
+    return {
+      id: item.id, titulo: item.titulo, descripcion: texto(item.descripcion),
+      precio: Number(item.precio), aforoMaximo: Number(item.aforoMaximo),
+      aforoDisponible: Number(item.aforoDisponible), modalidad: texto(item.modalidad),
+      horario: texto(item.horario), docente: texto(item.docente), imagen: texto(item.imagen),
+      direccionClase: texto(item.direccionClase), aula: texto(item.aula),
+      enlaceClase: texto(item.enlaceClase), estado: texto(item.estado),
+      docenteId: texto(item.docenteId), fechaInicio: texto(item.fechaInicio), fechaFin: texto(item.fechaFin)
+    };
+  }
+
   async getCursoById(id: string): Promise<CursoModel> {
     try {
       const data = await this.api.request<any>(`/cursos/${id}`);
