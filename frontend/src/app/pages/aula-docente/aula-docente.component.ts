@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { TareasDocenteComponent } from './tareas-docente.component';
 import { AulaService, ModuloAula, MaterialAula, formatoTamano, UUID_RE } from '../../services/aula.service';
 
 /**
@@ -12,7 +13,7 @@ import { AulaService, ModuloAula, MaterialAula, formatoTamano, UUID_RE } from '.
 @Component({
   selector: 'app-aula-docente',
   standalone: true,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, TareasDocenteComponent],
   styleUrl: '../aula-estudiante/aula.css',
   template: `
   <section class="aula-page">
@@ -145,6 +146,7 @@ import { AulaService, ModuloAula, MaterialAula, formatoTamano, UUID_RE } from '.
                 </table>
               </div>
             }
+            <app-tareas-docente [cursoId]="cursoId" [modulo]="mod" />
           </article>
         }
       }

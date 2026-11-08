@@ -154,6 +154,14 @@ public class AulaService {
         } else { throw denegado(); }
     }
 
+    /** Shared authorization entry point for module resources, including tasks. */
+    public void autorizarModulo(UUID cursoId, UUID moduloId, AuthPrincipal principal, boolean escritura) {
+        Curso curso = curso(cursoId);
+        if (escritura) requireDocente(curso, principal);
+        else requireLectura(curso, cursoId, principal);
+        modulo(cursoId, moduloId);
+    }
+
     private Curso curso(UUID id) {
         return cursos.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso no encontrado"));
     }

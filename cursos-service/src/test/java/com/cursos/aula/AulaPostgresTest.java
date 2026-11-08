@@ -69,7 +69,9 @@ class AulaPostgresTest {
             var ds = new DriverManagerDataSource(URL, USER, "");
             var factory = new LocalContainerEntityManagerFactoryBean();
             factory.setDataSource(ds);
-            factory.setPackagesToScan("com.cursos.aula");
+            // Phase A remains independently testable before the optional E.2 migration.
+            factory.setManagedTypes(org.springframework.orm.jpa.persistenceunit.PersistenceManagedTypes.of(
+                    Modulo.class.getName(), Material.class.getName()));
             factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
             factory.setJpaPropertyMap(Map.of("hibernate.hbm2ddl.auto", "validate", "hibernate.show_sql", "false"));
             factory.afterPropertiesSet(); // Fails if either real entity is incompatible with PostgreSQL DDL.
