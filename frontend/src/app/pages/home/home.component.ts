@@ -12,7 +12,26 @@ import { NotificationService } from '../../services/notification.service';
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.Emulated,
+  styles: [`
+    .visual-promo {
+      border: 1px solid #eef2f6;
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(15, 23, 42, .08);
+      background: #fff;
+    }
+    .visual-promo > div { display: flex; }
+    .visual-promo .single_tp {
+      width: 100%;
+      margin-bottom: 0;
+      padding: 35px 25px;
+      border-radius: 16px;
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 575.98px) {
+      .visual-promo .single_tp { padding: 25px 20px; }
+    }
+  `],
   template: `
 	<!-- START HOME HERO -->
 	<section id="home" class="home_bg">
@@ -54,8 +73,8 @@ import { NotificationService } from '../../services/notification.service';
 
 	<!-- START TOP PROMO FEATURES  -->
 	<section class="tp_feature">
-	   <div class="container-fluid">			
-			<div class="row">					
+	   <div class="container">
+			<div class="row visual-promo">
 				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
 					<div class="single_tp">
 						<h3>Cero Sobreventa de Vacantes</h3>

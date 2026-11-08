@@ -9,13 +9,22 @@ import { CartService } from '../../services/cart.service';
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.Emulated,
+  styles: [`
+    .nav-layout { row-gap: .75rem; }
+    .nav-links { min-width: 0; }
+    .nav-actions { row-gap: .5rem; }
+    @media (min-width: 992px) {
+      .nav-brand, .nav-actions { width: auto; }
+      .nav-links { flex: 1 1 0; }
+    }
+  `],
   template: `
 	<!-- START NAVBAR -->  
 	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
 		<div class="container">
-			<div class="row align-items-center">
-				<div class="col-lg-3 col-md-4 col-sm-6">
+			<div class="row align-items-center justify-content-between nav-layout">
+				<div class="col-lg-auto col-md-4 col-sm-6 nav-brand">
 					<div class="site-logo">
 						<a href="/" class="brand-logo-link">
 							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
@@ -23,7 +32,7 @@ import { CartService } from '../../services/cart.service';
 						</a>          			        				
 					</div>
 				</div>
-				<div class="col-lg-6 col-md-6 col-sm-6">
+				<div class="col-lg col-md-5 col-sm-6 nav-links">
 					<div class="header_right">
 						<nav id="main-menu" class="ms-auto">
 							<ul>
@@ -36,7 +45,7 @@ import { CartService } from '../../services/cart.service';
 						<div id="mobile_menu"></div>
 					</div>
 				</div>
-				<div class="col-lg-3 col-md-3 col-sm-12">
+				<div class="col-lg-auto col-md-3 col-sm-12 nav-actions">
 					<div class="home_lc">
 						<a href="/carrito" class="hlc" title="Ver Carrito de Matrícula" aria-label="Ver Carrito de Matrícula">
 							<i class="fa fa-shopping-cart"></i>

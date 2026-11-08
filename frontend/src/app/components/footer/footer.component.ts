@@ -8,7 +8,21 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-footer',
   standalone: true,
   imports: [CommonModule],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.Emulated,
+  styles: [`
+    .footer-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      max-width: 100%;
+      color: inherit;
+      text-decoration: none;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .footer-brand span { min-width: 0; overflow-wrap: anywhere; }
+    .footer-brand:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+  `],
   template: `
 	@if (isPortalDocente) {
 		<!-- START PORTAL DASHBOARD FOOTER -->
@@ -76,8 +90,9 @@ import { AuthService } from '../../services/auth.service';
 					<!-- Columna 1: Logo & Descripción -->
 					<div class="col-lg-3 col-sm-6 col-12 mb-4 mb-lg-0">
 						<div class="single_footer">
-							<a href="/" class="d-inline-block mb-3">
-								<img src="assets/images/all-img/logo2.png" alt="Gestión de Cursos" style="max-height: 48px; width: auto;">
+							<a href="/" class="footer-brand mb-3" aria-label="Gestión de Cursos - Inicio">
+								<i class="fa fa-graduation-cap" aria-hidden="true"></i>
+								<span>Gestión de Cursos</span>
 							</a>
 							<p>Plataforma líder en capacitación profesional con clases virtuales en vivo y presenciales en Lima. Inscripción automatizada con Mercado Pago y soporte académico continuo.</p>
 						</div>
