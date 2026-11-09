@@ -96,6 +96,10 @@ import { NotificationService } from '../../services/notification.service';
 								<span>Directorio de Usuarios</span>
 								<span class="platform-tab-badge" id="tab-badge-usuarios">-</span>
 							</button>
+							<button type="button" class="platform-tab-btn" id="tab-admin-certificaciones" (click)="irCertificaciones()" role="tab" aria-selected="false">
+								<i class="fa fa-certificate me-2"></i>
+								<span>Certificaciones</span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -569,6 +573,10 @@ export class AdminPanelComponent implements AfterViewInit {
         </tr>
       `;
     }).join('');
+  }
+
+  irCertificaciones(): void {
+    this.router.navigate(['/portal-admin/certificaciones']);
   }
 
   switchAdminTab(tab: string, updateHash = true): void {

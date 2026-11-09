@@ -162,6 +162,10 @@ public class AulaService {
         modulo(cursoId, moduloId);
     }
 
+    public void autorizarDocente(UUID cursoId, AuthPrincipal principal) {
+        requireDocente(curso(cursoId), principal);
+    }
+
     private Curso curso(UUID id) {
         return cursos.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso no encontrado"));
     }

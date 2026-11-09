@@ -27,11 +27,13 @@ public class TareaService {
     @Transactional
     public Vista crear(UUID curso,UUID modulo,TareaController.Crear body,AuthPrincipal p) {
         aula.autorizarModulo(curso,modulo,p,true);
+        tareas.bloquearCursoAcademico(curso); // orden uniforme: curso -> tarea
         return Vista.of(tareas.saveAndFlush(new Tarea(modulo,body.titulo(),body.consigna(),body.fechaLimite(),body.tipoEntrega(),UUID.fromString(p.subject()))));
     }
     @Transactional
     public Vista editar(UUID curso,UUID modulo,UUID id,TareaController.Editar body,AuthPrincipal p) {
         aula.autorizarModulo(curso,modulo,p,true);
+        tareas.bloquearCursoAcademico(curso); // orden uniforme: curso -> tarea
         Tarea tarea=editable(id,modulo,body.version());
         tarea.editar(body.titulo(),body.consigna(),body.fechaLimite(),body.tipoEntrega());
         return Vista.of(tareas.saveAndFlush(tarea));
@@ -39,6 +41,7 @@ public class TareaService {
     @Transactional
     public void eliminar(UUID curso,UUID modulo,UUID id,long version,AuthPrincipal p) {
         aula.autorizarModulo(curso,modulo,p,true);
+        tareas.bloquearCursoAcademico(curso); // orden uniforme: curso -> tarea
         tareas.delete(editable(id,modulo,version));
         tareas.flush();
     }

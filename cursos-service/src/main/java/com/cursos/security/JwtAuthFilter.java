@@ -28,14 +28,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String method = request.getMethod();
-        return "OPTIONS".equalsIgnoreCase(method) || ("GET".equalsIgnoreCase(method) && !isAula(request.getRequestURI()))
-                || !request.getRequestURI().startsWith("/api/cursos");
+        String path = request.getRequestURI();
+        return "OPTIONS".equalsIgnoreCase(method)
+                || ("GET".equalsIgnoreCase(method) && !isAula(path) && !isCertificadoPrivado(path))
+                || !path.startsWith("/api/cursos")
+                || isVerificacionPublica(path);
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        if (isAula(request.getRequestURI())) {
+        if (isAula(request.getRequestURI()) || isCertificadoPrivado(request.getRequestURI())) {
             // Respuestas del aula (incluidos 401/403) nunca deben cachearse.
             response.setHeader("Cache-Control", "no-store");
         }
@@ -60,6 +63,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     static boolean allowed(String path, AuthPrincipal p) {
+        if (isCertificadoPrivado(path)) {
+            // ADMIN administra certificados (sin acceso al aula); el estudiante solo lo propio (servicio).
+            if (path.startsWith("/api/cursos/certificados/admin")) return p.isAdmin();
+            return p.isAdmin() || "ESTUDIANTE".equals(p.rol());
+        }
         if (isAula(path)) {
             return "DOCENTE".equals(p.rol()) || "ESTUDIANTE".equals(p.rol());
         }
@@ -67,6 +75,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return p.isService() || p.isAdmin();
         }
         return p.isStaff();
+    }
+
+    private static final String CERTIFICADOS = "/api/cursos/certificados";
+
+    private static boolean isVerificacionPublica(String path) {
+        return path.startsWith(CERTIFICADOS + "/verificacion/");
+    }
+
+    private static boolean isCertificadoPrivado(String path) {
+        return (path.equals(CERTIFICADOS) || path.startsWith(CERTIFICADOS + "/")) && !isVerificacionPublica(path);
     }
 
     private static boolean isAula(String path) {

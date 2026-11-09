@@ -61,6 +61,22 @@ class GatewaySecurityFilterTest {
     }
 
     @Test
+    void corsPermiteIdempotencyKeyParaDecisionesYCertificados() throws ServletException, IOException {
+        CorsFilter filter = new CorsFilter("http://localhost:4200", true);
+        MockHttpServletRequest request = new MockHttpServletRequest("OPTIONS", "/api/cursos/certificados/admin/emisiones");
+        request.addHeader("Origin", "http://localhost:4200");
+        request.addHeader("Access-Control-Request-Method", "POST");
+        request.addHeader("Access-Control-Request-Headers", "authorization,content-type,idempotency-key");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request, response, new MockFilterChain());
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.getHeader("Access-Control-Allow-Headers")).contains("Idempotency-Key");
+        assertThat(response.getHeader("Access-Control-Allow-Methods")).contains("POST");
+    }
+
+    @Test
     void jwtValidoContinuaEnRutaProtegida() throws ServletException, IOException {
         JwtAuthenticationFilter filter = jwtFilter();
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/auth/usuarios");
