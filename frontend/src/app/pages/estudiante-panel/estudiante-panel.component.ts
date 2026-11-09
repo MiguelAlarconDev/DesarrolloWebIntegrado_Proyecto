@@ -35,6 +35,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 		<div class="container">
 			<div class="section-title">
 			  <h2>Mis Cursos Matriculados</h2>
+			  <button type="button" class="btn_one mt-2" (click)="irCertificados()"><i class="fa fa-certificate me-1"></i> Mis certificados</button>
 			  <p>Accede directamente a tu <span><u>enlace de Zoom / Meet</u></span> o consulta tu <span><u>aula física</u></span></p>
 			</div>
 
@@ -64,6 +65,10 @@ export class EstudiantePanelComponent implements AfterViewInit {
   async cargarAlumnoDemoMisCursos(): Promise<void> {
     // Sin credenciales incrustadas: el alumno inicia sesion con su propia cuenta.
     await this.router.navigateByUrl('/login?redirect=mis-cursos');
+  }
+
+  irCertificados(): void {
+    this.router.navigate(['/mis-cursos/certificados']);
   }
 
   abrirAulaVirtual(cursoId: string): void {

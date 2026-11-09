@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 public class CorsFilter extends OncePerRequestFilter {
 
     private static final String METHODS = "GET,POST,PUT,PATCH,DELETE,OPTIONS";
-    private static final String HEADERS = "Authorization,Content-Type,Accept";
+    // Idempotency-Key: decisiones academicas y emision de certificados (reintentos idempotentes).
+    private static final String HEADERS = "Authorization,Content-Type,Accept,Idempotency-Key";
 
     private final Set<String> allowedOrigins;
     private final boolean allowCredentials;

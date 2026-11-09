@@ -47,6 +47,7 @@ class AprobacionPostgresTest {
             for(String name:List.of("migracion_aula_virtual_fase_a.sql","migracion_aula_virtual_e2.sql")) migration(c,name);
             String before=value(c,"SELECT json_agg(u)::text FROM usuarios u");
             migration(c,"migracion_certificaciones_fase_2.sql");
+            migration(c,"migracion_certificaciones_fase_3.sql"); // el paquete incluye las entidades de emision
             assertThat(value(c,"SELECT json_agg(u)::text FROM usuarios u")).isEqualTo(before);
             assertThat(value(c,"SELECT count(*) FROM cursos")).isEqualTo("0");
             assertThat(value(c,"SELECT count(*) FROM pedidos")).isEqualTo("0");

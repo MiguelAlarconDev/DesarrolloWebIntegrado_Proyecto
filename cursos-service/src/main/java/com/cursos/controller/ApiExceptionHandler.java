@@ -19,6 +19,7 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler({com.cursos.aula.MatriculaClient.NoDisponibleException.class,
+            com.cursos.certificaciones.UsuarioClient.NoDisponibleException.class,
             com.cursos.aula.AlmacenamientoArchivos.NoDisponibleException.class})
     public ResponseEntity<Map<String, Object>> handleUnavailable(RuntimeException ex) {
         return respuesta(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());

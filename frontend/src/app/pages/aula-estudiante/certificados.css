@@ -1,0 +1,37 @@
+/* Certificaciones (docente, admin, estudiante y verificacion). */
+.cert-page { padding: 120px 0 70px; background: #f8fafc; min-height: 70vh; }
+.cert-back { display: inline-block; margin-bottom: 14px; font-size: 13px; font-weight: 600; color: #475569; text-decoration: none; }
+.cert-titulo { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+.cert-ayuda { color: #64748b; font-size: 13px; margin: 6px 0 12px; }
+.cert-vacio { color: #94a3b8; font-size: 13px; font-style: italic; margin: 0; }
+.cert-card { margin-top: 18px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; }
+.cert-toggle { background: none; border: 0; padding: 0; font-weight: 800; font-size: 16px; color: #0f172a; }
+.cert-toggle .fa { width: 16px; color: #2eca7f; }
+.cert-item { border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+.cert-fila { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cert-resumen { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 10px; font-size: 13px; }
+.cert-badge { display: inline-block; font-size: 11px; font-weight: 800; border-radius: 6px; padding: 3px 8px; background: #e2e8f0; color: #334155; }
+.cert-badge[data-estado="APTO"], .cert-badge[data-estado="EMITIDO"] { background: #dcfce7; color: #15803d; }
+.cert-badge[data-estado="NO_APTO"], .cert-badge[data-estado="FALLIDO"] { background: #fee2e2; color: #b91c1c; }
+.cert-badge[data-estado="SIN_DATOS_SUFICIENTES"], .cert-badge[data-estado="PENDIENTE"] { background: #fef3c7; color: #a16207; }
+.cert-decision { margin: 8px 0; font-size: 13px; }
+.cert-evidencia { margin: 8px 0; font-size: 13px; }
+.cert-form { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 10px; }
+.cert-acciones { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.cert-historial { list-style: none; padding: 0; margin: 6px 0 0; font-size: 12.5px; }
+.cert-historial li { border-top: 1px solid #f1f5f9; padding: 6px 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.cert-tabs { display: flex; gap: 8px; margin: 12px 0; }
+.cert-tabs button { border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; padding: 6px 14px; font-weight: 700; font-size: 13px; }
+.cert-tabs button.activa { background: #2eca7f; border-color: #2eca7f; color: #fff; }
+.cert-tabla { font-size: 13px; background: #fff; }
+.cert-tabla td { overflow-wrap: anywhere; }
+.cert-estado { text-align: center; padding: 36px 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; }
+.cert-estado i { font-size: 34px; color: #94a3b8; display: block; margin-bottom: 8px; }
+.cert-valido i { color: #16a34a; }
+.cert-invalido i { color: #dc2626; }
+.cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.cert-tarjeta { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
+.cert-tarjeta h2 { font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
+.cert-icono { font-size: 26px; color: #2eca7f; }
+.cert-verificar { max-width: 640px; }
+@media (max-width: 767px) { .cert-page { padding-top: 96px; } .cert-titulo { font-size: 21px; } }

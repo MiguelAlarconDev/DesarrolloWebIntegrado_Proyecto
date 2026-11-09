@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { TareasDocenteComponent } from './tareas-docente.component';
+import { CertificacionDocenteComponent } from './certificacion-docente.component';
 import { AulaService, ModuloAula, MaterialAula, formatoTamano, UUID_RE } from '../../services/aula.service';
 
 /**
@@ -13,7 +14,7 @@ import { AulaService, ModuloAula, MaterialAula, formatoTamano, UUID_RE } from '.
 @Component({
   selector: 'app-aula-docente',
   standalone: true,
-  imports: [DatePipe, RouterLink, TareasDocenteComponent],
+  imports: [DatePipe, RouterLink, TareasDocenteComponent, CertificacionDocenteComponent],
   styleUrl: '../aula-estudiante/aula.css',
   template: `
   <section class="aula-page">
@@ -149,6 +150,7 @@ import { AulaService, ModuloAula, MaterialAula, formatoTamano, UUID_RE } from '.
             <app-tareas-docente [cursoId]="cursoId" [modulo]="mod" />
           </article>
         }
+        <app-certificacion-docente [cursoId]="cursoId" />
       }
     </div>
   </section>
