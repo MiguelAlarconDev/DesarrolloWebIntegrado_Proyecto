@@ -91,7 +91,7 @@ import { AuthService } from '../../services/auth.service';
 								<li><a href="#" title="Facebook">FB</a></li>
 								<li><a href="#" title="Twitter">TW</a></li>
 								<li><a href="#" title="LinkedIn">IN</a></li>
-								<li><a href="https://wa.me/51999555666" target="_blank" rel="noopener noreferrer" title="WhatsApp">WA</a></li>
+								<li><a href="https://wa.me/51935300159" target="_blank" rel="noopener noreferrer" title="WhatsApp">WA</a></li>
 							</ul>
 						</div>
 					</div><!--- END COL -->
@@ -159,6 +159,7 @@ import { AuthService } from '../../services/auth.service';
 							<ul>
 								<li><a href="/">Inicio</a></li>
 								<li><a href="/cursos">Cursos</a></li>
+								<li><a href="/beneficios">Beneficios</a></li>
 								<li><a href="/carrito">Carrito</a></li>
 								<li><a href="/contacto">Contacto</a></li>
 							</ul>

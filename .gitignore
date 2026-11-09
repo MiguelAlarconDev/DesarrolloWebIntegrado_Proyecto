@@ -1,9 +1,15 @@
 target/
 .idea/
 *.iml
+node_modules/
 
 .env
 application-local.properties
 
 .DS_Store
 Thumbs.db
+*.log
+.codex/
+scratch/
+.wwebjs_auth/
+prototipo-frontend/

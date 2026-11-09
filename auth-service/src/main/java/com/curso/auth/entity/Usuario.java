@@ -24,7 +24,7 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 150)
     private String correo;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, length = 20)
     private String whatsapp;
 
     @Column(name = "password_hash", nullable = false)

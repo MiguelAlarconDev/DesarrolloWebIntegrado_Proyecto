@@ -13,6 +13,9 @@ public class AuthResponse {
     private RolUsuario rol;
     private String token;
     private String codigo2faGenerado;
+    private String apellidos;
+    private String dni;
+    private String whatsapp;
 
     public AuthResponse() {
     }
@@ -89,5 +92,29 @@ public class AuthResponse {
 
     public void setCodigo2faGenerado(String codigo2faGenerado) {
         this.codigo2faGenerado = codigo2faGenerado;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
     }
 }

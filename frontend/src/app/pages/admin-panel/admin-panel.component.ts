@@ -266,7 +266,7 @@ import { NotificationService } from '../../services/notification.service';
 					<div class="col-md-6 col-12">
 						<label class="form-label fw-bold" style="font-size: 12.5px;">Docente Asignado *</label>
 						<select id="nuevo-curso-docente" class="form-select form-select-sm">
-							<option value="a0000000-0000-0000-0000-000000000002">Ing. Roberto Docente (Docente Principal)</option>
+							<option value="a0000000-0000-0000-0000-000000000002">Ing. Roberto Mendoza</option>
 						</select>
 					</div>
 

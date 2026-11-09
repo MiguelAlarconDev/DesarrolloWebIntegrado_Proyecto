@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    AJUSTE DE ANCHO GLOBAL DEL SISTEMA (-10%)
    Reduce el ancho de todos los contenedores y secciones del sistema en un 10%
    ========================================================================== */
@@ -57,6 +57,14 @@
   max-width: 1180px !important;
   margin-left: auto !important;
   margin-right: auto !important;
+}
+
+#navigation .container-fluid,
+.site-navigation .container-fluid {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
 }
 
 @media (min-width: 1200px) and (max-width: 1399.98px) {
@@ -172,6 +180,8 @@ html {
   align-items: center !important;
 
   justify-content: space-between !important;
+
+  flex-wrap: nowrap !important;
 
   width: 100% !important;
 
@@ -5149,9 +5159,27 @@ app-root > div > main {
   padding: 11px 0 !important;
 }
 
-/* 1. Logo (-5%) */
+/* 1. Logo (-5%) y Separación respecto a los menús */
 .site-logo {
   min-height: 45px !important;
+}
+
+@media (min-width: 992px) {
+  .site-logo {
+    margin-right: 36px !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .site-logo {
+    margin-right: 50px !important;
+  }
+}
+
+@media (min-width: 1400px) {
+  .site-logo {
+    margin-right: 64px !important;
+  }
 }
 
 .site-logo a,
@@ -5171,8 +5199,26 @@ app-root > div > main {
 }
 
 /* 2. Enlaces del menú central (-5%) */
+@media (min-width: 992px) {
+  .header_right {
+    margin-left: 0 !important;
+  }
+  #main-menu {
+    margin-left: 0 !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  #main-menu {
+    margin-left: 0 !important;
+  }
+}
+
 #main-menu ul {
-  gap: 5px !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
 }
 
 #main-menu ul li a,
@@ -5180,13 +5226,14 @@ app-root > div > main {
 #navigation.navbar-fixed #main-menu ul li a {
   height: 40px !important;
   line-height: 40px !important;
-  padding: 0 14px !important;
-  font-size: 15px !important;
+  padding: 0 12px !important;
+  font-size: 14px !important;
   letter-spacing: -0.1px !important;
+  white-space: nowrap !important;
 }
 
 #main-menu ul li a i {
-  font-size: 15.5px !important;
+  font-size: 14.5px !important;
 }
 
 /* 3. Ícono del carrito alineado y con el mismo diseño de botón (40x40, borde 8px) */

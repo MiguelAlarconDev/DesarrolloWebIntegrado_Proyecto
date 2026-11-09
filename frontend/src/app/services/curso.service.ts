@@ -154,6 +154,86 @@ export class CursoService {
     });
   }
 
+  // ==========================================
+  // LIBRO DE CALIFICACIONES (GRADEBOOK 0-20)
+  // ==========================================
+  async obtenerCalificaciones(cursoId: string): Promise<any[]> {
+    try {
+      const data = await this.api.request<any[]>(`/cursos/calificaciones/curso/${cursoId}`);
+      return Array.isArray(data) ? data : [];
+    } catch (err: any) {
+      console.warn(`[CursoService] No se pudieron cargar calificaciones de BD para curso ${cursoId}:`, err?.message);
+      return [];
+    }
+  }
+
+  async obtenerCalificacionEstudiante(cursoId: string, estudianteId: string): Promise<any | null> {
+    try {
+      return await this.api.request<any>(`/cursos/calificaciones/curso/${cursoId}/estudiante/${estudianteId}`);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async guardarCalificacion(payload: {
+    cursoId: string;
+    estudianteId: string;
+    ec1?: number | null;
+    ec2?: number | null;
+    proyectoFinal?: number | null;
+    feedback?: string | null;
+    actualizadoPor?: string;
+  }): Promise<any> {
+    return this.api.request('/cursos/calificaciones', {
+      method: 'POST',
+      body: payload
+    });
+  }
+
+  // ==========================================
+  // CONTROL DE ASISTENCIAS POR SESIÓN
+  // ==========================================
+  async obtenerAsistencias(cursoId: string, sesion?: number): Promise<any[]> {
+    try {
+      const path = sesion
+        ? `/cursos/asistencias/curso/${cursoId}/sesion/${sesion}`
+        : `/cursos/asistencias/curso/${cursoId}`;
+      const data = await this.api.request<any[]>(path);
+      return Array.isArray(data) ? data : [];
+    } catch (err: any) {
+      console.warn(`[CursoService] No se pudieron cargar asistencias de BD para curso ${cursoId}:`, err?.message);
+      return [];
+    }
+  }
+
+  async obtenerResumenAsistencias(cursoId: string): Promise<any[]> {
+    try {
+      const data = await this.api.request<any[]>(`/cursos/asistencias/curso/${cursoId}/resumen`);
+      return Array.isArray(data) ? data : [];
+    } catch (err: any) {
+      console.warn(`[CursoService] No se pudo obtener resumen de asistencias para curso ${cursoId}:`, err?.message);
+      return [];
+    }
+  }
+
+  async guardarAsistenciasLote(payload: {
+    cursoId: string;
+    numeroSesion: number;
+    fechaSesion: string;
+    temaSesion?: string;
+    registradoPor?: string;
+    registros: Array<{
+      estudianteId: string;
+      estado: string; // 'P' | 'T' | 'FJ' | 'F'
+      observaciones?: string;
+    }>;
+  }): Promise<any> {
+    return this.api.request('/cursos/asistencias/lote', {
+      method: 'POST',
+      body: payload
+    });
+  }
+
   private normalizeCursos(list: any[]): CursoModel[] {
     return list.map((item, index) => this.normalizeSingleCurso(item, index));
   }

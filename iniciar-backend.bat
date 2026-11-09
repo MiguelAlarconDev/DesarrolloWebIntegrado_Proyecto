@@ -4,7 +4,7 @@ echo ========================================================
 echo   Iniciando Microservicios Backend CursosPro
 echo ========================================================
 echo.
-echo Verificando que PostgreSQL este activo en localhost:5432 con BD 'cursos_db'...
+echo Verificando que PostgreSQL este activo en localhost:5433 con BD 'cursos_db'...
 echo.
 
 cd /d "%~dp0"
@@ -30,7 +30,11 @@ start "4. Pedidos Service (8083)" cmd /k call mvnw.cmd spring-boot:run -pl pedid
 ping -n 3 127.0.0.1 >nul
 
 echo [5/5] Levantando Comprobantes Service (Python FastAPI - Puerto 8084)...
-start "5. Comprobantes Service (8084)" cmd /k "cd comprobantes-service && py -m uvicorn app.main:app --port 8084 --reload"
+if exist "comprobantes-service\.venv\Scripts\python.exe" (
+    start "5. Comprobantes Service (8084)" cmd /k "cd comprobantes-service && .venv\Scripts\python.exe -m uvicorn app.main:app --port 8084 --reload"
+) else (
+    start "5. Comprobantes Service (8084)" cmd /k "cd comprobantes-service && py -m uvicorn app.main:app --port 8084 --reload"
+)
 
 echo.
 echo ========================================================

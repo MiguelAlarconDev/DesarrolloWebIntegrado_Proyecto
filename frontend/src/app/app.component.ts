@@ -17,6 +17,23 @@ import { FooterComponent } from './components/footer/footer.component';
 export class AppComponent {
   private router = inject(Router);
 
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const cleanVersion = '2026-11-09-clean-v2';
+      if (localStorage.getItem('app_clean_version') !== cleanVersion) {
+        localStorage.removeItem('app_order_history');
+        localStorage.removeItem('last_successful_order');
+        localStorage.removeItem('app_active_cart');
+        localStorage.removeItem('reservation_timer_expiry');
+        localStorage.removeItem('app_cursos_cache');
+        localStorage.removeItem('mp_testuser_balance');
+        sessionStorage.removeItem('paid_course_ids');
+        sessionStorage.removeItem('pending_mp_order');
+        localStorage.setItem('app_clean_version', cleanVersion);
+      }
+    }
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {

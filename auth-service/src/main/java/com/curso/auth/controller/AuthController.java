@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -39,6 +40,12 @@ public class AuthController {
         return authService.verificar2fa(request);
     }
 
+    @PostMapping("/reenviar-2fa")
+    public AuthResponse reenviar2fa(@RequestBody Map<String, String> body) {
+        String correo = body.get("correo");
+        return authService.reenviar2fa(correo);
+    }
+
     @GetMapping("/usuarios")
     public List<Usuario> listarUsuarios() {
         return authService.listarUsuarios();
@@ -47,5 +54,10 @@ public class AuthController {
     @GetMapping("/usuarios/{id}")
     public Usuario buscarUsuario(@PathVariable UUID id) {
         return authService.buscarPorId(id);
+    }
+
+    @PutMapping("/usuarios/{id}")
+    public Usuario actualizarUsuario(@PathVariable UUID id, @RequestBody com.curso.auth.dto.ActualizarPerfilRequest request) {
+        return authService.actualizarPerfil(id, request);
     }
 }

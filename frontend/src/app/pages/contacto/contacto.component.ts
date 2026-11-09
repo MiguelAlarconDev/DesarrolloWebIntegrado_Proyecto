@@ -60,7 +60,7 @@ import { NotificationService } from '../../services/notification.service';
 								</div>
 								<div class="contact-item-content">
 									<h4 class="contact-item-title">Llámanos o WhatsApp :</h4>
-									<a href="tel:+51999555666" class="contact-item-link">+51 999 555 666</a>, <a href="tel:+5113118888" class="contact-item-link">+51 (01) 311 8888</a>
+									<a href="tel:+51935300159" class="contact-item-link">+51 935 300 159</a>, <a href="tel:+5113118888" class="contact-item-link">+51 (01) 311 8888</a>
 								</div>
 							</div>
 

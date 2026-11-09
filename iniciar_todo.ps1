@@ -45,26 +45,22 @@ Start-Sleep -Seconds 2
 # 5. Comprobantes Service (Python FastAPI - Puerto 8084)
 Write-Host "[5/6] Levantando Comprobantes Service (Python FastAPI - Puerto 8084)..." -ForegroundColor Green
 $comprobantesDir = Join-Path $root "comprobantes-service"
-Start-ServiceWindow -Title "5. Comprobantes Service (8084)" -Command "py -m uvicorn app.main:app --host 0.0.0.0 --port 8084 --reload" -WorkingDir $comprobantesDir
+$pythonExe = Join-Path $comprobantesDir ".venv\Scripts\python.exe"
+if (Test-Path $pythonExe) {
+    Start-ServiceWindow -Title "5. Comprobantes Service (8084)" -Command ".\.venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8084 --reload" -WorkingDir $comprobantesDir
+} else {
+    Start-ServiceWindow -Title "5. Comprobantes Service (8084)" -Command "py -m uvicorn app.main:app --host 0.0.0.0 --port 8084 --reload" -WorkingDir $comprobantesDir
+}
 
 Start-Sleep -Seconds 2
 
 # 6. Frontend Angular (4200)
 Write-Host "[6/6] Levantando Frontend Angular (Puerto 4200)..." -ForegroundColor Green
-$targetDir = "C:\dev\cursos-frontend"
-$srcDir = Join-Path $root "..\frontedangularsis"
-if (-not (Test-Path $srcDir)) { $srcDir = Join-Path $root "frontend" }
+$frontendDir = Join-Path $root "frontend"
 
-Copy-Item -Path "$srcDir\src\*" -Destination "$targetDir\src" -Recurse -Force
-Copy-Item -Path "$srcDir\public\*" -Destination "$targetDir\public" -Recurse -Force
-Copy-Item -Path "$srcDir\angular.json" -Destination "$targetDir\" -Force
-Copy-Item -Path "$srcDir\package.json" -Destination "$targetDir\" -Force
-Copy-Item -Path "$srcDir\tsconfig*.json" -Destination "$targetDir\" -Force
-
-Start-ServiceWindow -Title "6. Frontend Angular (4200)" -Command "set NG_CLI_ANALYTICS=false& call npx ng serve" -WorkingDir $targetDir
+Start-ServiceWindow -Title "6. Frontend Angular (4200)" -Command "set NG_CLI_ANALYTICS=false& call npx ng serve --open" -WorkingDir $frontendDir
 
 Start-Sleep -Seconds 3
-Start-Process "http://localhost:4200"
 
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host "  Todos los servicios se estan ejecutando en ventanas independientes." -ForegroundColor Cyan

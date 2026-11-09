@@ -52,8 +52,11 @@ export class PedidoService {
         }
       });
       if (response && response.id) {
+        const resolvedUrl = response.initPoint || response.mpInitPoint || response.init_point || response.sandbox_init_point;
         return {
           ...response,
+          initPoint: resolvedUrl,
+          mpInitPoint: resolvedUrl,
           curso: curso
         };
       }
@@ -80,6 +83,20 @@ export class PedidoService {
     return ordenLocal;
   }
 
+  async verificarEstadoMercadoPago(pedidoId: string): Promise<{ approved: boolean; paymentId: string }> {
+    try {
+      const res = await this.api.request<any>(`/pedidos/${pedidoId}/estado-mp`, {
+        method: 'GET'
+      });
+      return {
+        approved: !!(res && res.approved),
+        paymentId: (res && res.paymentId) ? String(res.paymentId) : ''
+      };
+    } catch (_) {
+      return { approved: false, paymentId: '' };
+    }
+  }
+
   async procesarPagoMercadoPago(pedido: any, datosPago: any = {}): Promise<any> {
     const mpPaymentId = 'MP-PAY-' + Math.floor(100000000 + Math.random() * 900000000);
     const tipoComprobante = datosPago.tipoComprobante || 'BOLETA';
@@ -91,14 +108,18 @@ export class PedidoService {
       backendPedido = await this.api.request<any>(`/pedidos/${pedido.id}/pagar`, {
         method: 'PUT',
         body: {
-          mpPaymentId,
+          mpPaymentId: (datosPago.mpPaymentId || mpPaymentId),
           metodoPago: datosPago.metodoPago || 'TARJETA',
           tipoComprobante,
           rucCliente: datosPago.ruc || null,
           razonSocial: datosPago.razonSocial || null,
           whatsapp: datosPago.whatsapp || null,
           correo: datosPago.correo || null,
-          clienteNombres: datosPago.clienteNombres || null
+          clienteNombres: datosPago.clienteNombres || null,
+          numeroTarjeta: datosPago.numeroTarjeta || null,
+          fechaExpiracion: datosPago.fechaExpiracion || null,
+          cvv: datosPago.cvv || null,
+          titular: datosPago.titular || null
         }
       });
     } catch (err: any) {
@@ -113,12 +134,12 @@ export class PedidoService {
     const user = this.authService.getCurrentUser() || {
       nombres: datosPago.clienteNombres || 'Carlos Estudiante',
       dni: datosPago.docIdentidad || '30000003',
-      whatsapp: datosPago.whatsapp || '+51999555666',
-      correo: datosPago.correo || 'estudiante@cursos.com'
+      whatsapp: datosPago.whatsapp || '+51935300159',
+      correo: datosPago.correo || 'carlokasike333@gmail.com'
     };
 
-    const telefonoDestino = datosPago.whatsapp || user.whatsapp || '+51999555666';
-    const correoDestino = datosPago.correo || user.correo || 'estudiante@cursos.com';
+    const telefonoDestino = datosPago.whatsapp || user.whatsapp || '+51935300159';
+    const correoDestino = datosPago.correo || user.correo || 'carlokasike333@gmail.com';
     const mensajeWhatsApp = this.buildWhatsAppMessage(user, curso, pedido.codigoOrden, `${serie}-${correlativo}`);
 
     const ordenConfirmada = {
@@ -126,7 +147,7 @@ export class PedidoService {
       ...(backendPedido || {}),
       curso,
       estado: 'PAGADO',
-      mpPaymentId,
+      mpPaymentId: (backendPedido && backendPedido.mpPaymentId) || datosPago.mpPaymentId || mpPaymentId,
       metodoPago: datosPago.metodoPago || 'Mercado Pago (Tarjeta / Yape)',
       fechaPago: new Date().toLocaleString('es-PE'),
       comprobante: {
@@ -206,6 +227,10 @@ export class PedidoService {
         const remote = await this.api.request<any[]>(`/pedidos/estudiante/${targetId}`);
         if (Array.isArray(remote)) {
           this.saveCachedPaidCourseIds(remote);
+          if (remote.length === 0) {
+            localStorage.removeItem('app_order_history');
+            localStorage.removeItem(APP_CONFIG.STORAGE_KEYS.LAST_ORDER);
+          }
           return remote;
         }
       } catch (err: any) {
@@ -254,6 +279,34 @@ export class PedidoService {
       history.unshift(order);
     }
     localStorage.setItem('app_order_history', JSON.stringify(history));
+  }
+
+  getEvaluacionAcademica(cursoId: string, estudianteId: string): { aprobado: boolean; nota?: number; fechaAprobacion?: string } | null {
+    try {
+      const raw = localStorage.getItem('app_academic_evaluations');
+      if (!raw) return null;
+      const map = JSON.parse(raw);
+      return map[`${cursoId}_${estudianteId}`] || map[cursoId] || null;
+    } catch {
+      return null;
+    }
+  }
+
+  guardarEvaluacionAcademica(cursoId: string, estudianteId: string, aprobado: boolean, nota: number = 18): void {
+    try {
+      const raw = localStorage.getItem('app_academic_evaluations');
+      const map = raw ? JSON.parse(raw) : {};
+      if (aprobado) {
+        map[`${cursoId}_${estudianteId}`] = {
+          aprobado: true,
+          nota: nota,
+          fechaAprobacion: new Date().toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        };
+      } else {
+        delete map[`${cursoId}_${estudianteId}`];
+      }
+      localStorage.setItem('app_academic_evaluations', JSON.stringify(map));
+    } catch (_) {}
   }
 
   private generateUUID(): string {

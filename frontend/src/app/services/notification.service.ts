@@ -92,7 +92,7 @@ export class NotificationService {
     if (cleanNum.length === 9) {
       cleanNum = '51' + cleanNum;
     } else if (cleanNum.length === 0) {
-      cleanNum = '51999555666';
+      cleanNum = '51935300159';
     }
     const encoded = encodeURIComponent(mensaje);
     const url = `https://api.whatsapp.com/send?phone=${cleanNum}&text=${encoded}`;

@@ -371,7 +371,7 @@ export class MisComprobantesComponent implements OnInit, AfterViewInit {
         apellidos: 'Alarcón',
         correo: 'estudiante@cursos.com',
         dni: '30000003',
-        whatsapp: '999555666',
+        whatsapp: '935300159',
         rol: 'ESTUDIANTE'
       };
     }

@@ -14,6 +14,7 @@ import { DocentePanelComponent } from './pages/docente-panel/docente-panel.compo
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel.component';
 import { ContactoComponent } from './pages/contacto/contacto.component';
 import { BeneficiosComponent } from './pages/beneficios/beneficios.component';
+import { AulaVirtualComponent } from './pages/aula-virtual/aula-virtual.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -39,6 +40,12 @@ export const routes: Routes = [
   { path: 'registro.html', redirectTo: 'registro', pathMatch: 'full' },
   { path: 'mis-cursos', component: EstudiantePanelComponent },
   { path: 'mis-cursos.html', redirectTo: 'mis-cursos', pathMatch: 'full' },
+  { path: 'aula-virtual', component: AulaVirtualComponent },
+  { path: 'aula-virtual.html', redirectTo: 'aula-virtual', pathMatch: 'full' },
+  { path: 'aula-virtual/:id', component: AulaVirtualComponent },
+  { path: 'mi-perfil', component: EstudiantePanelComponent },
+  { path: 'mi-perfil.html', redirectTo: 'mi-perfil', pathMatch: 'full' },
+  { path: 'perfil', redirectTo: 'mi-perfil', pathMatch: 'full' },
   { path: 'mis-comprobantes', component: MisComprobantesComponent },
   { path: 'mis-comprobantes.html', redirectTo: 'mis-comprobantes', pathMatch: 'full' },
   { path: 'mis-certificados', component: MisCertificadosComponent },

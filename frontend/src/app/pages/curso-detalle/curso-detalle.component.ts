@@ -45,7 +45,7 @@ import { NotificationService } from '../../services/notification.service';
 
             <!-- Título y Metadatos -->
             <div class="cd-course-header mt-3">
-              <h1 class="cd-course-title">{{ curso?.titulo || 'Professional Ceramic Moulding for Beginners' }}</h1>
+              <h1 class="cd-course-title">{{ curso?.titulo || 'Desarrollo de Software y Arquitectura Cloud' }}</h1>
               
               <div class="cd-meta-row">
                 <span class="cd-meta-item">
@@ -64,7 +64,7 @@ import { NotificationService } from '../../services/notification.service';
 
               <!-- Párrafos Introductorios -->
               <p class="cd-text-desc">
-                {{ curso?.descripcion || 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.' }}
+                {{ curso?.descripcion || 'Aprende las tecnologías más demandadas del mercado con un enfoque 100% práctico, clases guiadas paso a paso y proyectos reales para acelerar tu crecimiento profesional.' }}
               </p>
               <p class="cd-text-desc">
                 Este programa integral está diseñado con metodologías ágiles y casos prácticos reales para potenciar tus habilidades profesionales. Cada módulo incluye laboratorios guiados paso a paso, código fuente descargable y soporte directo del docente especialista para asegurar tu dominio integral.
@@ -77,32 +77,32 @@ import { NotificationService } from '../../services/notification.service';
                       class="cd-tab-btn" 
                       [class.active]="activeTab === 'overview'" 
                       (click)="selectTab('overview')">
-                OVERVIEW
+                DESCRIPCIÓN
               </button>
               <button type="button" 
                       class="cd-tab-btn" 
                       [class.active]="activeTab === 'curriculum'" 
                       (click)="selectTab('curriculum')">
-                CURRICULUM
+                TEMARIO
               </button>
               <button type="button" 
                       class="cd-tab-btn" 
                       [class.active]="activeTab === 'instructor'" 
                       (click)="selectTab('instructor')">
-                INSTRUCTOR
+                DOCENTE
               </button>
               <button type="button" 
                       class="cd-tab-btn" 
                       [class.active]="activeTab === 'reviews'" 
                       (click)="selectTab('reviews')">
-                REVIEWS
+                OPINIONES
               </button>
             </div>
 
             <!-- Contenido de las Pestañas -->
             <div class="cd-tab-content-area">
 
-              <!-- TAB 1: OVERVIEW -->
+              <!-- TAB 1: DESCRIPCIÓN -->
               <div *ngIf="activeTab === 'overview'" class="cd-tab-pane animate-fade">
                 <p class="cd-text-desc">
                   Aprende las mejores prácticas de la industria con un enfoque 100% práctico y orientado a proyectos. Descubre cómo optimizar tus flujos de trabajo, resolver problemas complejos y aplicar soluciones empresariales modernas con acompañamiento docente continuo.
@@ -138,7 +138,7 @@ import { NotificationService } from '../../services/notification.service';
                       <i class="fa fa-clock-o ms-3" title="Ver más tarde"></i>
                     </div>
                     <div class="cd-yt-brand-btn">
-                      <span>Mirar en <strong>YouTube</strong></span>
+                      <span>Ver en <strong>YouTube</strong></span>
                     </div>
                   </div>
                 </div>
@@ -151,10 +151,10 @@ import { NotificationService } from '../../services/notification.service';
                 <div class="cd-bottom-action-bar mt-4">
                   <div class="cd-action-buttons-group">
                     <button type="button" class="cd-btn-enroll-pill" (click)="enrollNow()">
-                      ENROLL NOW <i class="fa fa-angle-right ms-1"></i>
+                      INSCRIBIRME AHORA <i class="fa fa-angle-right ms-1"></i>
                     </button>
                     <button type="button" class="cd-btn-membership-pill" (click)="addToCart()">
-                      {{ inCart ? 'EN TU CARRITO' : 'GET MEMBERSHIP' }}
+                      {{ inCart ? 'EN EL CARRITO' : 'AGREGAR AL CARRITO' }}
                     </button>
                   </div>
 
@@ -172,7 +172,7 @@ import { NotificationService } from '../../services/notification.service';
                 </div>
               </div>
 
-              <!-- TAB 2: CURRICULUM -->
+              <!-- TAB 2: TEMARIO -->
               <div *ngIf="activeTab === 'curriculum'" class="cd-tab-pane animate-fade">
                 <h4 class="fw-bold mb-3 text-dark">Plan de Estudios Oficial & Temario Modular</h4>
                 <p class="text-muted mb-4">El contenido está estructurado progresivamente para garantizar un aprendizaje sólido desde los fundamentos hasta el despliegue profesional.</p>
@@ -199,7 +199,7 @@ import { NotificationService } from '../../services/notification.service';
                 </div>
               </div>
 
-              <!-- TAB 3: INSTRUCTOR -->
+              <!-- TAB 3: DOCENTE -->
               <div *ngIf="activeTab === 'instructor'" class="cd-tab-pane animate-fade">
                 <div class="cd-instructor-card">
                   <div class="cd-instructor-avatar">
@@ -222,7 +222,7 @@ import { NotificationService } from '../../services/notification.service';
                 </div>
               </div>
 
-              <!-- TAB 4: REVIEWS -->
+              <!-- TAB 4: OPINIONES -->
               <div *ngIf="activeTab === 'reviews'" class="cd-tab-pane animate-fade">
                 <div class="cd-reviews-summary">
                   <div class="cd-rating-big">
@@ -284,49 +284,49 @@ import { NotificationService } from '../../services/notification.service';
             <!-- TARJETA 1: COURSE FEATURES -->
             <div class="cd-features-card">
               <div class="cd-features-header">
-                Course features
+                Características del Curso
               </div>
               <div class="cd-features-body">
                 <div class="cd-feature-row">
                   <span class="cd-feature-label">
-                    <i class="fa fa-calendar-check-o cd-green-icon me-2"></i> Course duration
+                    <i class="fa fa-calendar-check-o cd-green-icon me-2"></i> Duración del curso
                   </span>
-                  <span class="cd-feature-badge">10 days</span>
+                  <span class="cd-feature-badge">{{ durationBadge }}</span>
                 </div>
                 <div class="cd-feature-row">
                   <span class="cd-feature-label">
-                    <i class="fa fa-user-circle-o cd-green-icon me-2"></i> Total Lectures
+                    <i class="fa fa-user-circle-o cd-green-icon me-2"></i> Sesiones de Clase
                   </span>
-                  <span class="cd-feature-badge">30</span>
+                  <span class="cd-feature-badge">30 sesiones</span>
                 </div>
                 <div class="cd-feature-row">
                   <span class="cd-feature-label">
-                    <i class="fa fa-users cd-green-icon me-2"></i> Total Students
+                    <i class="fa fa-users cd-green-icon me-2"></i> Alumnos Matriculados
                   </span>
-                  <span class="cd-feature-badge">1000</span>
+                  <span class="cd-feature-badge">1,000+</span>
                 </div>
                 <div class="cd-feature-row">
                   <span class="cd-feature-label">
-                    <i class="fa fa-graduation-cap cd-green-icon me-2"></i> Certification
+                    <i class="fa fa-graduation-cap cd-green-icon me-2"></i> Certificado Oficial
                   </span>
-                  <span class="cd-feature-badge">YES</span>
+                  <span class="cd-feature-badge">INCLUIDO</span>
                 </div>
 
                 <!-- Price Banner Verde -->
                 <div class="cd-price-banner">
-                  Price - S/ {{ curso ? (curso.precio | number:'1.2-2') : '150.00' }}
+                  Precio: S/ {{ curso ? (curso.precio | number:'1.2-2') : '150.00' }}
                 </div>
 
-                <!-- Botón Register Today -->
+                <!-- Botón Inscribirme Hoy -->
                 <button type="button" class="cd-btn-register-today" (click)="enrollNow()">
-                  Register Today
+                  Inscribirme Hoy
                 </button>
               </div>
             </div>
 
             <!-- TARJETA 2: RELATED COURSE -->
             <div class="cd-sidebar-box">
-              <h3 class="cd-sidebar-title">Related Course</h3>
+              <h3 class="cd-sidebar-title">Cursos Relacionados</h3>
               <div class="cd-related-list">
                 <div *ngFor="let rel of relatedCourses" 
                      class="cd-related-item" 
@@ -354,46 +354,46 @@ import { NotificationService } from '../../services/notification.service';
               </div>
             </div>
 
-            <!-- TARJETA 3: CATEGORIES -->
+            <!-- TARJETA 3: CATEGORÍAS -->
             <div class="cd-sidebar-box">
-              <h3 class="cd-sidebar-title">CATEGORIES</h3>
+              <h3 class="cd-sidebar-title">CATEGORÍAS</h3>
               <div class="cd-categories-grid">
-                <a href="/cursos" class="cd-category-tag">Education <sup>11</sup></a>
-                <a href="/cursos" class="cd-category-tag">AI Content <sup>44</sup></a>
-                <a href="/cursos" class="cd-category-tag">New Course <sup>33</sup></a>
-                <a href="/cursos" class="cd-category-tag">Marketing <sup>14</sup></a>
-                <a href="/cursos" class="cd-category-tag">Software <sup>23</sup></a>
-                <a href="/cursos" class="cd-category-tag">Design <sup>61</sup></a>
+                <a href="/cursos" class="cd-category-tag">Educación <sup>11</sup></a>
+                <a href="/cursos" class="cd-category-tag">Inteligencia Artificial <sup>44</sup></a>
+                <a href="/cursos" class="cd-category-tag">Nuevos Cursos <sup>33</sup></a>
+                <a href="/cursos" class="cd-category-tag">Marketing Digital <sup>14</sup></a>
+                <a href="/cursos" class="cd-category-tag">Desarrollo Web & Software <sup>23</sup></a>
+                <a href="/cursos" class="cd-category-tag">Diseño UI/UX <sup>61</sup></a>
               </div>
             </div>
 
-            <!-- TARJETA 4: FOLLOW US -->
+            <!-- TARJETA 4: SÍGUENOS -->
             <div class="cd-sidebar-box">
-              <h3 class="cd-sidebar-title">FOLLOW US</h3>
+              <h3 class="cd-sidebar-title">SÍGUENOS</h3>
               <div class="cd-social-grid">
                 <a href="https://facebook.com" target="_blank" rel="noopener" class="cd-social-tile cd-fb">
                   <i class="fa fa-facebook"></i>
-                  <span>250K Likes</span>
+                  <span>250K Seguidores</span>
                 </a>
                 <a href="https://twitter.com" target="_blank" rel="noopener" class="cd-social-tile cd-tw">
                   <i class="fa fa-twitter"></i>
-                  <span>120K Followers</span>
+                  <span>120K Seguidores</span>
                 </a>
                 <a href="https://youtube.com" target="_blank" rel="noopener" class="cd-social-tile cd-yt">
                   <i class="fa fa-youtube-play"></i>
-                  <span>95K Subscribers</span>
+                  <span>95K Suscriptores</span>
                 </a>
                 <a href="https://pinterest.com" target="_blank" rel="noopener" class="cd-social-tile cd-pin">
                   <i class="fa fa-pinterest"></i>
-                  <span>350K Followers</span>
+                  <span>350K Seguidores</span>
                 </a>
                 <a href="https://linkedin.com" target="_blank" rel="noopener" class="cd-social-tile cd-in">
                   <i class="fa fa-linkedin"></i>
-                  <span>80K Followers</span>
+                  <span>80K Conexiones</span>
                 </a>
                 <a href="javascript:void(0)" class="cd-social-tile cd-rss">
-                  <i class="fa fa-rss"></i>
-                  <span>412 Followers</span>
+                  <i class="fa fa-whatsapp"></i>
+                  <span>Comunidad</span>
                 </a>
               </div>
             </div>
@@ -1004,7 +1004,7 @@ import { NotificationService } from '../../services/notification.service';
       border-bottom-color: #2eca7f;
     }
 
-    /* Redes Sociales FOLLOW US */
+    /* Redes Sociales SÍGUENOS */
     .cd-social-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1243,10 +1243,10 @@ export class CursoDetalleComponent implements OnInit, OnDestroy {
   showVideoModal: boolean = false;
 
   formattedDate: string = '10 Oct 2026';
-  durationBadge: string = '10 days';
-  seatsAvailableBadge: string = '30 Seats Available';
-  videoTitleTag: string = '10 Excel Formulas';
-  videoSubtitleTag: string = 'Make you Excel Expert';
+  durationBadge: string = '10 semanas';
+  seatsAvailableBadge: string = '30 Vacantes Disponibles';
+  videoTitleTag: string = 'Clase Muestra en Vivo';
+  videoSubtitleTag: string = 'Aprende con Especialistas';
   techBadgeLetter: string = 'X';
 
   temarioModulos = [
@@ -1336,7 +1336,7 @@ export class CursoDetalleComponent implements OnInit, OnDestroy {
     if (c.fechaInicio) {
       try {
         const d = new Date(c.fechaInicio);
-        this.formattedDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        this.formattedDate = d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
       } catch (_) {
         this.formattedDate = '10 Oct 2026';
       }
@@ -1344,22 +1344,22 @@ export class CursoDetalleComponent implements OnInit, OnDestroy {
       this.formattedDate = '10 Oct 2026';
     }
 
-    this.durationBadge = c.modalidad === 'VIRTUAL' ? '10 days' : '40 hours';
+    this.durationBadge = c.modalidad === 'VIRTUAL' ? '10 semanas' : '40 horas';
     const vac = c.aforoDisponible !== undefined ? c.aforoDisponible : (c.aforoMaximo || 30);
-    this.seatsAvailableBadge = `${vac} Seats Available`;
+    this.seatsAvailableBadge = `${vac} Vacantes Disponibles`;
 
     // Adaptar títulos de la caja de video
     if (c.titulo.toLowerCase().includes('excel')) {
-      this.videoTitleTag = '10 Excel Formulas';
-      this.videoSubtitleTag = 'Make you Excel Expert';
+      this.videoTitleTag = 'Excel y Fórmulas Avanzadas';
+      this.videoSubtitleTag = 'Conviértete en Experto';
       this.techBadgeLetter = 'X';
     } else if (c.titulo.toLowerCase().includes('java') || c.titulo.toLowerCase().includes('spring')) {
-      this.videoTitleTag = 'Java & Spring Boot';
+      this.videoTitleTag = 'Java y Spring Boot';
       this.videoSubtitleTag = 'Microservicios Empresariales';
       this.techBadgeLetter = 'J';
     } else if (c.titulo.toLowerCase().includes('angular') || c.titulo.toLowerCase().includes('frontend')) {
-      this.videoTitleTag = 'Angular 22 Mastery';
-      this.videoSubtitleTag = 'Standalone & Reactive Signals';
+      this.videoTitleTag = 'Angular y TypeScript';
+      this.videoSubtitleTag = 'Arquitectura Frontend Moderna';
       this.techBadgeLetter = 'A';
     } else {
       this.videoTitleTag = c.titulo.length > 22 ? c.titulo.substring(0, 22) + '...' : c.titulo;
@@ -1379,7 +1379,7 @@ export class CursoDetalleComponent implements OnInit, OnDestroy {
       const defaults: CursoModel[] = [
         {
           id: 'b0000000-0000-0000-0000-000000000002',
-          titulo: 'UI/UX Design and Prototyping...',
+          titulo: 'Diseño de Interfaces UI/UX y Prototipado',
           descripcion: 'Diseño de interfaces intuitivas y sistemas de diseño escalables con Figma.',
           modalidad: 'VIRTUAL',
           precio: 42.00,
@@ -1391,7 +1391,7 @@ export class CursoDetalleComponent implements OnInit, OnDestroy {
         },
         {
           id: 'b0000000-0000-0000-0000-000000000003',
-          titulo: 'Greatest Passion In Development...',
+          titulo: 'Arquitectura Limpia y Buenas Prácticas',
           descripcion: 'Metodologías ágiles, buenas prácticas y arquitectura limpia en proyectos de TI.',
           modalidad: 'VIRTUAL',
           precio: 37.00,
@@ -1403,7 +1403,7 @@ export class CursoDetalleComponent implements OnInit, OnDestroy {
         },
         {
           id: 'b0000000-0000-0000-0000-000000000004',
-          titulo: 'Incorporate your art into code...',
+          titulo: 'Frontend Creativo y Animaciones Web',
           descripcion: 'Frontend creativo con animaciones CSS, canvas y componentes interactivos.',
           modalidad: 'PRESENCIAL',
           precio: 21.00,

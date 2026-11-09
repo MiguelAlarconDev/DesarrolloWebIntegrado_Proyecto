@@ -117,28 +117,58 @@ public class PedidoService {
         return pagar(pedidoId, pagarRequest);
     }
 
+    public Map<String, Object> verificarEstadoMercadoPago(UUID pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        if (pedido.getEstado() == EstadoPedido.PAGADO || pedido.getEstado() == EstadoPedido.CONFIRMADO) {
+            return Map.of(
+                    "approved", true,
+                    "paymentId", pedido.getMpPaymentId() != null ? pedido.getMpPaymentId() : ""
+            );
+        }
+        String mpPaymentId = mercadoPagoClient.buscarPagoAprobadoPorReferencia(pedidoId.toString());
+        if (mpPaymentId != null && !mpPaymentId.isBlank()) {
+            return Map.of(
+                    "approved", true,
+                    "paymentId", mpPaymentId
+            );
+        }
+        return Map.of(
+                "approved", false,
+                "paymentId", ""
+        );
+    }
+
     @Transactional
     public Pedido pagar(UUID pedidoId, PagarPedidoRequest request) {
         Pedido pedido = buscarPorId(pedidoId);
 
         if (pedido.getEstado() == EstadoPedido.PAGADO || pedido.getEstado() == EstadoPedido.CONFIRMADO) {
-            throw new IllegalStateException("Este pedido ya fue pagado anteriormente");
+            return pedido;
         }
 
         if (pedido.getEstado() == EstadoPedido.CANCELADO) {
             throw new IllegalStateException("No se puede pagar un pedido que fue cancelado");
         }
 
-        pedido.setEstado(EstadoPedido.PAGADO);
-        pedido.setMpPaymentId(request != null && request.getMpPaymentId() != null
-                ? request.getMpPaymentId()
-                : "PAY-" + System.currentTimeMillis());
-
-        Pedido pedidoActualizado = pedidoRepository.save(pedido);
-
         // Obtener datos del estudiante y curso para comprobante y notificación
         UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
         CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
+
+        if (request != null && request.getCorreo() != null && !request.getCorreo().isBlank() && estudiante != null) {
+            estudiante.setCorreo(request.getCorreo().trim());
+        }
+
+        String realMpId = (request != null && request.getMpPaymentId() != null && request.getMpPaymentId().matches("^\\d+$"))
+                ? request.getMpPaymentId()
+                : mercadoPagoClient.buscarPagoAprobadoPorReferencia(pedido.getId().toString());
+        if (realMpId == null || realMpId.isBlank()) {
+            realMpId = mercadoPagoClient.procesarPagoDirecto(pedido, curso, request);
+        }
+
+        pedido.setEstado(EstadoPedido.PAGADO);
+        pedido.setMpPaymentId(realMpId);
+
+        Pedido pedidoActualizado = pedidoRepository.save(pedido);
 
         // Generar comprobante electrónico
         generarComprobante(pedidoActualizado, estudiante, curso, request);

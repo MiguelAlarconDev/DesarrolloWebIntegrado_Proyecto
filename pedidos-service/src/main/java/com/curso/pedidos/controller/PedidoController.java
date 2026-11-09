@@ -83,6 +83,11 @@ public class PedidoController {
         return pedidoService.listar();
     }
 
+    @GetMapping("/{id}/estado-mp")
+    public Map<String, Object> verificarEstadoMercadoPago(@PathVariable UUID id) {
+        return pedidoService.verificarEstadoMercadoPago(id);
+    }
+
     @GetMapping("/{id}")
     public Pedido buscar(@PathVariable UUID id) {
         return pedidoService.buscarPorId(id);

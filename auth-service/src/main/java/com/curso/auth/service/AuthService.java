@@ -1,5 +1,6 @@
 package com.curso.auth.service;
 
+import com.curso.auth.client.WhatsAppClient;
 import com.curso.auth.dto.AuthResponse;
 import com.curso.auth.dto.LoginRequest;
 import com.curso.auth.dto.RegistroUsuarioRequest;
@@ -18,9 +19,11 @@ import java.util.UUID;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final WhatsAppClient whatsAppClient;
 
-    public AuthService(UsuarioRepository usuarioRepository) {
+    public AuthService(UsuarioRepository usuarioRepository, WhatsAppClient whatsAppClient) {
         this.usuarioRepository = usuarioRepository;
+        this.whatsAppClient = whatsAppClient;
     }
 
     public AuthResponse registrar(RegistroUsuarioRequest request) {
@@ -52,15 +55,19 @@ public class AuthService {
 
         Usuario guardado = usuarioRepository.save(usuario);
 
-        return new AuthResponse(
+        AuthResponse resReg = new AuthResponse(
                 "Usuario registrado exitosamente",
                 "SUCCESS",
                 guardado.getId(),
-                guardado.getNombres() + " " + guardado.getApellidos(),
+                guardado.getNombres(),
                 guardado.getCorreo(),
                 guardado.getRol(),
                 "TOKEN-REGISTRO-" + guardado.getId()
         );
+        resReg.setApellidos(guardado.getApellidos());
+        resReg.setDni(guardado.getDni());
+        resReg.setWhatsapp(guardado.getWhatsapp());
+        return resReg;
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -82,29 +89,74 @@ public class AuthService {
             usuario.setCodigo2faExpiraEn(LocalDateTime.now().plusMinutes(5)); // Válido por 5 minutos
             usuarioRepository.save(usuario);
 
-            System.out.printf("[SEGURIDAD 2FA] Código OTP generado para %s: %s (Vence en 5 min, Enviado al WhatsApp %s)%n",
-                    usuario.getCorreo(), codigoOtp, usuario.getWhatsapp());
+            // Enviar mensaje real a WhatsApp a través de Green-API
+            String portalNombre = usuario.getRol() == RolUsuario.ADMIN ? "Panel de Administrador" : "Portal Docente";
+            String msg = String.format("Plataforma de Cursos: Tu código de verificación 2FA para el %s es: %s. Válido por 5 minutos.", portalNombre, codigoOtp);
+            boolean enviado = whatsAppClient.enviarMensaje(usuario.getWhatsapp(), msg);
+
+            System.out.printf("[2FA - WHATSAPP GREEN-API] Envío a %s (%s): %s | Código OTP: %s%n",
+                    usuario.getWhatsapp(), usuario.getNombres(), enviado ? "EXITOSO" : "FALLIDO", codigoOtp);
 
             AuthResponse response = new AuthResponse();
-            response.setMensaje("Se requiere verificación 2FA. Ingrese el código OTP generado (vigencia: 5 minutos).");
+            response.setMensaje("Hemos enviado un código de 6 dígitos a tu WhatsApp oficial (" + usuario.getWhatsapp() + "). Revisa tu teléfono e ingrésalo a continuación.");
             response.setStatus("REQUIRES_2FA");
             response.setUsuarioId(usuario.getId());
             response.setNombres(usuario.getNombres() + " " + usuario.getApellidos());
             response.setCorreo(usuario.getCorreo());
             response.setRol(usuario.getRol());
-            response.setCodigo2faGenerado(codigoOtp);
+            // NO se envía el código en la respuesta JSON para que el docente lo revise en su WhatsApp
+            response.setCodigo2faGenerado(null);
+            response.setWhatsapp(usuario.getWhatsapp());
+            response.setDni(usuario.getDni());
             return response;
         }
 
-        return new AuthResponse(
+        AuthResponse resLog = new AuthResponse(
                 "Inicio de sesión exitoso",
                 "SUCCESS",
                 usuario.getId(),
-                usuario.getNombres() + " " + usuario.getApellidos(),
+                usuario.getNombres(),
                 usuario.getCorreo(),
                 usuario.getRol(),
                 "BEARER-TOKEN-" + usuario.getRol() + "-" + usuario.getId()
         );
+        resLog.setApellidos(usuario.getApellidos());
+        resLog.setDni(usuario.getDni());
+        resLog.setWhatsapp(usuario.getWhatsapp());
+        return resLog;
+    }
+
+    public AuthResponse reenviar2fa(String correo) {
+        if (correo == null || correo.isBlank()) {
+            throw new IllegalArgumentException("Correo obligatorio para reenviar código 2FA");
+        }
+        Usuario usuario = usuarioRepository.findByCorreo(correo.trim().toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con correo: " + correo));
+
+        String codigoOtp = String.format("%06d", new Random().nextInt(999999));
+        usuario.setCodigo2fa(codigoOtp);
+        usuario.setCodigo2faExpiraEn(LocalDateTime.now().plusMinutes(5));
+        usuarioRepository.save(usuario);
+
+        // Reenviar mensaje real a WhatsApp
+        String portalNombre = usuario.getRol() == RolUsuario.ADMIN ? "Panel de Administrador" : "Portal Docente";
+        String msg = String.format("Plataforma de Cursos: Tu NUEVO código de verificación 2FA para el %s es: %s. Válido por 5 minutos.", portalNombre, codigoOtp);
+        boolean enviado = whatsAppClient.enviarMensaje(usuario.getWhatsapp(), msg);
+
+        System.out.printf("[2FA - RE-ENVÍO WHATSAPP GREEN-API] Envío a %s (%s): %s | Código OTP: %s%n",
+                usuario.getWhatsapp(), usuario.getNombres(), enviado ? "EXITOSO" : "FALLIDO", codigoOtp);
+
+        AuthResponse response = new AuthResponse();
+        response.setMensaje("Nuevo código 2FA enviado automáticamente a tu WhatsApp (" + usuario.getWhatsapp() + ").");
+        response.setStatus("REQUIRES_2FA");
+        response.setUsuarioId(usuario.getId());
+        response.setNombres(usuario.getNombres() + " " + usuario.getApellidos());
+        response.setCorreo(usuario.getCorreo());
+        response.setRol(usuario.getRol());
+        response.setCodigo2faGenerado(null);
+        response.setWhatsapp(usuario.getWhatsapp());
+        response.setDni(usuario.getDni());
+        return response;
     }
 
     public AuthResponse verificar2fa(Verificar2faRequest request) {
@@ -116,22 +168,26 @@ public class AuthService {
         }
 
         if (usuario.getCodigo2faExpiraEn() == null || usuario.getCodigo2faExpiraEn().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("El código 2FA ha expirado. Por favor inicie sesión nuevamente para generar uno nuevo.");
+            throw new IllegalArgumentException("El código 2FA ha expirado. Por favor solicita uno nuevo.");
         }
 
         usuario.setCodigo2fa(null);
         usuario.setCodigo2faExpiraEn(null);
         usuarioRepository.save(usuario);
 
-        return new AuthResponse(
+        AuthResponse res2fa = new AuthResponse(
                 "Autenticación 2FA exitosa. Acceso concedido.",
                 "SUCCESS",
                 usuario.getId(),
-                usuario.getNombres() + " " + usuario.getApellidos(),
+                usuario.getNombres(),
                 usuario.getCorreo(),
                 usuario.getRol(),
                 "BEARER-TOKEN-2FA-" + usuario.getRol() + "-" + usuario.getId()
         );
+        res2fa.setApellidos(usuario.getApellidos());
+        res2fa.setDni(usuario.getDni());
+        res2fa.setWhatsapp(usuario.getWhatsapp());
+        return res2fa;
     }
 
     public List<Usuario> listarUsuarios() {
@@ -141,5 +197,25 @@ public class AuthService {
     public Usuario buscarPorId(UUID id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + id));
+    }
+
+    public Usuario actualizarPerfil(UUID id, com.curso.auth.dto.ActualizarPerfilRequest request) {
+        Usuario usuario = buscarPorId(id);
+        if (request.getNombres() != null && !request.getNombres().isBlank()) {
+            usuario.setNombres(request.getNombres().trim());
+        }
+        if (request.getApellidos() != null && !request.getApellidos().isBlank()) {
+            usuario.setApellidos(request.getApellidos().trim());
+        }
+        if (request.getDni() != null && !request.getDni().isBlank()) {
+            usuario.setDni(request.getDni().trim());
+        }
+        if (request.getWhatsapp() != null && !request.getWhatsapp().isBlank()) {
+            usuario.setWhatsapp(request.getWhatsapp().trim());
+        }
+        if (request.getCorreo() != null && !request.getCorreo().isBlank()) {
+            usuario.setCorreo(request.getCorreo().trim().toLowerCase());
+        }
+        return usuarioRepository.save(usuario);
     }
 }

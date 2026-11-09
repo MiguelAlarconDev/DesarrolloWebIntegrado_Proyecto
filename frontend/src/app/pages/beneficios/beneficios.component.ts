@@ -26,10 +26,13 @@ import { CartService } from '../../services/cart.service';
 	</section>	
 	<!-- END SECTION TOP -->
 
-	<!-- NAVEGACIÓN DE TEMAS CON LOS BOTONES ORIGINALES (.btn_one / .btn_two) -->
+	<!-- NAVEGACIÓN DE TEMAS CON BOTONES -->
 	<div class="best-cpurse" style="padding-top: 50px; padding-bottom: 10px;">
 		<div class="container">
 			<div class="text-center">
+				<button type="button" (click)="seleccionarTema('docentes')" [class]="temaActivo === 'docentes' ? 'btn_one me-2 mb-2' : 'btn_two me-2 mb-2'" style="cursor: pointer;">
+					<i class="fa fa-graduation-cap me-1"></i> Docentes y Metodología
+				</button>
 				<button type="button" (click)="seleccionarTema('vacantes')" [class]="temaActivo === 'vacantes' ? 'btn_one me-2 mb-2' : 'btn_two me-2 mb-2'" style="cursor: pointer;">
 					<i class="fa fa-check-circle me-1"></i> Cero Sobreventa de Vacantes
 				</button>
@@ -46,6 +49,98 @@ import { CartService } from '../../services/cart.service';
 		</div>
 	</div>
 
+	<!-- 1. SECCIÓN: DOCENTES Y METODOLOGÍA (CON IMAGEN DE LA PROFESORA) -->
+	@if (temaActivo === 'docentes' || temaActivo === 'todos') {
+		<section class="ab_one section-padding" id="detalle-docentes">
+			<div class="container">									
+				<div class="row align-items-center">								
+					<div class="col-lg-6 col-sm-12 col-xs-12">
+						<div class="ab_img position-relative" style="overflow: hidden; border-radius: 20px; box-shadow: 0 16px 40px rgba(0,0,0,0.12);">
+							<img src="assets/images/all-img/profesora-beneficios.jpg" class="img-fluid w-100" alt="Docentes Especialistas en Clase" style="display: block; object-fit: cover; max-height: 460px; transition: transform 0.3s ease;">
+							<div style="position: absolute; bottom: 20px; left: 20px; background: rgba(26,45,98,0.92); color: #ffffff; padding: 12px 20px; border-radius: 12px; backdrop-filter: blur(8px); border-left: 4px solid #2eca7f;">
+								<span style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #2eca7f; font-weight: 800;">Formación Profesional</span>
+								<strong style="font-size: 15px;">Clases Prácticas con Docentes Expertos</strong>
+							</div>
+						</div>
+						<div class="course_features mt-4">
+							<h3>Calidad Académica Garantizada</h3>
+							<ul>
+								<li><i class="fa fa-graduation-cap"></i> Docentes <b>Ingenieros & Especialistas</b></li>
+								<li><i class="fa fa-laptop"></i> Metodología <b>Teoría + Práctica en Vivo</b></li>
+								<li><i class="fa fa-comments"></i> Consultas <b>Atención Directa en Clase</b></li>
+								<li><i class="fa fa-certificate"></i> Certificación <b>Con Valor Curricular Oficial</b></li>
+							</ul>
+						</div>
+					</div>					
+					<div class="col-lg-6 col-sm-12 col-xs-12">
+						<div class="ab_content">
+							<h2>Aprende con <u><span>Docentes Expertos</span></u> y Metodología 100% Práctica.</h2>
+							<p>Nuestros cursos están dictados por profesionales con amplia experiencia real en la industria y en docencia universitaria. Desde la resolución paso a paso en pizarra hasta la implementación de proyectos completos de software y tecnología.</p>
+						</div>
+						<div class="abmv">
+							<span class="ti-user"></span>
+							<h4>Docentes del Sector Tecnológico</h4>
+							<p>Profesionales titulados y certificados que te guían en el aprendizaje de herramientas demandadas por las mejores empresas.</p>
+						</div>
+						<div class="abmv">
+							<span class="ti-blackboard"></span>
+							<h4>Resolución Paso a Paso y Laboratorios Reales</h4>
+							<p>Clases dinámicas con explicación clara de conceptos, demostraciones en vivo y desarrollo de ejercicios prácticos desde cero.</p>
+						</div>
+						<div class="abmv">
+							<span class="ti-medall"></span>
+							<h4>Certificado Oficial de Aprobación</h4>
+							<p>Al aprobar tus cursos recibes tu certificado emitido con código verificable (CERT-2026-XXXXXX) para enriquecer tu CV y perfil de LinkedIn.</p>
+						</div>
+						<div class="mt-4">
+							<a class="btn_one me-2 mb-2" href="/cursos"><i class="fa fa-book me-1"></i> Ver Catálogo de Cursos</a>
+							<a class="btn_two mb-2" href="/contacto">Consultar con un Asesor</a>
+						</div>
+					</div>								  
+				</div>
+			</div>
+		</section>
+
+		<section class="marketing_content_area section-padding bg-light">
+			<div class="container">
+				<div class="section-title">
+					<h2>Metodología de Aprendizaje</h2>
+					<p>¿Cómo impulsamos tu <span><u>crecimiento académico</u></span>?</p>
+				</div>
+				<div class="row tp_promo_box">
+					<div class="col-lg-4 col-sm-6 col-xs-12">
+						<div class="single_feature_one">
+							<div class="sf_top">
+								<span class="ti-video-clapper ss_one"></span>
+								<h2><a href="/cursos">1. Sesiones en Vivo</a></h2>
+							</div>
+							<p>Interacción directa con el profesor a través de Zoom o en laboratorios físicos con equipos equipados.</p>
+						</div>
+					</div>
+					<div class="col-lg-4 col-sm-6 col-xs-12">
+						<div class="single_feature_one">
+							<div class="sf_top">
+								<span class="ti-light-bulb ss_two"></span>
+								<h2><a href="/cursos">2. Proyectos Reales</a></h2>
+							</div>
+							<p>Aplica lo aprendido resolviendo desafíos y casos prácticos que te preparan para el mercado laboral.</p>
+						</div>
+					</div>
+					<div class="col-lg-4 col-sm-6 col-xs-12">
+						<div class="single_feature_one">
+							<div class="sf_top">
+								<span class="ti-award ss_three"></span>
+								<h2><a href="/mis-certificados">3. Acreditación</a></h2>
+							</div>
+							<p>Descarga tus certificados en PDF con registro de horas académicas oficiales y firma de tu docente.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	}
+
+	<!-- 2. SECCIÓN: CERO SOBREVENTA DE VACANTES -->
 	@if (temaActivo === 'vacantes' || temaActivo === 'todos') {
 		<section class="ab_one section-padding" id="detalle-vacantes">
 			<div class="container">									
@@ -121,7 +216,7 @@ import { CartService } from '../../services/cart.service';
 					<div class="col-lg-4 col-sm-6 col-xs-12">
 						<div class="single_feature_one">
 							<div class="sf_top">
-								<span class="ti-Lock ss_three"></span>
+								<span class="ti-lock ss_three"></span>
 								<h2><a href="/mis-cursos">3. Asignación Inmediata</a></h2>
 							</div>
 							<p>Confirmado el pago, tu vacante queda descontada y registrada a tu nombre en el listado oficial del docente.</p>
@@ -132,6 +227,7 @@ import { CartService } from '../../services/cart.service';
 		</section>
 	}
 
+	<!-- 3. SECCIÓN: PAGO SEGURO CON MERCADO PAGO -->
 	@if (temaActivo === 'pasarela' || temaActivo === 'todos') {
 		<section class="ab_one section-padding" id="detalle-pasarela">
 			<div class="container">									
@@ -218,6 +314,7 @@ import { CartService } from '../../services/cart.service';
 		</section>
 	}
 
+	<!-- 4. SECCIÓN: WHATSAPP Y BOLETA INMEDIATOS -->
 	@if (temaActivo === 'boleta' || temaActivo === 'todos') {
 		<section class="ab_one section-padding" id="detalle-boleta">
 			<div class="container">									
@@ -276,7 +373,7 @@ import { CartService } from '../../services/cart.service';
 						<div class="single_feature_one">
 							<div class="sf_top">
 								<span class="ti-files ss_one"></span>
-								<h2><a href="/mis-cursos">1. Boleta / Factura</a></h2>
+								<h2><a href="/mis-comprobantes">1. Boleta / Factura</a></h2>
 							</div>
 							<p>Comprobante electrónico numerado (<strong>B001</strong> o <strong>F001</strong>) con el detalle de tus cursos matriculados e impuestos de ley.</p>
 						</div>
@@ -304,32 +401,42 @@ import { CartService } from '../../services/cart.service';
 		</section>
 	}
 
+	<!-- 5. BLOQUES INFERIORES DE RESUMEN -->
 	<section class="tp_feature" style="padding-top: 30px;">
 	   <div class="container">			
 			<div class="row tp_promo_box">					
-				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding">
+				<div class="col-lg-3 col-sm-6 col-xs-12 no-padding">
 					<div class="single_tp">
-						<h3>Cero Sobreventa de Vacantes</h3>
-						<p>Control automático que descuenta los cupos en el momento exacto en que compras, garantizando tu asiento en el aula física o tu cupo en Zoom.</p>
-						<a href="javascript:void(0)" (click)="seleccionarTema('vacantes')" class="cta"><span>Ver Detalle de Cupos</span>
+						<h3>Docentes Especialistas</h3>
+						<p>Clases en vivo dictadas por ingenieros y especialistas con enfoque 100% práctico y certificación oficial.</p>
+						<a href="javascript:void(0)" (click)="seleccionarTema('docentes')" class="cta"><span>Ver Metodología</span>
+						  <svg width="13px" height="10px" viewBox="0 0 13 10"><path d="M1,5 L11,5"></path><polyline points="8 1 12 5 8 9"></polyline></svg>
+						</a>
+					</div>
+				</div>
+				<div class="col-lg-3 col-sm-6 col-xs-12 no-padding">
+					<div class="single_tp">
+						<h3>Cero Sobreventa</h3>
+						<p>Control automático que descuenta los cupos en tiempo real, garantizando tu asiento o acceso en Zoom.</p>
+						<a href="javascript:void(0)" (click)="seleccionarTema('vacantes')" class="cta"><span>Ver Cupos</span>
 						  <svg width="13px" height="10px" viewBox="0 0 13 10"><path d="M1,5 L11,5"></path><polyline points="8 1 12 5 8 9"></polyline></svg>
 						</a>
 					</div>
 				</div>			
-				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding">
+				<div class="col-lg-3 col-sm-6 col-xs-12 no-padding">
 					<div class="single_tp">
-						<h3>Pago Seguro con Mercado Pago</h3>
-						<p>Paga en línea al instante con tarjeta de crédito, débito o Yape/Plin mediante pasarela cifrada sin esperar transferencias manuales.</p>
+						<h3>Mercado Pago Seguro</h3>
+						<p>Paga al instante con tarjeta de crédito, débito o Yape/Plin mediante pasarela bancaria cifrada.</p>
 						<a href="javascript:void(0)" (click)="seleccionarTema('pasarela')" class="cta"><span>Conocer Pasarela</span>
 						  <svg width="13px" height="10px" viewBox="0 0 13 10"><path d="M1,5 L11,5"></path><polyline points="8 1 12 5 8 9"></polyline></svg>
 						</a>
 					</div>
 				</div>			
-				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding">
+				<div class="col-lg-3 col-sm-6 col-xs-12 no-padding">
 					<div class="single_tp">
-						<h3>WhatsApp & Boleta Inmediatos</h3>
-						<p>Recibe tu Boleta o Factura electrónica al instante y un mensaje automático a tu WhatsApp con los enlaces de clase o dirección del laboratorio.</p>
-						<a href="javascript:void(0)" (click)="seleccionarTema('boleta')" class="cta"><span>Ver Envío y Boleta</span>
+						<h3>WhatsApp & Boleta</h3>
+						<p>Recibe tu Boleta o Factura electrónica al instante y un mensaje a tu WhatsApp con los enlaces de clase.</p>
+						<a href="javascript:void(0)" (click)="seleccionarTema('boleta')" class="cta"><span>Ver Envío</span>
 						  <svg width="13px" height="10px" viewBox="0 0 13 10"><path d="M1,5 L11,5"></path><polyline points="8 1 12 5 8 9"></polyline></svg>
 						</a>
 					</div>
@@ -345,14 +452,14 @@ export class BeneficiosComponent implements OnInit, AfterViewInit, OnDestroy {
   private cartService = inject(CartService);
   private qSub?: Subscription;
 
-  temaActivo: 'vacantes' | 'pasarela' | 'boleta' | 'todos' = 'todos';
+  temaActivo: 'docentes' | 'vacantes' | 'pasarela' | 'boleta' | 'todos' = 'todos';
   bannerTitle = 'Beneficios de Nuestra Plataforma';
-  bannerSubtitle = 'Inscripción 100% Automatizada';
+  bannerSubtitle = 'Educación Práctica y Matrícula Automatizada';
 
   ngOnInit(): void {
     this.qSub = this.route.queryParams.subscribe(params => {
       const tema = (params['tema'] || '').toLowerCase();
-      if (tema === 'vacantes' || tema === 'pasarela' || tema === 'boleta' || tema === 'todos') {
+      if (tema === 'docentes' || tema === 'vacantes' || tema === 'pasarela' || tema === 'boleta' || tema === 'todos') {
         this.aplicarTema(tema as any);
       } else {
         this.aplicarTema('todos');
@@ -365,16 +472,19 @@ export class BeneficiosComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cartService.updateBadge();
   }
 
-  seleccionarTema(tema: 'vacantes' | 'pasarela' | 'boleta' | 'todos'): void {
+  seleccionarTema(tema: 'docentes' | 'vacantes' | 'pasarela' | 'boleta' | 'todos'): void {
     this.aplicarTema(tema);
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  private aplicarTema(tema: 'vacantes' | 'pasarela' | 'boleta' | 'todos'): void {
+  private aplicarTema(tema: 'docentes' | 'vacantes' | 'pasarela' | 'boleta' | 'todos'): void {
     this.temaActivo = tema;
-    if (tema === 'vacantes') {
+    if (tema === 'docentes') {
+      this.bannerTitle = 'Docentes Expertos & Metodología Práctica';
+      this.bannerSubtitle = 'Educación Superior de Calidad';
+    } else if (tema === 'vacantes') {
       this.bannerTitle = 'Cero Sobreventa de Vacantes';
       this.bannerSubtitle = 'Control de Aforo en Tiempo Real';
     } else if (tema === 'pasarela') {
@@ -385,7 +495,7 @@ export class BeneficiosComponent implements OnInit, AfterViewInit, OnDestroy {
       this.bannerSubtitle = 'Comprobantes y Accesos al Instante';
     } else {
       this.bannerTitle = 'Beneficios de Nuestra Plataforma';
-      this.bannerSubtitle = 'Inscripción 100% Automatizada';
+      this.bannerSubtitle = 'Educación Práctica y Matrícula Automatizada';
     }
   }
 

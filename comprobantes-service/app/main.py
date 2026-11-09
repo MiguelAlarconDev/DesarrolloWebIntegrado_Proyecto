@@ -18,7 +18,7 @@ from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
-load_dotenv(ENV_PATH)
+load_dotenv(ENV_PATH, override=True)
 
 
 class ComprobanteRequest(BaseModel):
@@ -126,11 +126,12 @@ def generar_pdf(datos: ComprobanteRequest, destino: Path) -> None:
 
 
 def enviar_correo(datos: ComprobanteRequest, pdf_path: Path) -> None:
-    host = os.getenv("SMTP_HOST")
-    port = int(os.getenv("SMTP_PORT", "587"))
-    username = os.getenv("SMTP_USERNAME")
-    password = (os.getenv("SMTP_PASSWORD") or "").replace(" ", "")
-    remitente = os.getenv("SMTP_FROM", username or "")
+    load_dotenv(ENV_PATH, override=True)
+    host = os.getenv("SMTP_HOST") or "smtp.gmail.com"
+    port = int(os.getenv("SMTP_PORT") or "587")
+    username = os.getenv("SMTP_USERNAME") or "carlokasike333@gmail.com"
+    password = (os.getenv("SMTP_PASSWORD") or "baymfrfmwjstrmtb").replace(" ", "")
+    remitente = os.getenv("SMTP_FROM") or username
 
     if not host or not username or not password or not remitente:
         raise RuntimeError("Configuracion SMTP incompleta")
@@ -319,4 +320,3 @@ def descargar_certificado(
         fecha=fecha,
     )
     return FileResponse(cert_path, media_type="application/pdf", filename=f"Certificado_{codigoCertificado}.pdf")
-
