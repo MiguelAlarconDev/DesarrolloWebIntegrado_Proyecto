@@ -182,6 +182,7 @@ export class CursoService {
     ec2?: number | null;
     proyectoFinal?: number | null;
     feedback?: string | null;
+    docenteId?: string;
     actualizadoPor?: string;
   }): Promise<any> {
     return this.api.request('/cursos/calificaciones', {

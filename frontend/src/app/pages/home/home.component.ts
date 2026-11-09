@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APP_CONFIG, CursoModel } from '../../services/config.data';
@@ -149,7 +149,7 @@ import { NotificationService } from '../../services/notification.service';
 	<!-- END COURSE SECTION -->
   `
 })
-export class HomeComponent implements AfterViewInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
@@ -163,7 +163,40 @@ export class HomeComponent implements AfterViewInit {
   searchKeywordHome = '';
   paidCourseIdsHome = new Set<string>();
 
+  ngOnInit(): void {
+    if (this.redirigirSiRolEspecial()) return;
+  }
+
+  private redirigirSiRolEspecial(): boolean {
+    const user = this.authService.getCurrentUser();
+    const rawHash = (typeof window !== 'undefined' ? (window.location.hash || '').replace('#', '').toLowerCase() : '');
+    const fragment = rawHash || (this.route.snapshot.fragment || '').toLowerCase();
+
+    if (user) {
+      if (user.rol === 'ADMIN') {
+        const targetHash = (fragment === 'usuarios' || fragment === 'pedidos' || fragment === 'cursos' || fragment === 'resumen')
+          ? `#${fragment}`
+          : '';
+        this.router.navigateByUrl('/portal-admin' + targetHash);
+        return true;
+      }
+      if (user.rol === 'DOCENTE') {
+        this.router.navigateByUrl('/portal-docente');
+        return true;
+      }
+    } else {
+      // Si un usuario no autenticado intenta ingresar a las secciones de administración:
+      if (fragment === 'usuarios' || fragment === 'pedidos') {
+        this.router.navigateByUrl('/login?redirect=' + encodeURIComponent('portal-admin#' + fragment));
+        return true;
+      }
+    }
+    return false;
+  }
+
   ngAfterViewInit(): void {
+    if (this.redirigirSiRolEspecial()) return;
+
     if (typeof window !== 'undefined') {
       (window as any).reservar = (id: string) => this.reservar(id);
       (window as any).filtrarCursos = (mod: string) => this.filtrarCursos(mod);
@@ -173,17 +206,12 @@ export class HomeComponent implements AfterViewInit {
     this.initHome();
 
     this.route.fragment.subscribe(fragment => {
-      if (fragment) {
-        const u = this.authService.getCurrentUser();
-        if (u && u.rol === 'ADMIN' && (fragment === 'usuarios' || fragment === 'pedidos' || fragment === 'cursos')) {
-          this.router.navigateByUrl('/portal-admin#' + fragment);
-          return;
-        }
-        setTimeout(() => {
-          const el = document.getElementById(fragment);
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }
+      if (!fragment) return;
+      if (this.redirigirSiRolEspecial()) return;
+      setTimeout(() => {
+        const el = document.getElementById(fragment);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     });
   }
 

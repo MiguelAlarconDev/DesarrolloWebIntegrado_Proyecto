@@ -1,6 +1,7 @@
-import { Component, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CursoModel } from '../../services/config.data';
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { CursoService } from '../../services/curso.service';
@@ -210,7 +211,7 @@ import { NotificationService } from '../../services/notification.service';
 									<th>WhatsApp</th>
 									<th>Rol</th>
 									<th>Seguridad 2FA</th>
-									<th style="width: 130px; text-align: center;">Acciones</th>
+									<th style="width: 175px; text-align: center;">Acciones</th>
 								</tr>
 							</thead>
 							<tbody id="tabla-admin-usuarios-body">
@@ -472,12 +473,14 @@ import { NotificationService } from '../../services/notification.service';
 	</div>
   `
 })
-export class AdminPanelComponent implements AfterViewInit {
+export class AdminPanelComponent implements AfterViewInit, OnDestroy {
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
   private cursoService = inject(CursoService);
   private pedidoService = inject(PedidoService);
   private notifications = inject(NotificationService);
+  private routeSub?: Subscription;
 
   adminCursos: CursoModel[] = [];
   adminPedidos: any[] = [];
@@ -490,8 +493,26 @@ export class AdminPanelComponent implements AfterViewInit {
       w.cambiarEstadoCurso = (id: string, estado: string) => this.cambiarEstadoCurso(id, estado);
       w.abrirModalEditarUsuario = (id: string) => this.abrirModalEditarUsuario(id);
       w.confirmarEliminarUsuario = (id: string, nombre: string, correo: string) => this.confirmarEliminarUsuario(id, nombre, correo);
+
+      window.addEventListener('hashchange', () => {
+        const h = (window.location.hash || '').replace('#', '').toLowerCase();
+        if (['cursos', 'pedidos', 'usuarios', 'resumen'].includes(h)) {
+          this.switchAdminTab(h, false);
+        }
+      });
     }
+
+    this.routeSub = this.route.fragment.subscribe(fragment => {
+      if (fragment && ['cursos', 'pedidos', 'usuarios', 'resumen'].includes(fragment.toLowerCase())) {
+        this.switchAdminTab(fragment.toLowerCase(), false);
+      }
+    });
+
     this.initPortalAdmin();
+  }
+
+  ngOnDestroy(): void {
+    this.routeSub?.unsubscribe();
   }
 
   async initPortalAdmin(): Promise<void> {
@@ -515,10 +536,13 @@ export class AdminPanelComponent implements AfterViewInit {
 
     this.authService.updateNavbar();
 
+    const routeFrag = (this.route.snapshot.fragment || '').toLowerCase();
     const hashTab = (window.location.hash || '').replace('#', '').toLowerCase();
     const urlParams = new URLSearchParams(window.location.search);
     const queryTab = (urlParams.get('tab') || '').toLowerCase();
-    const initialTab = (hashTab === 'resumen' || hashTab === 'pedidos' || hashTab === 'usuarios') ? hashTab : 'cursos';
+    const pathTab = (typeof window !== 'undefined' && window.location.pathname.includes('usuarios')) ? 'usuarios' : '';
+    const targetTab = routeFrag || hashTab || queryTab || pathTab;
+    const initialTab = (targetTab === 'resumen' || targetTab === 'pedidos' || targetTab === 'usuarios') ? targetTab : 'cursos';
 
     if (queryTab === 'new' || hashTab === 'nuevo' || urlParams.get('action') === 'new') {
       setTimeout(() => this.abrirModalCrearCurso(), 300);
@@ -761,10 +785,10 @@ export class AdminPanelComponent implements AfterViewInit {
           <td style="text-align: center;">
             <div class="d-inline-flex gap-1">
               <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2" title="Editar datos y rol" onclick="window.abrirModalEditarUsuario('${u.id}')">
-                <i class="fa fa-pencil"></i>
+                <i class="fa fa-pencil me-1"></i>Editar
               </button>
               <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" title="Eliminar cuenta de usuario" onclick="window.confirmarEliminarUsuario('${u.id}', '${safeNombre}', '${u.correo}')" ${esAdminPrincipal ? 'disabled title="No se puede eliminar el administrador principal"' : ''}>
-                <i class="fa fa-trash"></i>
+                <i class="fa fa-trash me-1"></i>Eliminar
               </button>
             </div>
           </td>
@@ -776,8 +800,13 @@ export class AdminPanelComponent implements AfterViewInit {
   // ==========================================
   // MODAL EDITAR USUARIO
   // ==========================================
-  abrirModalEditarUsuario(id: string): void {
-    const usuario = this.adminUsuarios.find(u => u.id === id);
+  async abrirModalEditarUsuario(id: string): Promise<void> {
+    let usuario = this.adminUsuarios.find(u => u.id === id);
+    if (!usuario) {
+      try {
+        usuario = await this.authService.obtenerUsuarioPorId(id);
+      } catch (_) {}
+    }
     if (!usuario) {
       this.notifications.showToast('Usuario no encontrado.', 'warning');
       return;

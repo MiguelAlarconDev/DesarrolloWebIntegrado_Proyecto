@@ -269,24 +269,41 @@ export class LoginComponent implements AfterViewInit {
   }
 
   private loginExitoso(user: any): void {
-    this.notifications.showToast(`¡Bienvenido, ${user.nombres}! Accediendo al portal...`, 'success');
+    this.notifications.showToast('¡Bienvenido, ' + (user?.nombres || 'Usuario') + '! Accediendo al portal...', 'success');
     this.authService.updateNavbar();
 
     const params = new URLSearchParams(window.location.search);
-    const explicitRedirect = params.get('redirect');
+    const explicitRedirect = (params.get('redirect') || '').trim();
 
-    let destUrl = this.authService.getPortalUrlForRole(user.rol);
-    if (explicitRedirect) {
-      const isStudentUrl = explicitRedirect.includes('mis-cursos') || explicitRedirect.includes('mis-comprobantes') || explicitRedirect.includes('carrito');
-      if ((user.rol === 'ADMIN' || user.rol === 'DOCENTE') && isStudentUrl) {
-        destUrl = this.authService.getPortalUrlForRole(user.rol);
+    let destUrl = '';
+    if (user.rol === 'ADMIN') {
+      if (explicitRedirect.includes('usuarios')) {
+        destUrl = '/portal-admin#usuarios';
+      } else if (explicitRedirect.includes('pedidos')) {
+        destUrl = '/portal-admin#pedidos';
+      } else if (explicitRedirect.includes('cursos')) {
+        destUrl = '/portal-admin#cursos';
+      } else if (explicitRedirect.startsWith('/portal-admin') || explicitRedirect.startsWith('portal-admin')) {
+        destUrl = '/' + explicitRedirect.replace(/^\//, '');
       } else {
-        destUrl = explicitRedirect;
+        destUrl = '/portal-admin';
+      }
+    } else if (user.rol === 'DOCENTE') {
+      if (explicitRedirect.startsWith('/portal-docente') || explicitRedirect.startsWith('portal-docente')) {
+        destUrl = '/' + explicitRedirect.replace(/^\//, '');
+      } else {
+        destUrl = '/portal-docente';
+      }
+    } else {
+      if (explicitRedirect && !['/', 'index.html', 'index', ''].includes(explicitRedirect)) {
+        destUrl = '/' + explicitRedirect.replace(/^\//, '');
+      } else {
+        destUrl = '/mis-cursos';
       }
     }
 
     setTimeout(() => {
-      this.router.navigateByUrl('/' + destUrl.replace(/^\//, ''));
+      this.router.navigateByUrl(destUrl);
     }, 350);
   }
 }

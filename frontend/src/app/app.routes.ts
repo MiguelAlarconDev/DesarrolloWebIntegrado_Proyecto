@@ -56,5 +56,9 @@ export const routes: Routes = [
   { path: 'portal-docente.html', redirectTo: 'portal-docente', pathMatch: 'full' },
   { path: 'portal-admin', component: AdminPanelComponent },
   { path: 'portal-admin.html', redirectTo: 'portal-admin', pathMatch: 'full' },
+  { path: 'admin', redirectTo: 'portal-admin', pathMatch: 'full' },
+  { path: 'admin.html', redirectTo: 'portal-admin', pathMatch: 'full' },
+  { path: 'usuarios', component: AdminPanelComponent },
+  { path: 'usuarios.html', redirectTo: 'usuarios', pathMatch: 'full' },
   { path: '**', redirectTo: '' }
 ];
