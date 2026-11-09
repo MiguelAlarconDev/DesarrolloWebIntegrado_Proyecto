@@ -60,4 +60,10 @@ public class AuthController {
     public Usuario actualizarUsuario(@PathVariable UUID id, @RequestBody com.curso.auth.dto.ActualizarPerfilRequest request) {
         return authService.actualizarPerfil(id, request);
     }
+
+    @DeleteMapping("/usuarios/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminarUsuario(@PathVariable UUID id) {
+        authService.eliminarUsuario(id);
+    }
 }

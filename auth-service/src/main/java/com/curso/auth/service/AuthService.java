@@ -8,7 +8,9 @@ import com.curso.auth.dto.Verificar2faRequest;
 import com.curso.auth.entity.RolUsuario;
 import com.curso.auth.entity.Usuario;
 import com.curso.auth.repository.UsuarioRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,10 +22,12 @@ public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
     private final WhatsAppClient whatsAppClient;
+    private final EntityManager entityManager;
 
-    public AuthService(UsuarioRepository usuarioRepository, WhatsAppClient whatsAppClient) {
+    public AuthService(UsuarioRepository usuarioRepository, WhatsAppClient whatsAppClient, EntityManager entityManager) {
         this.usuarioRepository = usuarioRepository;
         this.whatsAppClient = whatsAppClient;
+        this.entityManager = entityManager;
     }
 
     public AuthResponse registrar(RegistroUsuarioRequest request) {
@@ -216,6 +220,40 @@ public class AuthService {
         if (request.getCorreo() != null && !request.getCorreo().isBlank()) {
             usuario.setCorreo(request.getCorreo().trim().toLowerCase());
         }
+        if (request.getRol() != null && !request.getRol().isBlank()) {
+            try {
+                usuario.setRol(RolUsuario.valueOf(request.getRol().trim().toUpperCase()));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        if (request.getIs2faEnabled() != null) {
+            usuario.setIs2faEnabled(request.getIs2faEnabled());
+        }
+        if (request.getIsActive() != null) {
+            usuario.setIsActive(request.getIsActive());
+        }
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            usuario.setPasswordHash(request.getPassword().trim());
+        }
         return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public void eliminarUsuario(UUID id) {
+        Usuario usuario = buscarPorId(id);
+        if ("admin@cursos.com".equalsIgnoreCase(usuario.getCorreo())) {
+            throw new IllegalArgumentException("No se puede eliminar la cuenta principal del Administrador del Sistema.");
+        }
+
+        try {
+            entityManager.createNativeQuery("DELETE FROM asistencias WHERE estudiante_id = :uid").setParameter("uid", id).executeUpdate();
+            entityManager.createNativeQuery("DELETE FROM calificaciones WHERE estudiante_id = :uid").setParameter("uid", id).executeUpdate();
+            entityManager.createNativeQuery("DELETE FROM pedidos WHERE estudiante_id = :uid").setParameter("uid", id).executeUpdate();
+            entityManager.createNativeQuery("UPDATE cursos SET docente_id = 'a0000000-0000-0000-0000-000000000002' WHERE docente_id = :uid").setParameter("uid", id).executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("[AuthService] Advertencia al limpiar dependencias de usuario: " + ex.getMessage());
+        }
+
+        usuarioRepository.delete(usuario);
     }
 }

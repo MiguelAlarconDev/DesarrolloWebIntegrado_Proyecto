@@ -7,6 +7,13 @@ public class ActualizarPerfilRequest {
     private String dni;
     private String whatsapp;
     private String correo;
+    private String rol;
+    private Boolean is2faEnabled;
+    private Boolean isActive;
+    private String password;
+
+    public ActualizarPerfilRequest() {
+    }
 
     public String getNombres() {
         return nombres;
@@ -46,5 +53,37 @@ public class ActualizarPerfilRequest {
 
     public void setCorreo(String correo) {
         this.correo = correo;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+
+    public Boolean getIs2faEnabled() {
+        return is2faEnabled;
+    }
+
+    public void setIs2faEnabled(Boolean is2faEnabled) {
+        this.is2faEnabled = is2faEnabled;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

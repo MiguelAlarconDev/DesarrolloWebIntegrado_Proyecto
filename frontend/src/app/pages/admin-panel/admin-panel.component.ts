@@ -76,7 +76,7 @@ import { NotificationService } from '../../services/notification.service';
 				</div>
 			</div>
 
-			<!-- PESTAÑAS DE CONTROL ADMINISTRATIVO (CON HASH Y DEEP LINKING) -->
+			<!-- PESTAÑAS DE CONTROL ADMINISTRATIVO -->
 			<div class="row mb-4">
 				<div class="col-12">
 					<div class="platform-tabs-wrapper">
@@ -107,13 +107,13 @@ import { NotificationService } from '../../services/notification.service';
 					<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
 						<div>
 							<h4 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">
-								<i class="fa fa-cubes text-primary me-2"></i>Gestión de Cursos y Aforos
+								<i class="fa fa-th-list text-primary me-2"></i>Catálogo Central de Cursos
 							</h4>
-							<p class="text-muted" style="font-size: 13.5px; margin: 0;">Control oficial de precios, aforos en tiempo real y estado en el catálogo:</p>
+							<p class="text-muted" style="font-size: 13.5px; margin: 0;">Gestiona el aforo, modalidad y disponibilidad de los cursos en tiempo real:</p>
 						</div>
-						<div>
-							<button type="button" class="btn btn-success btn-sm fw-bold px-3 py-2" (click)="abrirModalCrearCurso()">
-								<i class="fa fa-plus-circle me-1"></i> Crear Nuevo Curso
+						<div class="d-flex gap-2">
+							<button type="button" class="btn btn-sm btn-success fw-bold px-3" (click)="abrirModalCrearCurso()">
+								<i class="fa fa-plus me-1"></i> Crear Nuevo Curso
 							</button>
 						</div>
 					</div>
@@ -122,10 +122,10 @@ import { NotificationService } from '../../services/notification.service';
 						<table class="table table-hover align-middle" style="font-size: 13.5px;">
 							<thead style="background: #f8fafc; color: #475569; font-weight: 700;">
 								<tr>
-									<th>Curso</th>
+									<th>Título y Horario</th>
 									<th>Modalidad</th>
-									<th>Precio</th>
-									<th>Aforo en Vivo</th>
+									<th>Precio Oficial</th>
+									<th>Aforo y Vacantes</th>
 									<th>Estado</th>
 									<th class="text-end">Acciones</th>
 								</tr>
@@ -133,7 +133,7 @@ import { NotificationService } from '../../services/notification.service';
 							<tbody id="tabla-admin-cursos-body">
 								<tr>
 									<td colspan="6" class="text-center py-4 text-muted">
-										<i class="fa fa-spinner fa-spin me-2"></i>Cargando cursos del sistema...
+										<i class="fa fa-spinner fa-spin me-2"></i>Cargando cursos desde cursos-service...
 									</td>
 								</tr>
 							</tbody>
@@ -142,15 +142,15 @@ import { NotificationService } from '../../services/notification.service';
 				</div>
 			</div>
 
-			<!-- PESTAÑA 2: ÓRDENES Y MATRÍCULAS -->
+			<!-- PESTAÑA 2: MATRÍCULAS Y PAGOS -->
 			<div id="seccion-admin-pedidos" style="display: none;">
 				<div class="clean-surface">
 					<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
 						<div>
 							<h4 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">
-								<i class="fa fa-receipt text-success me-2"></i>Historial Central de Pedidos y Pagos
+								<i class="fa fa-credit-card text-success me-2"></i>Historial de Pagos y Comprobantes
 							</h4>
-							<p class="text-muted" style="font-size: 13.5px; margin: 0;">Transacciones procesadas a través de Mercado Pago y Comprobantes SUNAT:</p>
+							<p class="text-muted" style="font-size: 13.5px; margin: 0;">Transacciones procesadas a través de Mercado Pago y comprobantes de pago:</p>
 						</div>
 					</div>
 
@@ -159,18 +159,18 @@ import { NotificationService } from '../../services/notification.service';
 							<thead style="background: #f8fafc; color: #475569; font-weight: 700;">
 								<tr>
 									<th>Código Orden</th>
-									<th>Alumno / DNI</th>
+									<th>Estudiante</th>
 									<th>Curso</th>
-									<th>Monto</th>
+									<th>Monto Pagado</th>
 									<th>Comprobante</th>
-									<th>Estado</th>
 									<th>Fecha</th>
+									<th>Estado</th>
 								</tr>
 							</thead>
 							<tbody id="tabla-admin-pedidos-body">
 								<tr>
 									<td colspan="7" class="text-center py-4 text-muted">
-										<i class="fa fa-spinner fa-spin me-2"></i>Cargando transacciones...
+										<i class="fa fa-spinner fa-spin me-2"></i>Cargando pedidos desde pedidos-service...
 									</td>
 								</tr>
 							</tbody>
@@ -179,7 +179,7 @@ import { NotificationService } from '../../services/notification.service';
 				</div>
 			</div>
 
-			<!-- PESTAÑA 3: DIRECTORIO DE USUARIOS -->
+			<!-- PESTAÑA 3: DIRECTORIO DE USUARIOS (CRUD COMPLETO) -->
 			<div id="seccion-admin-usuarios" style="display: none;">
 				<div class="clean-surface">
 					<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
@@ -187,7 +187,16 @@ import { NotificationService } from '../../services/notification.service';
 							<h4 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">
 								<i class="fa fa-id-card-o text-purple me-2" style="color: #9333ea;"></i>Directorio de Usuarios y Roles
 							</h4>
-							<p class="text-muted" style="font-size: 13.5px; margin: 0;">Cuentas registradas en auth-service (Estudiantes, Docentes y Administradores):</p>
+							<p class="text-muted" style="font-size: 13.5px; margin: 0;">Administra cuentas registradas en auth-service (Estudiantes, Docentes y Administradores):</p>
+						</div>
+						<div class="d-flex flex-wrap align-items-center gap-2">
+							<div class="input-group input-group-sm" style="width: 250px;">
+								<span class="input-group-text bg-white border-end-0"><i class="fa fa-search text-muted"></i></span>
+								<input type="text" id="buscador-admin-usuarios" class="form-control border-start-0" placeholder="Buscar por DNI, nombre, correo..." (input)="filtrarUsuariosAdmin($any($event.target).value)">
+							</div>
+							<button type="button" class="btn btn-sm btn-primary fw-bold" (click)="abrirModalCrearUsuario()">
+								<i class="fa fa-user-plus me-1"></i> Nuevo Usuario
+							</button>
 						</div>
 					</div>
 
@@ -201,11 +210,12 @@ import { NotificationService } from '../../services/notification.service';
 									<th>WhatsApp</th>
 									<th>Rol</th>
 									<th>Seguridad 2FA</th>
+									<th style="width: 130px; text-align: center;">Acciones</th>
 								</tr>
 							</thead>
 							<tbody id="tabla-admin-usuarios-body">
 								<tr>
-									<td colspan="6" class="text-center py-4 text-muted">
+									<td colspan="7" class="text-center py-4 text-muted">
 										<i class="fa fa-spinner fa-spin me-2"></i>Cargando usuarios...
 									</td>
 								</tr>
@@ -267,6 +277,7 @@ import { NotificationService } from '../../services/notification.service';
 						<label class="form-label fw-bold" style="font-size: 12.5px;">Docente Asignado *</label>
 						<select id="nuevo-curso-docente" class="form-select form-select-sm">
 							<option value="a0000000-0000-0000-0000-000000000002">Ing. Roberto Mendoza</option>
+							<option value="a0000000-0000-0000-0000-000000000004">Prof. Carlos Mendoza</option>
 						</select>
 					</div>
 
@@ -297,6 +308,168 @@ import { NotificationService } from '../../services/notification.service';
 			</form>
 		</div>
 	</div>
+
+	<!-- MODAL: EDITAR USUARIO -->
+	<div id="modal-editar-usuario" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px); overflow-y: auto; padding: 20px 0;">
+		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 550px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
+			<div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+				<h4 style="font-weight: 800; color: #0f172a; margin: 0;">
+					<i class="fa fa-pencil text-primary me-2"></i>Editar Cuenta de Usuario
+				</h4>
+				<button type="button" class="btn-close" (click)="cerrarModalEditarUsuario()"></button>
+			</div>
+
+			<form id="form-editar-usuario" (submit)="guardarUsuarioEditado($event)">
+				<input type="hidden" id="edit-user-id">
+
+				<div class="row g-3">
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Nombres *</label>
+						<input type="text" id="edit-user-nombres" class="form-control form-control-sm" required>
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Apellidos *</label>
+						<input type="text" id="edit-user-apellidos" class="form-control form-control-sm" required>
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">DNI (8 a 15 dígitos) *</label>
+						<input type="text" id="edit-user-dni" class="form-control form-control-sm" maxlength="15" required>
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">WhatsApp Oficial *</label>
+						<input type="text" id="edit-user-whatsapp" class="form-control form-control-sm" placeholder="+51935300159" required>
+					</div>
+
+					<div class="col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Correo Electrónico *</label>
+						<input type="email" id="edit-user-correo" class="form-control form-control-sm" required>
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Rol en el Sistema *</label>
+						<select id="edit-user-rol" class="form-select form-select-sm fw-bold">
+							<option value="ESTUDIANTE">ESTUDIANTE (Alumno)</option>
+							<option value="DOCENTE">DOCENTE (Profesor)</option>
+							<option value="ADMIN">ADMIN (Administrador)</option>
+						</select>
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Seguridad 2FA (WhatsApp OTP) *</label>
+						<select id="edit-user-2fa" class="form-select form-select-sm">
+							<option value="false">Desactivado</option>
+							<option value="true">Activado (Requiere código OTP)</option>
+						</select>
+					</div>
+
+					<div class="col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Restablecer Contraseña (Opcional)</label>
+						<input type="password" id="edit-user-password" class="form-control form-control-sm" placeholder="Dejar en blanco para conservar la actual">
+						<small class="text-muted" style="font-size: 11px;">Solo escribe aquí si deseas cambiarle la contraseña a este usuario.</small>
+					</div>
+				</div>
+
+				<div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+					<button type="button" class="btn btn-outline-secondary btn-sm" (click)="cerrarModalEditarUsuario()">Cancelar</button>
+					<button type="submit" class="btn btn-primary btn-sm fw-bold px-3" id="btn-submit-editar-usuario">
+						<i class="fa fa-save me-1"></i> Guardar Cambios
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- MODAL: CREAR NUEVO USUARIO -->
+	<div id="modal-crear-usuario" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px); overflow-y: auto; padding: 20px 0;">
+		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 550px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
+			<div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+				<h4 style="font-weight: 800; color: #0f172a; margin: 0;">
+					<i class="fa fa-user-plus text-success me-2"></i>Registrar Nuevo Usuario
+				</h4>
+				<button type="button" class="btn-close" (click)="cerrarModalCrearUsuario()"></button>
+			</div>
+
+			<form id="form-crear-usuario" (submit)="guardarNuevoUsuario($event)">
+				<div class="row g-3">
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Nombres *</label>
+						<input type="text" id="nuevo-user-nombres" class="form-control form-control-sm" required placeholder="Ej: Pedro">
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Apellidos *</label>
+						<input type="text" id="nuevo-user-apellidos" class="form-control form-control-sm" required placeholder="Ej: Sánchez">
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">DNI (8 dígitos) *</label>
+						<input type="text" id="nuevo-user-dni" class="form-control form-control-sm" maxlength="15" required placeholder="72109845">
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">WhatsApp Oficial *</label>
+						<input type="text" id="nuevo-user-whatsapp" class="form-control form-control-sm" placeholder="+51935300159" required>
+					</div>
+
+					<div class="col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Correo Electrónico *</label>
+						<input type="email" id="nuevo-user-correo" class="form-control form-control-sm" required placeholder="usuario@cursos.com">
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Rol en el Sistema *</label>
+						<select id="nuevo-user-rol" class="form-select form-select-sm fw-bold">
+							<option value="ESTUDIANTE">ESTUDIANTE (Alumno)</option>
+							<option value="DOCENTE">DOCENTE (Profesor)</option>
+							<option value="ADMIN">ADMIN (Administrador)</option>
+						</select>
+					</div>
+
+					<div class="col-md-6 col-12">
+						<label class="form-label fw-bold" style="font-size: 12.5px;">Contraseña Inicial *</label>
+						<input type="password" id="nuevo-user-password" class="form-control form-control-sm" required placeholder="123456" value="123456">
+					</div>
+				</div>
+
+				<div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+					<button type="button" class="btn btn-outline-secondary btn-sm" (click)="cerrarModalCrearUsuario()">Cancelar</button>
+					<button type="submit" class="btn btn-success btn-sm fw-bold px-3" id="btn-submit-crear-usuario">
+						<i class="fa fa-check me-1"></i> Crear Usuario
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- MODAL: CONFIRMAR ELIMINAR USUARIO -->
+	<div id="modal-eliminar-usuario" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 16px;">
+		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 440px; width: 100%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3); text-align: center;">
+			<div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 14px;">
+				<i class="fa fa-trash"></i>
+			</div>
+			<h4 style="font-weight: 800; color: #0f172a; margin-bottom: 8px;">¿Eliminar este Usuario?</h4>
+			<p class="text-muted" style="font-size: 13.5px; margin-bottom: 14px;">
+				Estás a punto de eliminar permanentemente la cuenta de:
+			</p>
+
+			<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 20px; text-align: left;">
+				<div class="mb-1"><strong>Nombre:</strong> <span id="delete-user-nombre">-</span></div>
+				<div><strong>Correo:</strong> <span id="delete-user-correo" class="text-muted">-</span></div>
+			</div>
+
+			<input type="hidden" id="delete-user-id">
+
+			<div class="d-flex justify-content-center gap-2">
+				<button type="button" class="btn btn-outline-secondary btn-sm px-3" (click)="cerrarModalEliminarUsuario()">Cancelar</button>
+				<button type="button" class="btn btn-danger btn-sm fw-bold px-3" id="btn-submit-eliminar-usuario" (click)="ejecutarEliminarUsuario()">
+					<i class="fa fa-trash me-1"></i> Sí, Eliminar Cuenta
+				</button>
+			</div>
+		</div>
+	</div>
   `
 })
 export class AdminPanelComponent implements AfterViewInit {
@@ -312,8 +485,11 @@ export class AdminPanelComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     if (typeof window !== 'undefined') {
-      (window as any).switchAdminTab = (tab: string) => this.switchAdminTab(tab);
-      (window as any).cambiarEstadoCurso = (id: string, estado: string) => this.cambiarEstadoCurso(id, estado);
+      const w = window as any;
+      w.switchAdminTab = (tab: string) => this.switchAdminTab(tab);
+      w.cambiarEstadoCurso = (id: string, estado: string) => this.cambiarEstadoCurso(id, estado);
+      w.abrirModalEditarUsuario = (id: string) => this.abrirModalEditarUsuario(id);
+      w.confirmarEliminarUsuario = (id: string, nombre: string, correo: string) => this.confirmarEliminarUsuario(id, nombre, correo);
     }
     this.initPortalAdmin();
   }
@@ -448,20 +624,20 @@ export class AdminPanelComponent implements AfterViewInit {
       this.adminPedidos = await this.pedidoService.obtenerTodosPedidos();
 
       let pagadas = 0;
-      let totalSoles = 0;
+      let totalIngresos = 0;
 
       this.adminPedidos.forEach(p => {
         if (p.estado === 'PAGADO') {
           pagadas++;
-          totalSoles += Number(p.monto || 0);
+          totalIngresos += Number(p.montoTotal || p.monto || 0);
         }
       });
 
       if (metricMatriculas) metricMatriculas.textContent = String(pagadas);
+      if (metricIngresos) metricIngresos.textContent = `S/ ${totalIngresos.toFixed(2)}`;
+
       const bPedidos = document.getElementById('tab-badge-pedidos');
       if (bPedidos) bPedidos.textContent = String(this.adminPedidos.length);
-
-      if (metricIngresos) metricIngresos.textContent = `S/ ${totalSoles.toFixed(2)}`;
 
       this.renderTablaPedidosAdmin(this.adminPedidos);
     } catch (err: any) {
@@ -476,41 +652,37 @@ export class AdminPanelComponent implements AfterViewInit {
     if (!tbody) return;
 
     if (!lista || lista.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">Aún no hay pedidos registrados.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No hay registros de matrículas ni compras.</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = lista.map(p => {
+    tbody.innerHTML = lista.map((p) => {
       const est = p.estudiante || {};
-      const curso = p.curso || {};
+      const estNombre = (est.nombres && est.apellidos) ? `${est.nombres} ${est.apellidos}` : (p.estudianteNombre || 'Estudiante');
       const comp = p.comprobante || {};
-      const rawFecha = p.fechaRegistro || p.createdAt || p.fechaActualizacion;
-      const fecha = rawFecha
-        ? new Date(rawFecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })
+      const numComp = comp.serie && comp.numeroCorrelativo
+        ? `${comp.serie}-${String(comp.numeroCorrelativo).padStart(6, '0')}`
         : '-';
 
-      const nombreEst = (est.nombres && est.apellidos)
-        ? `${est.nombres} ${est.apellidos}`
-        : (est.nombres || p.estudianteNombre || 'Estudiante');
-      const tituloCurso = p.cursoTitulo || curso.titulo || 'Curso Especializado';
+      const fechaStr = p.createdAt || p.fechaCreacion || p.fechaRegistro || p.fechaActualizacion;
+      const fechaFmt = fechaStr ? new Date(fechaStr).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Reciente';
 
-      const isPagado = p.estado === 'PAGADO';
-      const badgeEstado = isPagado
-        ? `<span class="status-pill-success"><i class="fa fa-check-circle me-1"></i>Pagado</span>`
+      const estadoPill = p.estado === 'PAGADO'
+        ? `<span class="badge bg-success" style="font-size: 11px;"><i class="fa fa-check me-1"></i>PAGADO</span>`
         : `<span class="badge bg-warning text-dark" style="font-size: 11px;">PENDIENTE</span>`;
 
       return `
         <tr>
-          <td><strong class="font-monospace text-primary">${p.codigoOrden || 'ORD-000'}</strong></td>
+          <td><span class="font-monospace fw-bold text-primary">${p.codigoOrden || 'ORD-MAT'}</span></td>
           <td>
-            <strong>${nombreEst}</strong>
-            <span class="d-block text-muted" style="font-size: 11.5px;">DNI: ${est.dni || '-'}</span>
+            <strong>${estNombre}</strong>
+            <span class="d-block text-muted" style="font-size: 11.5px;">${est.correo || ''}</span>
           </td>
-          <td>${tituloCurso}</td>
-          <td><strong>S/ ${Number(p.monto || 0).toFixed(2)}</strong></td>
-          <td><span class="badge bg-light text-dark border font-monospace">${comp.serie ? comp.serie + '-' + String(comp.numeroCorrelativo || 1).padStart(6, '0') : '-'}</span></td>
-          <td>${badgeEstado}</td>
-          <td>${fecha}</td>
+          <td>${p.cursoTitulo || 'Curso Especializado'}</td>
+          <td><strong>S/ ${Number(p.montoTotal || p.monto || 0).toFixed(2)}</strong></td>
+          <td><span class="font-monospace text-secondary fw-semibold">${numComp}</span></td>
+          <td>${fechaFmt}</td>
+          <td>${estadoPill}</td>
         </tr>
       `;
     }).join('');
@@ -529,9 +701,26 @@ export class AdminPanelComponent implements AfterViewInit {
       this.renderTablaUsuariosAdmin(this.adminUsuarios);
     } catch (err: any) {
       if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Error: ${err?.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-danger">Error: ${err?.message}</td></tr>`;
       }
     }
+  }
+
+  filtrarUsuariosAdmin(query: string): void {
+    const q = (query || '').toLowerCase().trim();
+    if (!q) {
+      this.renderTablaUsuariosAdmin(this.adminUsuarios);
+      return;
+    }
+    const filtrados = this.adminUsuarios.filter(u => {
+      const nom = `${u.nombres || ''} ${u.apellidos || ''}`.toLowerCase();
+      const dni = (u.dni || '').toLowerCase();
+      const cor = (u.correo || '').toLowerCase();
+      const tel = (u.whatsapp || '').toLowerCase();
+      const rol = (u.rol || '').toLowerCase();
+      return nom.includes(q) || dni.includes(q) || cor.includes(q) || tel.includes(q) || rol.includes(q);
+    });
+    this.renderTablaUsuariosAdmin(filtrados);
   }
 
   private renderTablaUsuariosAdmin(lista: UserProfile[]): void {
@@ -539,7 +728,7 @@ export class AdminPanelComponent implements AfterViewInit {
     if (!tbody) return;
 
     if (!lista || lista.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No se pudieron cargar usuarios.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No se encontraron usuarios para este criterio.</td></tr>`;
       return;
     }
 
@@ -558,6 +747,9 @@ export class AdminPanelComponent implements AfterViewInit {
         ? `<span class="text-success fw-bold" style="font-size: 12px;"><i class="fa fa-check-circle me-1"></i>Activo (OTP)</span>`
         : `<span class="text-muted" style="font-size: 12px;">Desactivado</span>`;
 
+      const safeNombre = `${u.nombres || ''} ${u.apellidos || ''}`.replace(/'/g, "\\'");
+      const esAdminPrincipal = u.correo === 'admin@cursos.com';
+
       return `
         <tr>
           <td><span class="font-monospace fw-bold">${u.dni || '-'}</span></td>
@@ -566,9 +758,227 @@ export class AdminPanelComponent implements AfterViewInit {
           <td><span class="badge bg-light text-dark font-monospace">${u.whatsapp || '-'}</span></td>
           <td>${badgeRol}</td>
           <td>${badge2fa}</td>
+          <td style="text-align: center;">
+            <div class="d-inline-flex gap-1">
+              <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2" title="Editar datos y rol" onclick="window.abrirModalEditarUsuario('${u.id}')">
+                <i class="fa fa-pencil"></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" title="Eliminar cuenta de usuario" onclick="window.confirmarEliminarUsuario('${u.id}', '${safeNombre}', '${u.correo}')" ${esAdminPrincipal ? 'disabled title="No se puede eliminar el administrador principal"' : ''}>
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </td>
         </tr>
       `;
     }).join('');
+  }
+
+  // ==========================================
+  // MODAL EDITAR USUARIO
+  // ==========================================
+  abrirModalEditarUsuario(id: string): void {
+    const usuario = this.adminUsuarios.find(u => u.id === id);
+    if (!usuario) {
+      this.notifications.showToast('Usuario no encontrado.', 'warning');
+      return;
+    }
+
+    const modal = document.getElementById('modal-editar-usuario');
+    const inputId = document.getElementById('edit-user-id') as HTMLInputElement | null;
+    const inputNombres = document.getElementById('edit-user-nombres') as HTMLInputElement | null;
+    const inputApellidos = document.getElementById('edit-user-apellidos') as HTMLInputElement | null;
+    const inputDni = document.getElementById('edit-user-dni') as HTMLInputElement | null;
+    const inputWhatsapp = document.getElementById('edit-user-whatsapp') as HTMLInputElement | null;
+    const inputCorreo = document.getElementById('edit-user-correo') as HTMLInputElement | null;
+    const selectRol = document.getElementById('edit-user-rol') as HTMLSelectElement | null;
+    const select2fa = document.getElementById('edit-user-2fa') as HTMLSelectElement | null;
+    const inputPwd = document.getElementById('edit-user-password') as HTMLInputElement | null;
+
+    if (inputId) inputId.value = usuario.id;
+    if (inputNombres) inputNombres.value = usuario.nombres || '';
+    if (inputApellidos) inputApellidos.value = usuario.apellidos || '';
+    if (inputDni) inputDni.value = usuario.dni || '';
+    if (inputWhatsapp) inputWhatsapp.value = usuario.whatsapp || '';
+    if (inputCorreo) inputCorreo.value = usuario.correo || '';
+    if (selectRol) selectRol.value = usuario.rol || 'ESTUDIANTE';
+    if (select2fa) select2fa.value = String(Boolean(usuario.is2faEnabled));
+    if (inputPwd) inputPwd.value = '';
+
+    if (modal) modal.style.display = 'flex';
+  }
+
+  cerrarModalEditarUsuario(): void {
+    const modal = document.getElementById('modal-editar-usuario');
+    if (modal) modal.style.display = 'none';
+  }
+
+  async guardarUsuarioEditado(e: Event): Promise<void> {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit-editar-usuario') as HTMLButtonElement | null;
+
+    const id = (document.getElementById('edit-user-id') as HTMLInputElement)?.value;
+    const nombres = (document.getElementById('edit-user-nombres') as HTMLInputElement)?.value?.trim();
+    const apellidos = (document.getElementById('edit-user-apellidos') as HTMLInputElement)?.value?.trim();
+    const dni = (document.getElementById('edit-user-dni') as HTMLInputElement)?.value?.trim();
+    const whatsapp = (document.getElementById('edit-user-whatsapp') as HTMLInputElement)?.value?.trim();
+    const correo = (document.getElementById('edit-user-correo') as HTMLInputElement)?.value?.trim();
+    const rol = (document.getElementById('edit-user-rol') as HTMLSelectElement)?.value;
+    const is2faEnabled = (document.getElementById('edit-user-2fa') as HTMLSelectElement)?.value === 'true';
+    const password = (document.getElementById('edit-user-password') as HTMLInputElement)?.value?.trim();
+
+    if (!id || !nombres || !apellidos || !dni || !correo || !whatsapp) {
+      this.notifications.showToast('Por favor completa todos los campos obligatorios.', 'warning');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa fa-spinner fa-spin me-1"></i> Guardando...`;
+    }
+
+    try {
+      const payload: any = {
+        nombres,
+        apellidos,
+        dni,
+        whatsapp,
+        correo,
+        rol,
+        is2faEnabled
+      };
+      if (password) {
+        payload.password = password;
+      }
+
+      await this.authService.actualizarUsuario(id, payload);
+      this.notifications.showToast(`¡Usuario "${nombres} ${apellidos}" actualizado exitosamente!`, 'success');
+      this.cerrarModalEditarUsuario();
+      await this.cargarUsuariosAdmin();
+    } catch (err: any) {
+      this.notifications.showToast('Error al actualizar usuario: ' + err?.message, 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa fa-save me-1"></i> Guardar Cambios`;
+      }
+    }
+  }
+
+  // ==========================================
+  // MODAL CREAR NUEVO USUARIO
+  // ==========================================
+  abrirModalCrearUsuario(): void {
+    const modal = document.getElementById('modal-crear-usuario');
+    const form = document.getElementById('form-crear-usuario') as HTMLFormElement | null;
+    if (form) form.reset();
+    const pwdInput = document.getElementById('nuevo-user-password') as HTMLInputElement | null;
+    if (pwdInput) pwdInput.value = '123456';
+    if (modal) modal.style.display = 'flex';
+  }
+
+  cerrarModalCrearUsuario(): void {
+    const modal = document.getElementById('modal-crear-usuario');
+    if (modal) modal.style.display = 'none';
+  }
+
+  async guardarNuevoUsuario(e: Event): Promise<void> {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit-crear-usuario') as HTMLButtonElement | null;
+
+    const nombres = (document.getElementById('nuevo-user-nombres') as HTMLInputElement)?.value?.trim();
+    const apellidos = (document.getElementById('nuevo-user-apellidos') as HTMLInputElement)?.value?.trim();
+    const dni = (document.getElementById('nuevo-user-dni') as HTMLInputElement)?.value?.trim();
+    const whatsapp = (document.getElementById('nuevo-user-whatsapp') as HTMLInputElement)?.value?.trim();
+    const correo = (document.getElementById('nuevo-user-correo') as HTMLInputElement)?.value?.trim();
+    const rol = (document.getElementById('nuevo-user-rol') as HTMLSelectElement)?.value || 'ESTUDIANTE';
+    const password = (document.getElementById('nuevo-user-password') as HTMLInputElement)?.value?.trim() || '123456';
+
+    if (!nombres || !apellidos || !dni || !correo || !whatsapp || !password) {
+      this.notifications.showToast('Por favor completa todos los campos requeridos.', 'warning');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa fa-spinner fa-spin me-1"></i> Registrando...`;
+    }
+
+    try {
+      await this.authService.registro({
+        nombres,
+        apellidos,
+        dni,
+        whatsapp,
+        correo,
+        rol,
+        password,
+        is2faEnabled: rol === 'DOCENTE' || rol === 'ADMIN'
+      });
+
+      this.notifications.showToast(`¡Usuario "${nombres} ${apellidos}" creado exitosamente!`, 'success');
+      this.cerrarModalCrearUsuario();
+      await this.cargarUsuariosAdmin();
+    } catch (err: any) {
+      this.notifications.showToast('Error al registrar usuario: ' + err?.message, 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa fa-check me-1"></i> Crear Usuario`;
+      }
+    }
+  }
+
+  // ==========================================
+  // MODAL ELIMINAR USUARIO
+  // ==========================================
+  confirmarEliminarUsuario(id: string, nombre: string, correo: string): void {
+    if (correo === 'admin@cursos.com') {
+      this.notifications.showToast('No es posible eliminar la cuenta principal de Administrador.', 'warning');
+      return;
+    }
+
+    const modal = document.getElementById('modal-eliminar-usuario');
+    const inputId = document.getElementById('delete-user-id') as HTMLInputElement | null;
+    const spanNombre = document.getElementById('delete-user-nombre');
+    const spanCorreo = document.getElementById('delete-user-correo');
+
+    if (inputId) inputId.value = id;
+    if (spanNombre) spanNombre.textContent = nombre;
+    if (spanCorreo) spanCorreo.textContent = correo;
+
+    if (modal) modal.style.display = 'flex';
+  }
+
+  cerrarModalEliminarUsuario(): void {
+    const modal = document.getElementById('modal-eliminar-usuario');
+    if (modal) modal.style.display = 'none';
+  }
+
+  async ejecutarEliminarUsuario(): Promise<void> {
+    const inputId = document.getElementById('delete-user-id') as HTMLInputElement | null;
+    const btn = document.getElementById('btn-submit-eliminar-usuario') as HTMLButtonElement | null;
+    const id = inputId ? inputId.value : null;
+
+    if (!id) return;
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa fa-spinner fa-spin me-1"></i> Eliminando...`;
+    }
+
+    try {
+      await this.authService.eliminarUsuario(id);
+      this.notifications.showToast('¡Usuario eliminado exitosamente del sistema!', 'success');
+      this.cerrarModalEliminarUsuario();
+      await this.cargarUsuariosAdmin();
+    } catch (err: any) {
+      this.notifications.showToast('Error al eliminar usuario: ' + err?.message, 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa fa-trash me-1"></i> Sí, Eliminar Cuenta`;
+      }
+    }
   }
 
   switchAdminTab(tab: string, updateHash = true): void {

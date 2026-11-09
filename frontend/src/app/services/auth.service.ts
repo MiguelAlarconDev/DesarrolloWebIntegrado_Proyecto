@@ -217,6 +217,19 @@ export class AuthService {
     return this.api.request<UserProfile>(`/auth/usuarios/${id}`);
   }
 
+  async actualizarUsuario(id: string, payload: any): Promise<any> {
+    return this.api.request(`/auth/usuarios/${id}`, {
+      method: 'PUT',
+      body: payload
+    });
+  }
+
+  async eliminarUsuario(id: string): Promise<any> {
+    return this.api.request(`/auth/usuarios/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
   saveSession(token: string, user: UserProfile): void {
     localStorage.setItem(APP_CONFIG.STORAGE_KEYS.TOKEN, token);
     localStorage.setItem(APP_CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));

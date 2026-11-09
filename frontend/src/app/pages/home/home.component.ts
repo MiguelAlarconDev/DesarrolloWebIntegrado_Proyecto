@@ -174,6 +174,11 @@ export class HomeComponent implements AfterViewInit {
 
     this.route.fragment.subscribe(fragment => {
       if (fragment) {
+        const u = this.authService.getCurrentUser();
+        if (u && u.rol === 'ADMIN' && (fragment === 'usuarios' || fragment === 'pedidos' || fragment === 'cursos')) {
+          this.router.navigateByUrl('/portal-admin#' + fragment);
+          return;
+        }
         setTimeout(() => {
           const el = document.getElementById(fragment);
           if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
