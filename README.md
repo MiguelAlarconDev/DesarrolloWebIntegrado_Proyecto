@@ -32,28 +32,49 @@ El sistema está compuesto por servicios independientes que se comunican mediant
 
 Los microservicios comparten la base de datos `cursos_db` en PostgreSQL:
 
-La conexión se configura **solo por variables de entorno** (nunca en archivos versionados):
+La conexión se configura **solo con variables de entorno o con un archivo `.env` privado** (ignorado por Git), nunca en archivos versionados. Configuración local típica (PostgreSQL 18 en `127.0.0.1:5432`):
 
-```powershell
-$env:DB_URL      = "jdbc:postgresql://<host>:5432/postgres?sslmode=require"   # Supabase: Session pooler
-$env:DB_USERNAME = "postgres.<ref-proyecto>"
-# DB_PASSWORD la solicita iniciar_servicios.ps1 sin eco; JWT_SECRET (>= 32 caracteres) es obligatorio.
+```dotenv
+DB_URL=jdbc:postgresql://127.0.0.1:5432/cursos_db
+DB_USERNAME=postgres
+DB_PASSWORD=<tu-contraseña-local>
 ```
 
-`spring.jpa.hibernate.ddl-auto` es `none` por defecto: los servicios **no modifican el esquema**. Ver [`.env.example`](.env.example) para el resto de variables (Mercado Pago, SMTP, Meta).
+`spring.jpa.hibernate.ddl-auto` es siempre `none` al usar el script: los servicios **no modifican el esquema**. Ver [`.env.example`](.env.example) para el resto de variables (JWT, Mercado Pago, SMTP, Meta, Supabase Storage).
 
 > [!NOTE]
-> Para inicializar la base de datos con las tablas y los 3 cursos semilla, ejecuta el script ubicado en:
-> [`database/schema_local.sql`](database/schema_local.sql)
+> Para inicializar una base **nueva y vacía** con las tablas y los 3 cursos semilla, ejecuta
+> [`database/schema_local.sql`](database/schema_local.sql). **Contiene `DROP`**: no lo ejecutes sobre una base con datos.
 
 ---
 
 ## ⚡ Arranque rápido (Windows PowerShell)
 
+**Primera vez** (crea tu configuración privada a partir de la plantilla; nunca sobrescribe un `.env` existente):
+
 ```powershell
-.\iniciar_servicios.ps1      # verifica dependencias y puertos, pide la contraseña sin eco y levanta los 7 servicios
+.\iniciar_servicios.ps1 -CrearEnv   # copia .env.example a .env
+notepad .env                        # completa los valores <...> (contraseña de BD, JWT_SECRET, token TEST de Mercado Pago...)
+```
+
+**Uso diario** (un solo comando):
+
+```powershell
+.\iniciar_servicios.ps1      # carga .env, verifica dependencias y puertos y levanta los 7 servicios
 .\detener_servicios.ps1      # detiene solo los procesos lanzados por el script (.run\pids.json)
 ```
+
+También funcionan `iniciar_servicios.bat` / `detener_servicios.bat` (doble clic). Opciones: `-SinFrontend` (todo menos Angular), `-EnvFile <ruta>` (otro archivo de configuración).
+
+Cómo se resuelve la configuración:
+
+- **Prioridad:** variables ya definidas en la sesión de PowerShell → `.env` → valores por defecto de cada servicio. Sin `.env`, el script pregunta URL, usuario y contraseña (sin eco).
+- Los valores vacíos o con forma `<...>` se ignoran; `PORT`, `PATH` y otras variables del sistema no se aceptan desde `.env`.
+- Nunca se imprimen valores: solo nombres de variables. Tras lanzar los servicios, las variables cargadas desde `.env` y la contraseña se retiran de la sesión.
+- Si falta `JWT_SECRET`, se genera uno aleatorio por ejecución (las sesiones iniciadas no sobreviven a un reinicio); defínelo en `.env` para conservarlas.
+- Avisa si el token de Mercado Pago no es de prueba (`TEST-`) y si hay SMTP configurado (los correos serían reales).
+
+Protecciones: si ya hay servicios del proyecto en ejecución o algún puerto está ocupado, el script **no inicia nada** e indica el puerto, el proceso y su PID. `.run\pids.json` guarda PID e instante de inicio, de modo que `detener_servicios.ps1` nunca detiene un proceso ajeno aunque Windows reutilice el PID.
 
 Logs en `.run\logs\`. Puertos: Gateway 8080, Auth 8081, Cursos 8082, Pedidos 8083, Comprobantes 8084, WhatsApp 8085, Angular 4200.
 
