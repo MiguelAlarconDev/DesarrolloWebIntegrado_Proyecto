@@ -5,6 +5,7 @@ import com.cursos.repository.CursoRepository;
 import com.cursos.security.AuthPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
@@ -54,6 +55,7 @@ public class CertificadoService {
     private final Clock clock;
     private final String urlVerificacion;
 
+    @Autowired
     public CertificadoService(ValidadorEmision validador, CertificadoRepository certificados, CertificadoEventoRepository eventos,
                               CursoRepository cursos, UsuarioClient usuarios, AlmacenamientoArchivos storage, JdbcTemplate jdbc,
                               PlatformTransactionManager manager,
