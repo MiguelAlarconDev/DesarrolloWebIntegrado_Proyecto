@@ -39,6 +39,8 @@ class TareaPostgresTest {
             assertThat(value(db,"SELECT count(*) FROM pg_indexes WHERE schemaname='public' AND tablename IN ('aula_tareas','aula_entregas','aula_entrega_archivos')")).isEqualTo("8");
             assertThat(value(db,"SELECT count(*) FROM pg_constraint WHERE conrelid IN ('aula_tareas'::regclass,'aula_entregas'::regclass,'aula_entrega_archivos'::regclass) AND contype='f' AND confdeltype='r'")).isEqualTo("6");
             assertThat(value(db,"SELECT bool_and(relrowsecurity) FROM pg_class WHERE oid IN ('aula_tareas'::regclass,'aula_entregas'::regclass,'aula_entrega_archivos'::regclass)")).isEqualTo("t");
+            // Fase 2: los escritores academicos coordinan por curso (curso_revision_academica).
+            migration(db,"migracion_certificaciones_fase_2.sql");
             var factory=new LocalContainerEntityManagerFactoryBean();
             factory.setDataSource(new DriverManagerDataSource(URL,"aula_test",""));
             factory.setPackagesToScan("com.cursos.aula.tareas");
@@ -68,6 +70,8 @@ class TareaPostgresTest {
                 assertThat(service.detalle(curso,modulo,id,principal).fechaLimite()).isEqualTo(fecha);
                 var updated=service.editar(curso,modulo,id,new TareaController.Editar("Editada","Consigna",fecha,Tarea.TipoEntrega.TEXTO,created.version()),principal);
                 assertThat(updated.version()).isEqualTo(created.version()+1);
+                // Escritor real: bloqueo de curso + triggers -> crear (1) y editar (2).
+                assertThat(value(db,"SELECT revision FROM public.curso_revision_academica WHERE curso_id='"+curso+"'")).isEqualTo("2");
                 assertThatThrownBy(()->service.eliminar(curso,modulo,id,created.version(),principal))
                     .isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
                 // Two persistence contexts reproduce an optimistic locking collision.

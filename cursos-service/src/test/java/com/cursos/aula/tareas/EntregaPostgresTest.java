@@ -33,6 +33,7 @@ class EntregaPostgresTest {
             TareaPostgresTest.sql(db,"INSERT INTO usuarios VALUES('"+alumno+"'),('"+docente+"'); INSERT INTO cursos VALUES('"+curso+"')");
             TareaPostgresTest.migration(db,"migracion_aula_virtual_fase_a.sql");
             TareaPostgresTest.migration(db,"migracion_aula_virtual_e2.sql");
+            TareaPostgresTest.migration(db,"migracion_certificaciones_fase_2.sql");
             TareaPostgresTest.sql(db,"INSERT INTO curso_modulos VALUES('"+modulo+"','"+curso+"','M',1)");
             var factory=new LocalContainerEntityManagerFactoryBean();
             factory.setDataSource(new DriverManagerDataSource(URL,"aula_test",""));

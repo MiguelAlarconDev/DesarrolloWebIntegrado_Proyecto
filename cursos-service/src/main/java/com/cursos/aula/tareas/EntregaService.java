@@ -77,6 +77,7 @@ public class EntregaService {
         Confirmada confirmada;
         try {
             confirmada = enTransaccion(() -> {
+                tareas.bloquearCursoAcademico(curso); // orden uniforme: curso -> tarea -> entrega
                 Tarea tarea = bloquear(tareaId, modulo);
                 Entrega actual = entregas.findByTareaIdAndEstudianteId(tareaId, alumno).orElse(null);
                 // Recheck after upload/lock acquisition: deadline, type, grade and version can change.
@@ -153,6 +154,7 @@ public class EntregaService {
                 || feedback == null || feedback.isBlank() || feedback.length() > 20000 || version < 0)
             throw error(HttpStatus.BAD_REQUEST, "Nota, retroalimentacion o version invalida");
         return enTransaccion(() -> {
+            tareas.bloquearCursoAcademico(curso); // orden uniforme: curso -> tarea -> entrega
             bloquear(tarea, modulo);
             Entrega e = entregaDeTarea(entregaId, tarea);
             if (e.getEstado() == Entrega.Estado.ENVIO_PENDIENTE)
