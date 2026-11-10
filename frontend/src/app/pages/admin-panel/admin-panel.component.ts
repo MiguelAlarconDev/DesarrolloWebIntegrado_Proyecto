@@ -311,16 +311,16 @@ import { NotificationService } from '../../services/notification.service';
 	</div>
 
 	<!-- MODAL: EDITAR USUARIO -->
-	<div id="modal-editar-usuario" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px); overflow-y: auto; padding: 20px 0;">
+	<div id="modal-editar-usuario" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); z-index: 9999999; align-items: center; justify-content: center; backdrop-filter: blur(4px); overflow-y: auto; padding: 20px 0;" onclick="if(event.target === this) window.cerrarModalEditarUsuario && window.cerrarModalEditarUsuario()">
 		<div style="background: #ffffff; border-radius: 16px; padding: 28px 24px; max-width: 550px; width: 92%; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
 			<div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
 				<h4 style="font-weight: 800; color: #0f172a; margin: 0;">
 					<i class="fa fa-pencil text-primary me-2"></i>Editar Cuenta de Usuario
 				</h4>
-				<button type="button" class="btn-close" (click)="cerrarModalEditarUsuario()"></button>
+				<button type="button" class="btn-close" (click)="cerrarModalEditarUsuario()" onclick="window.cerrarModalEditarUsuario && window.cerrarModalEditarUsuario()"></button>
 			</div>
 
-			<form id="form-editar-usuario" (submit)="guardarUsuarioEditado($event)">
+			<form id="form-editar-usuario" (submit)="guardarUsuarioEditado($event)" autocomplete="off">
 				<input type="hidden" id="edit-user-id">
 
 				<div class="row g-3">
@@ -374,7 +374,7 @@ import { NotificationService } from '../../services/notification.service';
 				</div>
 
 				<div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-					<button type="button" class="btn btn-outline-secondary btn-sm" (click)="cerrarModalEditarUsuario()">Cancelar</button>
+					<button type="button" class="btn btn-outline-secondary btn-sm" (click)="cerrarModalEditarUsuario()" onclick="window.cerrarModalEditarUsuario && window.cerrarModalEditarUsuario()">Cancelar</button>
 					<button type="submit" class="btn btn-primary btn-sm fw-bold px-3" id="btn-submit-editar-usuario">
 						<i class="fa fa-save me-1"></i> Guardar Cambios
 					</button>
@@ -492,7 +492,12 @@ export class AdminPanelComponent implements AfterViewInit, OnDestroy {
       w.switchAdminTab = (tab: string) => this.switchAdminTab(tab);
       w.cambiarEstadoCurso = (id: string, estado: string) => this.cambiarEstadoCurso(id, estado);
       w.abrirModalEditarUsuario = (id: string) => this.abrirModalEditarUsuario(id);
+      w.cerrarModalEditarUsuario = () => this.cerrarModalEditarUsuario();
+      w.guardarUsuarioEditado = (e: Event) => this.guardarUsuarioEditado(e);
       w.confirmarEliminarUsuario = (id: string, nombre: string, correo: string) => this.confirmarEliminarUsuario(id, nombre, correo);
+      w.cerrarModalEliminarUsuario = () => this.cerrarModalEliminarUsuario();
+      w.abrirModalCrearUsuario = () => this.abrirModalCrearUsuario();
+      w.cerrarModalCrearUsuario = () => this.cerrarModalCrearUsuario();
 
       window.addEventListener('hashchange', () => {
         const h = (window.location.hash || '').replace('#', '').toLowerCase();
@@ -849,7 +854,7 @@ export class AdminPanelComponent implements AfterViewInit, OnDestroy {
     const nombres = (document.getElementById('edit-user-nombres') as HTMLInputElement)?.value?.trim();
     const apellidos = (document.getElementById('edit-user-apellidos') as HTMLInputElement)?.value?.trim();
     const dni = (document.getElementById('edit-user-dni') as HTMLInputElement)?.value?.trim();
-    const whatsapp = (document.getElementById('edit-user-whatsapp') as HTMLInputElement)?.value?.trim();
+    let whatsapp = (document.getElementById('edit-user-whatsapp') as HTMLInputElement)?.value?.trim() || '';
     const correo = (document.getElementById('edit-user-correo') as HTMLInputElement)?.value?.trim();
     const rol = (document.getElementById('edit-user-rol') as HTMLSelectElement)?.value;
     const is2faEnabled = (document.getElementById('edit-user-2fa') as HTMLSelectElement)?.value === 'true';
@@ -858,6 +863,10 @@ export class AdminPanelComponent implements AfterViewInit, OnDestroy {
     if (!id || !nombres || !apellidos || !dni || !correo || !whatsapp) {
       this.notifications.showToast('Por favor completa todos los campos obligatorios.', 'warning');
       return;
+    }
+
+    if (whatsapp && /^\d{9}$/.test(whatsapp)) {
+      whatsapp = '+51' + whatsapp;
     }
 
     if (btn) {
@@ -880,6 +889,21 @@ export class AdminPanelComponent implements AfterViewInit, OnDestroy {
       }
 
       await this.authService.actualizarUsuario(id, payload);
+
+      const currentUser = this.authService.getCurrentUser();
+      if (currentUser && currentUser.id === id) {
+        this.authService.updateProfile({
+          nombres: payload.nombres,
+          apellidos: payload.apellidos,
+          dni: payload.dni,
+          whatsapp: payload.whatsapp,
+          correo: payload.correo,
+          rol: payload.rol,
+          is2faEnabled: payload.is2faEnabled
+        });
+        this.authService.updateNavbar();
+      }
+
       this.notifications.showToast(`¡Usuario "${nombres} ${apellidos}" actualizado exitosamente!`, 'success');
       this.cerrarModalEditarUsuario();
       await this.cargarUsuariosAdmin();

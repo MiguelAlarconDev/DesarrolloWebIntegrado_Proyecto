@@ -212,13 +212,21 @@ public class AuthService {
             usuario.setApellidos(request.getApellidos().trim());
         }
         if (request.getDni() != null && !request.getDni().isBlank()) {
-            usuario.setDni(request.getDni().trim());
+            String nuevoDni = request.getDni().trim();
+            if (!nuevoDni.equalsIgnoreCase(usuario.getDni()) && usuarioRepository.existsByDni(nuevoDni)) {
+                throw new IllegalStateException("Ya existe otro usuario registrado con el DNI: " + nuevoDni);
+            }
+            usuario.setDni(nuevoDni);
         }
         if (request.getWhatsapp() != null && !request.getWhatsapp().isBlank()) {
             usuario.setWhatsapp(request.getWhatsapp().trim());
         }
         if (request.getCorreo() != null && !request.getCorreo().isBlank()) {
-            usuario.setCorreo(request.getCorreo().trim().toLowerCase());
+            String nuevoCorreo = request.getCorreo().trim().toLowerCase();
+            if (!nuevoCorreo.equalsIgnoreCase(usuario.getCorreo()) && usuarioRepository.existsByCorreo(nuevoCorreo)) {
+                throw new IllegalStateException("Ya existe otro usuario registrado con el correo: " + nuevoCorreo);
+            }
+            usuario.setCorreo(nuevoCorreo);
         }
         if (request.getRol() != null && !request.getRol().isBlank()) {
             try {
