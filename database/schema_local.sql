@@ -108,12 +108,12 @@ CREATE TABLE notificaciones (
 -- DATOS INICIALES DE PRUEBA (SEED DATA)
 -- ============================================================================
 
--- Usuarios (password: '123456')
+-- Usuarios (password de prueba: 'Clave1234', guardada con BCrypt)
 INSERT INTO usuarios (id, dni, nombres, apellidos, correo, whatsapp, password_hash, rol, is_2fa_enabled)
 VALUES 
-('a0000000-0000-0000-0000-000000000001', '10000001', 'Admin', 'General', 'admin@cursos.com', '+51999111222', '123456', 'ADMIN', TRUE),
-('a0000000-0000-0000-0000-000000000002', '20000002', 'Roberto', 'Docente', 'docente@cursos.com', '+51999333444', '123456', 'DOCENTE', TRUE),
-('a0000000-0000-0000-0000-000000000003', '30000003', 'Carlos', 'Estudiante', 'estudiante@cursos.com', '+51999555666', '123456', 'ESTUDIANTE', FALSE);
+('a0000000-0000-0000-0000-000000000001', '10000001', 'Admin', 'General', 'admin@cursos.com', '51999111222', '$2a$10$a9VbTSizZYECPBSbD48MNuER3x9Tzvz3BvSFbkSjyCK4Zoy9WYO9u', 'ADMIN', TRUE),
+('a0000000-0000-0000-0000-000000000002', '20000002', 'Roberto', 'Docente', 'docente@cursos.com', '51999333444', '$2a$10$a9VbTSizZYECPBSbD48MNuER3x9Tzvz3BvSFbkSjyCK4Zoy9WYO9u', 'DOCENTE', TRUE),
+('a0000000-0000-0000-0000-000000000003', '30000003', 'Carlos', 'Estudiante', 'estudiante@cursos.com', '51999555666', '$2a$10$a9VbTSizZYECPBSbD48MNuER3x9Tzvz3BvSFbkSjyCK4Zoy9WYO9u', 'ESTUDIANTE', FALSE);
 
 -- Cursos virtuales y presenciales
 INSERT INTO cursos (id, titulo, descripcion, docente_id, fecha_inicio, fecha_fin, horario, modalidad, aforo_maximo, aforo_disponible, precio, enlace_clase, direccion_clase, aula, estado)

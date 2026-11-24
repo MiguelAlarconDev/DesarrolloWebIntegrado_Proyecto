@@ -10,7 +10,19 @@ import java.util.Map;
 @Component
 public class WhatsappOtpClient {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(WhatsappOtpClient.class);
+
     private final RestClient restClient;
+    private boolean logOtpIfUnavailable = false;
+
+    /**
+     * Solo desarrollo local: si WhatsApp no esta vinculado, el codigo se escribe en el log del
+     * servicio en lugar de fallar. Nunca activar en produccion (el perfil prod lo fuerza a false).
+     */
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    public void setLogOtpIfUnavailable(@Value("${security.otp.log-if-whatsapp-down:false}") boolean value) {
+        this.logOtpIfUnavailable = value;
+    }
 
     public WhatsappOtpClient(
             RestClient.Builder restClientBuilder,
@@ -41,6 +53,10 @@ public class WhatsappOtpClient {
                     .retrieve()
                     .toBodilessEntity();
         } catch (Exception ex) {
+            if (logOtpIfUnavailable) {
+                log.warn("[DEV] WhatsApp no disponible. Codigo 2FA para {}: {}", phone, otp);
+                return;
+            }
             throw new ServiceUnavailableException("No se pudo enviar el codigo 2FA por WhatsApp. Intente nuevamente mas tarde.", ex);
         }
     }

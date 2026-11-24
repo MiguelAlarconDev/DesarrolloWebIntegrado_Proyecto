@@ -64,7 +64,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"correo\": \"estudiante@cursos.com\",\n  \"password\": \"123456\"\n}"
+							"raw": "{\n  \"correo\": \"estudiante@cursos.com\",\n  \"password\": \"Clave1234\"\n}"
 						},
 						"url": {
 							"raw": "{{gatewayUrl}}/api/auth/login",
@@ -85,7 +85,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"correo\": \"docente@cursos.com\",\n  \"password\": \"123456\"\n}"
+							"raw": "{\n  \"correo\": \"docente@cursos.com\",\n  \"password\": \"Clave1234\"\n}"
 						},
 						"url": {
 							"raw": "{{gatewayUrl}}/api/auth/login",

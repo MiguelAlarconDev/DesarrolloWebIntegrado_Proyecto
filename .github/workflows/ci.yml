@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "feature/**", "deploy/**"]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Compilar y probar los 4 servicios Java
+        run: mvn -B verify
+
+  servicios-node-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: cd whatsapp-service && npm ci --ignore-scripts && node --check src/index.js
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: cd comprobantes-service && pip install -r requirements.txt && python -m py_compile app/main.py
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: cd frontend && npm ci && npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [backend]
+    strategy:
+      matrix:
+        include:
+          - { name: gateway-service, file: gateway-service/Dockerfile, context: . }
+          - { name: auth-service, file: auth-service/Dockerfile, context: . }
+          - { name: cursos-service, file: cursos-service/Dockerfile, context: . }
+          - { name: pedidos-service, file: pedidos-service/Dockerfile, context: . }
+          - { name: comprobantes-service, file: comprobantes-service/Dockerfile, context: comprobantes-service }
+          - { name: whatsapp-service, file: whatsapp-service/Dockerfile, context: whatsapp-service }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir imagen ${{ matrix.name }}
+        run: docker build -f ${{ matrix.file }} -t ${{ matrix.name }} ${{ matrix.context }}

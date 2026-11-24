@@ -48,6 +48,7 @@ public class IpProtectionService {
     private final Map<String, Window> authFailures = new ConcurrentHashMap<>();
     private final Map<String, Window> rateViolations = new ConcurrentHashMap<>();
 
+    @org.springframework.beans.factory.annotation.Autowired
     public IpProtectionService(
             @Value("${security.rate-limit.general-per-minute:120}") int generalPerMinute,
             @Value("${security.rate-limit.auth-per-minute:10}") int authPerMinute,
