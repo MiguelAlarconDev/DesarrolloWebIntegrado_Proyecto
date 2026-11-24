@@ -12,8 +12,9 @@ public class AuthClient {
 
     private final RestClient restClient;
 
-    public AuthClient(@Value("${services.auth.url:http://localhost:8081}") String authUrl) {
-        this.restClient = RestClient.builder()
+    public AuthClient(RestClient.Builder internalRestClientBuilder,
+                      @Value("${services.auth.url:http://localhost:8081}") String authUrl) {
+        this.restClient = internalRestClientBuilder.clone()
                 .baseUrl(authUrl)
                 .build();
     }

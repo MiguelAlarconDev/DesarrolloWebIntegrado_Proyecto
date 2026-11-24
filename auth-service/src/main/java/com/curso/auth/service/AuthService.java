@@ -8,12 +8,15 @@ import com.curso.auth.dto.UsuarioResponse;
 import com.curso.auth.dto.Verificar2faRequest;
 import com.curso.auth.entity.RolUsuario;
 import com.curso.auth.entity.Usuario;
+import com.curso.auth.exception.AccountLockedException;
 import com.curso.auth.exception.AuthenticationException;
 import com.curso.auth.repository.UsuarioRepository;
 import com.curso.auth.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +26,12 @@ import java.util.UUID;
 public class AuthService {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    /** Intentos de contrasenia fallidos antes de bloquear la cuenta. */
+    static final int MAX_INTENTOS_LOGIN = 5;
+    /** Minutos que la cuenta queda bloqueada. */
+    static final int MINUTOS_BLOQUEO = 15;
+    /** Intentos de codigo 2FA antes de invalidar el codigo. */
+    static final int MAX_INTENTOS_2FA = 5;
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -41,14 +50,26 @@ public class AuthService {
     }
 
     public AuthResponse registrar(RegistroUsuarioRequest request) {
+        return registrar(request, false);
+    }
+
+    /**
+     * Registro de usuarios. Solo un ADMIN autenticado puede crear DOCENTE o ADMIN;
+     * el registro publico siempre crea ESTUDIANTE (evita la escalada de privilegios).
+     */
+    public AuthResponse registrar(RegistroUsuarioRequest request, boolean solicitadoPorAdmin) {
+        if (!solicitadoPorAdmin && request.getRol() != null && request.getRol() != RolUsuario.ESTUDIANTE) {
+            throw new SecurityException("Solo un administrador puede registrar usuarios con rol " + request.getRol());
+        }
+        request.setCorreo(request.getCorreo().trim().toLowerCase());
         if (usuarioRepository.existsByCorreo(request.getCorreo())) {
-            throw new IllegalArgumentException("Ya existe un usuario registrado con el correo: " + request.getCorreo());
+            throw new IllegalStateException("Ya existe un usuario registrado con el correo: " + request.getCorreo());
         }
         if (usuarioRepository.existsByDni(request.getDni())) {
-            throw new IllegalArgumentException("Ya existe un usuario registrado con el DNI: " + request.getDni());
+            throw new IllegalStateException("Ya existe un usuario registrado con el DNI: " + request.getDni());
         }
         if (usuarioRepository.existsByWhatsapp(request.getWhatsapp())) {
-            throw new IllegalArgumentException("Ya existe un usuario registrado con el WhatsApp: " + request.getWhatsapp());
+            throw new IllegalStateException("Ya existe un usuario registrado con el WhatsApp: " + request.getWhatsapp());
         }
 
         Usuario usuario = new Usuario();
@@ -80,12 +101,31 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo())
+        Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo().trim().toLowerCase())
+                .or(() -> usuarioRepository.findByCorreo(request.getCorreo()))
                 .orElseThrow(() -> new AuthenticationException("Credenciales invalidas"));
 
+        if (usuario.getBloqueadoHasta() != null && usuario.getBloqueadoHasta().isAfter(LocalDateTime.now())) {
+            throw new AccountLockedException("Cuenta bloqueada temporalmente por intentos fallidos. Intente despues de las "
+                    + usuario.getBloqueadoHasta().toLocalTime().withNano(0) + ".");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash())) {
+            int intentos = usuario.getIntentosFallidos() + 1;
+            if (intentos >= MAX_INTENTOS_LOGIN) {
+                usuario.setIntentosFallidos(0);
+                usuario.setBloqueadoHasta(LocalDateTime.now().plusMinutes(MINUTOS_BLOQUEO));
+                usuarioRepository.save(usuario);
+                throw new AccountLockedException("Demasiados intentos fallidos. La cuenta se bloqueo por "
+                        + MINUTOS_BLOQUEO + " minutos.");
+            }
+            usuario.setIntentosFallidos(intentos);
+            usuarioRepository.save(usuario);
             throw new AuthenticationException("Credenciales invalidas");
         }
+
+        usuario.setIntentosFallidos(0);
+        usuario.setBloqueadoHasta(null);
 
         if (!Boolean.TRUE.equals(usuario.getIsActive())) {
             throw new IllegalStateException("La cuenta de usuario esta inactiva");
@@ -95,6 +135,7 @@ public class AuthService {
             String codigoOtp = generarOtp();
             usuario.setCodigo2fa(codigoOtp);
             usuario.setCodigo2faExpiraEn(LocalDateTime.now().plusMinutes(5));
+            usuario.setIntentos2fa(0);
             usuarioRepository.save(usuario);
             whatsappOtpClient.sendOtp(usuario.getWhatsapp(), codigoOtp);
 
@@ -108,6 +149,7 @@ public class AuthService {
             return response;
         }
 
+        usuarioRepository.save(usuario);
         return new AuthResponse(
                 "Inicio de sesion exitoso",
                 "SUCCESS",
@@ -120,10 +162,25 @@ public class AuthService {
     }
 
     public AuthResponse verificar2fa(Verificar2faRequest request) {
-        Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + request.getCorreo()));
+        Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo().trim().toLowerCase())
+                .or(() -> usuarioRepository.findByCorreo(request.getCorreo()))
+                .orElseThrow(() -> new AuthenticationException("Codigo 2FA incorrecto"));
 
-        if (usuario.getCodigo2fa() == null || !usuario.getCodigo2fa().equals(request.getCodigo2fa().trim())) {
+        if (usuario.getCodigo2fa() == null) {
+            throw new AuthenticationException("No hay un codigo 2FA vigente. Inicie sesion nuevamente.");
+        }
+
+        if (!codigosIguales(usuario.getCodigo2fa(), request.getCodigo2fa().trim())) {
+            int intentos = usuario.getIntentos2fa() + 1;
+            if (intentos >= MAX_INTENTOS_2FA) {
+                usuario.setCodigo2fa(null);
+                usuario.setCodigo2faExpiraEn(null);
+                usuario.setIntentos2fa(0);
+                usuarioRepository.save(usuario);
+                throw new AuthenticationException("Demasiados intentos. El codigo fue invalidado; inicie sesion nuevamente.");
+            }
+            usuario.setIntentos2fa(intentos);
+            usuarioRepository.save(usuario);
             throw new AuthenticationException("Codigo 2FA incorrecto");
         }
 
@@ -136,6 +193,7 @@ public class AuthService {
 
         usuario.setCodigo2fa(null);
         usuario.setCodigo2faExpiraEn(null);
+        usuario.setIntentos2fa(0);
         usuarioRepository.save(usuario);
 
         return new AuthResponse(
@@ -159,6 +217,10 @@ public class AuthService {
         return usuarioRepository.findById(id)
                 .map(UsuarioResponse::from)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + id));
+    }
+
+    private static boolean codigosIguales(String esperado, String recibido) {
+        return MessageDigest.isEqual(esperado.getBytes(StandardCharsets.UTF_8), recibido.getBytes(StandardCharsets.UTF_8));
     }
 
     private String generarOtp() {

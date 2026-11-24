@@ -15,7 +15,19 @@ public class WhatsappOtpClient {
     public WhatsappOtpClient(
             RestClient.Builder restClientBuilder,
             @Value("${services.whatsapp.url:${WHATSAPP_SERVICE_URL:http://localhost:8085}}") String whatsappUrl) {
-        this.restClient = restClientBuilder.baseUrl(whatsappUrl).build();
+        this(restClientBuilder, whatsappUrl, "");
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public WhatsappOtpClient(
+            RestClient.Builder restClientBuilder,
+            @Value("${services.whatsapp.url:${WHATSAPP_SERVICE_URL:http://localhost:8085}}") String whatsappUrl,
+            @Value("${security.internal-key:${INTERNAL_API_KEY:}}") String internalKey) {
+        RestClient.Builder builder = restClientBuilder.clone().baseUrl(whatsappUrl);
+        if (internalKey != null && !internalKey.isBlank()) {
+            builder.defaultHeader("X-Internal-Key", internalKey);
+        }
+        this.restClient = builder.build();
     }
 
     public void sendOtp(String phone, String otp) {

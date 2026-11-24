@@ -19,4 +19,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, UUID> {
     List<Pedido> findByCursoIdAndEstado(UUID cursoId, EstadoPedido estado);
 
     List<Pedido> findByCursoId(UUID cursoId);
+
+    List<Pedido> findByEstadoInAndReservaExpiraEnBefore(List<EstadoPedido> estados, java.time.LocalDateTime limite);
 }

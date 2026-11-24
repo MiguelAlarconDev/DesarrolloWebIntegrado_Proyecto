@@ -43,7 +43,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"dni\": \"77889900\",\n  \"nombres\": \"Juan\",\n  \"apellidos\": \"Perez\",\n  \"correo\": \"juan.perez@gmail.com\",\n  \"whatsapp\": \"+51987654321\",\n  \"password\": \"123456\",\n  \"rol\": \"ESTUDIANTE\",\n  \"is2faEnabled\": false\n}"
+							"raw": "{\n  \"dni\": \"77889900\",\n  \"nombres\": \"Juan\",\n  \"apellidos\": \"Perez\",\n  \"correo\": \"juan.perez@gmail.com\",\n  \"whatsapp\": \"+51987654321\",\n  \"password\": \"Clave1234\",\n  \"rol\": \"ESTUDIANTE\",\n  \"is2faEnabled\": false\n}"
 						},
 						"url": {
 							"raw": "{{gatewayUrl}}/api/auth/registro",

@@ -16,6 +16,10 @@ public class SecurityConfig {
 
     @Bean
     public RestClient.Builder restClientBuilder() {
-        return RestClient.builder();
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory =
+                new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(java.time.Duration.ofSeconds(5));
+        factory.setReadTimeout(java.time.Duration.ofSeconds(20));
+        return RestClient.builder().requestFactory(factory);
     }
 }

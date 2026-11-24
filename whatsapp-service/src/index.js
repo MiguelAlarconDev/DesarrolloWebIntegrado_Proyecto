@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 require('dotenv').config();
@@ -6,16 +7,34 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 8085;
 
-app.use(express.json());
+app.disable('x-powered-by');
+app.use(express.json({ limit: '10kb' }));
+
+// Capa de seguridad: solo acepta llamadas de otros microservicios (cabecera X-Internal-Key).
+// Si INTERNAL_API_KEY no esta definida (desarrollo local) no se exige.
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || '';
+function requireInternalKey(req, res, next) {
+    if (!INTERNAL_API_KEY) return next();
+    const provided = Buffer.from(req.get('X-Internal-Key') || '');
+    const expected = Buffer.from(INTERNAL_API_KEY);
+    if (provided.length !== expected.length || !crypto.timingSafeEqual(provided, expected)) {
+        return res.status(401).json({ success: false, message: 'Acceso solo a traves del gateway' });
+    }
+    return next();
+}
+
+// Ultimo codigo QR pendiente (para vincular el telefono desde el panel ADMIN en la nube)
+let lastQr = null;
 
 // Estado del cliente de WhatsApp
 let isReady = false;
 
 // Inicializar cliente de WhatsApp con persistencia de sesión
 const client = new Client({
-    authStrategy: new LocalAuth({ dataPath: './.wwebjs_auth' }),
+    authStrategy: new LocalAuth({ dataPath: process.env.WWEBJS_DATA_PATH || './.wwebjs_auth' }),
     puppeteer: {
         headless: true,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -30,12 +49,14 @@ const client = new Client({
 
 // Mostrar código QR en la consola al iniciar por primera vez
 client.on('qr', (qr) => {
+    lastQr = qr;
     console.log('--- ESCANEA ESTE CÓDIGO QR EN WHATSAPP ---');
     qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
     isReady = true;
+    lastQr = null;
     console.log('✅ Cliente de WhatsApp listo y conectado.');
 });
 
@@ -56,14 +77,20 @@ client.initialize();
 
 // Endpoint de verificación de salud (Health check)
 app.get('/health', (req, res) => {
+    // Siempre 200 para que el orquestador no reinicie el contenedor mientras se escanea el QR
     res.json({
         status: isReady ? 'ONLINE' : 'OFFLINE',
         service: 'whatsapp-service'
     });
 });
 
+// Estado y QR pendiente (via gateway, solo ADMIN): GET /api/whatsapp/estado
+app.get('/api/whatsapp/estado', requireInternalKey, (req, res) => {
+    res.json({ conectado: isReady, qrPendiente: lastQr });
+});
+
 // Endpoint para enviar mensajes de texto
-app.post('/api/whatsapp/send', async (req, res) => {
+app.post('/api/whatsapp/send', requireInternalKey, async (req, res) => {
     if (!isReady) {
         return res.status(503).json({
             success: false,
@@ -71,9 +98,9 @@ app.post('/api/whatsapp/send', async (req, res) => {
         });
     }
 
-    const { phone, message } = req.body;
+    const { phone, message } = req.body || {};
 
-    if (!phone || !message) {
+    if (typeof phone !== 'string' || typeof message !== 'string' || !phone || !message || message.length > 1000) {
         return res.status(400).json({
             success: false,
             message: 'Se requieren los campos "phone" y "message".'
@@ -98,12 +125,11 @@ app.post('/api/whatsapp/send', async (req, res) => {
         console.error('Error al enviar mensaje:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error al enviar el mensaje de WhatsApp.',
-            error: error.message
+            message: 'Error al enviar el mensaje de WhatsApp.'
         });
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Microservicio WhatsApp corriendo en el puerto ${PORT}`);
 });

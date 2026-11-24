@@ -6,6 +6,8 @@ import com.curso.cursos.dto.CrearCursoRequest;
 import com.curso.cursos.entity.Curso;
 import com.curso.cursos.entity.EstadoCurso;
 import com.curso.cursos.service.CursoService;
+import com.curso.cursos.config.CurrentUser;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -51,13 +53,17 @@ public class CursoController {
 
     @PutMapping("/{id}/enlace")
     public Curso actualizarEnlace(@PathVariable UUID id,
-                                  @Valid @RequestBody ActualizarEnlaceRequest request) {
+                                  @Valid @RequestBody ActualizarEnlaceRequest request,
+                                  HttpServletRequest http) {
+        cursoService.verificarPropietario(id, CurrentUser.from(http));
         return cursoService.actualizarEnlaceClase(id, request);
     }
 
     @PutMapping("/{id}/datos-clase")
     public Curso actualizarDatosClase(@PathVariable UUID id,
-                                      @Valid @RequestBody ActualizarDatosClaseRequest request) {
+                                      @Valid @RequestBody ActualizarDatosClaseRequest request,
+                                      HttpServletRequest http) {
+        cursoService.verificarPropietario(id, CurrentUser.from(http));
         return cursoService.actualizarDatosClase(id, request);
     }
 

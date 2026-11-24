@@ -1,11 +1,13 @@
 package com.curso.auth.controller;
 
+import com.curso.auth.config.CurrentUser;
 import com.curso.auth.dto.AuthResponse;
 import com.curso.auth.dto.LoginRequest;
 import com.curso.auth.dto.RegistroUsuarioRequest;
 import com.curso.auth.dto.UsuarioResponse;
 import com.curso.auth.dto.Verificar2faRequest;
 import com.curso.auth.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,19 @@ public class AuthController {
 
     @PostMapping("/registro")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthResponse registrar(@Valid @RequestBody RegistroUsuarioRequest request) {
-        return authService.registrar(request);
+    public AuthResponse registrar(@Valid @RequestBody RegistroUsuarioRequest request, HttpServletRequest http) {
+        CurrentUser caller = CurrentUser.from(http);
+        return authService.registrar(request, caller != null && caller.isAdmin());
+    }
+
+    /** Datos del usuario autenticado (id tomado del token validado por el gateway). */
+    @GetMapping("/perfil")
+    public UsuarioResponse perfil(HttpServletRequest http) {
+        CurrentUser caller = CurrentUser.from(http);
+        if (caller == null) {
+            throw new com.curso.auth.exception.AuthenticationException("Sesion no valida");
+        }
+        return authService.buscarPorId(caller.id());
     }
 
     @PostMapping("/login")

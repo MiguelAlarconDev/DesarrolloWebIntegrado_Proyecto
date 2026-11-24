@@ -7,7 +7,9 @@ from email.message import EmailMessage
 from pathlib import Path
 from uuid import UUID
 
-from fastapi import FastAPI, HTTPException
+import hmac
+
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr, Field, model_validator
 from reportlab.lib import colors
@@ -57,6 +59,15 @@ app = FastAPI(
 )
 
 OUTPUT_DIR = Path(os.getenv("PDF_OUTPUT_DIR", "generated"))
+INTERNAL_API_KEY = os.getenv("INTERNAL_API_KEY", "")
+
+
+def require_internal_key(x_internal_key: str | None = Header(default=None)) -> None:
+    """Solo otros microservicios (con X-Internal-Key) pueden usar este servicio."""
+    if not INTERNAL_API_KEY:
+        return
+    if not x_internal_key or not hmac.compare_digest(x_internal_key, INTERNAL_API_KEY):
+        raise HTTPException(status_code=401, detail="Acceso solo a traves del gateway")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -161,7 +172,7 @@ def health():
     return {"status": "UP", "service": "comprobantes-service"}
 
 
-@app.post("/api/comprobantes/enviar", response_model=ComprobanteResponse)
+@app.post("/api/comprobantes/enviar", response_model=ComprobanteResponse, dependencies=[Depends(require_internal_key)])
 def crear_y_enviar_comprobante(datos: ComprobanteRequest):
     nombre_archivo = f"comprobante-{datos.pedidoId}.pdf"
     pdf_path = OUTPUT_DIR / nombre_archivo
@@ -181,7 +192,7 @@ def crear_y_enviar_comprobante(datos: ComprobanteRequest):
     )
 
 
-@app.get("/api/comprobantes/{pedido_id}/descargar")
+@app.get("/api/comprobantes/{pedido_id}/descargar", dependencies=[Depends(require_internal_key)])
 def descargar_comprobante(pedido_id: UUID):
     pdf_path = OUTPUT_DIR / f"comprobante-{pedido_id}.pdf"
     if not pdf_path.exists():

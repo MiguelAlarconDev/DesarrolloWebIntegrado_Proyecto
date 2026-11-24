@@ -26,18 +26,22 @@ public class MercadoPagoClient {
     private final String backUrlSuccess;
     private final String backUrlFailure;
     private final String backUrlPending;
+    private final String notificationUrl;
 
     public MercadoPagoClient(
             @Value("${mercadopago.access-token:}") String accessToken,
             @Value("${mercadopago.back-url.success:http://localhost:8080/pago/exito}") String backUrlSuccess,
             @Value("${mercadopago.back-url.failure:http://localhost:8080/pago/fallo}") String backUrlFailure,
-            @Value("${mercadopago.back-url.pending:http://localhost:8080/pago/pendiente}") String backUrlPending
+            @Value("${mercadopago.back-url.pending:http://localhost:8080/pago/pendiente}") String backUrlPending,
+            @Value("${mercadopago.notification-url:}") String notificationUrl
     ) {
+        this.notificationUrl = notificationUrl;
         this.accessToken = accessToken;
         this.backUrlSuccess = backUrlSuccess;
         this.backUrlFailure = backUrlFailure;
         this.backUrlPending = backUrlPending;
         this.restClient = RestClient.builder()
+                .requestFactory(com.curso.pedidos.config.HttpClientsConfig.externalFactory())
                 .baseUrl("https://api.mercadopago.com")
                 .build();
     }
@@ -58,7 +62,7 @@ public class MercadoPagoClient {
             String tituloCurso = (curso != null && curso.getTitulo() != null) ? curso.getTitulo() : "Curso Plataforma";
             String descCurso = (curso != null && curso.getDescripcion() != null) ? curso.getDescripcion() : tituloCurso;
 
-            Map<String, Object> body = Map.of(
+            Map<String, Object> body = new java.util.HashMap<>(Map.of(
                     "items", List.of(Map.of(
                             "id", pedido.getCursoId().toString(),
                             "title", tituloCurso,
@@ -77,8 +81,12 @@ public class MercadoPagoClient {
                             "failure", backUrlFailure,
                             "pending", backUrlPending
                     ),
-                    "external_reference", pedido.getId().toString()
-            );
+                    "external_reference", pedido.getId().toString(),
+                    "auto_return", "approved"
+            ));
+            if (notificationUrl != null && !notificationUrl.isBlank()) {
+                body.put("notification_url", notificationUrl);
+            }
 
             Map<String, Object> response = restClient.post()
                     .uri("/checkout/preferences")

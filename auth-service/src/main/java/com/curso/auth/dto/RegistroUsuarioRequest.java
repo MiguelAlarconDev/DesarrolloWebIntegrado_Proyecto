@@ -3,18 +3,22 @@ package com.curso.auth.dto;
 import com.curso.auth.entity.RolUsuario;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class RegistroUsuarioRequest {
 
     @NotBlank(message = "El DNI es obligatorio")
     @Size(min = 8, max = 15, message = "El DNI debe tener entre 8 y 15 caracteres")
+    @Pattern(regexp = "^[0-9A-Za-z]+$", message = "El DNI solo admite letras y numeros")
     private String dni;
 
     @NotBlank(message = "Los nombres son obligatorios")
+    @Size(max = 100, message = "Los nombres no pueden superar 100 caracteres")
     private String nombres;
 
     @NotBlank(message = "Los apellidos son obligatorios")
+    @Size(max = 100, message = "Los apellidos no pueden superar 100 caracteres")
     private String apellidos;
 
     @NotBlank(message = "El correo es obligatorio")
@@ -22,10 +26,12 @@ public class RegistroUsuarioRequest {
     private String correo;
 
     @NotBlank(message = "El número de WhatsApp es obligatorio")
+    @Pattern(regexp = "^\\+?[0-9]{9,15}$", message = "WhatsApp debe tener entre 9 y 15 digitos, con codigo de pais (ej. 51987654321)")
     private String whatsapp;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
+    @Size(min = 8, max = 72, message = "La contraseña debe tener entre 8 y 72 caracteres")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*[0-9]).+$", message = "La contraseña debe combinar letras y numeros")
     private String password;
 
     private RolUsuario rol;

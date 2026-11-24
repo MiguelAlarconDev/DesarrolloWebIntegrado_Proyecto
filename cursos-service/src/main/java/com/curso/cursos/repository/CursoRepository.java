@@ -14,4 +14,9 @@ public interface CursoRepository extends JpaRepository<Curso, UUID> {
     List<Curso> findByEstado(EstadoCurso estado);
 
     List<Curso> findByDocenteId(UUID docenteId);
+
+    /** Bloqueo de fila: dos compras simultaneas no pueden tomar la misma ultima vacante. */
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select c from Curso c where c.id = :id")
+    java.util.Optional<Curso> findByIdForUpdate(@org.springframework.data.repository.query.Param("id") UUID id);
 }

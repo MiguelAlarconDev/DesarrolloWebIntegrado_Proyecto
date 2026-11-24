@@ -142,6 +142,48 @@ public class PedidoService {
         return pedidoActualizado;
     }
 
+    /**
+     * Control de propiedad: un ESTUDIANTE solo accede a sus pedidos y un DOCENTE solo a los
+     * participantes de sus cursos. ADMIN y las llamadas internas (sin usuario) no se restringen.
+     */
+    public void verificarAccesoPedido(Pedido pedido, com.curso.pedidos.config.CurrentUser usuario) {
+        if (usuario == null || usuario.isAdmin()) {
+            return;
+        }
+        if (!usuario.id().equals(pedido.getEstudianteId())) {
+            throw new SecurityException("No tiene acceso a este pedido");
+        }
+    }
+
+    public void verificarDocenteDelCurso(UUID cursoId, com.curso.pedidos.config.CurrentUser usuario) {
+        if (usuario == null || usuario.isAdmin()) {
+            return;
+        }
+        CursoDto curso = cursoClient.obtenerCurso(cursoId);
+        if (!usuario.isDocente() || !usuario.id().equals(curso.getDocenteId())) {
+            throw new SecurityException("Solo el docente del curso puede ver sus participantes");
+        }
+    }
+
+    /**
+     * RF-08: libera automaticamente las vacantes de reservas no pagadas a los 15 minutos
+     * (transaccion compensatoria). Corre cada minuto.
+     */
+    @org.springframework.scheduling.annotation.Scheduled(fixedDelayString = "${pedidos.expiracion.intervalo-ms:60000}",
+            initialDelayString = "${pedidos.expiracion.retraso-inicial-ms:30000}")
+    public void expirarReservasVencidas() {
+        List<Pedido> vencidos = pedidoRepository.findByEstadoInAndReservaExpiraEnBefore(
+                List.of(EstadoPedido.REGISTRADO, EstadoPedido.PENDIENTE_PAGO), LocalDateTime.now());
+        for (Pedido pedido : vencidos) {
+            try {
+                cancelar(pedido.getId());
+                System.out.printf("[PEDIDOS-SERVICE] Reserva %s expirada: vacante liberada.%n", pedido.getCodigoOrden());
+            } catch (Exception ex) {
+                System.out.printf("[PEDIDOS-SERVICE] No se pudo expirar la reserva %s: %s%n", pedido.getCodigoOrden(), ex.getMessage());
+            }
+        }
+    }
+
     @Transactional
     public Pedido cancelar(UUID pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);

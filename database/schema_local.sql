@@ -25,6 +25,9 @@ CREATE TABLE usuarios (
     codigo_2fa VARCHAR(10),
     codigo_2fa_expira_en TIMESTAMP WITH TIME ZONE,
     is_active BOOLEAN DEFAULT TRUE,
+    intentos_fallidos INTEGER DEFAULT 0,
+    bloqueado_hasta TIMESTAMP,
+    intentos_2fa INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -23,6 +23,17 @@ public class CursoService {
         this.cursoRepository = cursoRepository;
     }
 
+    /** Un DOCENTE solo puede modificar sus propios cursos; ADMIN puede todos. */
+    public void verificarPropietario(UUID cursoId, com.curso.cursos.config.CurrentUser usuario) {
+        if (usuario == null || usuario.isAdmin()) {
+            return;
+        }
+        Curso curso = buscarPorId(cursoId);
+        if (!usuario.id().equals(curso.getDocenteId())) {
+            throw new SecurityException("Solo el docente asignado puede modificar este curso");
+        }
+    }
+
     public List<Curso> listarPublicos() {
         return cursoRepository.findByEstado(EstadoCurso.PUBLICADO);
     }
@@ -89,7 +100,8 @@ public class CursoService {
 
     @Transactional
     public Curso descontarAforo(UUID id) {
-        Curso curso = buscarPorId(id);
+        Curso curso = cursoRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado con ID: " + id));
         if (curso.getEstado() != EstadoCurso.PUBLICADO) {
             throw new IllegalStateException("El curso no se encuentra disponible para matrícula");
         }
@@ -105,7 +117,8 @@ public class CursoService {
 
     @Transactional
     public Curso liberarAforo(UUID id) {
-        Curso curso = buscarPorId(id);
+        Curso curso = cursoRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado con ID: " + id));
         if (curso.getAforoDisponible() < curso.getAforoMaximo()) {
             curso.setAforoDisponible(curso.getAforoDisponible() + 1);
         }

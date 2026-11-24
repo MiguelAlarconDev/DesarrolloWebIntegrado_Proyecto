@@ -1,9 +1,28 @@
+# Build
 target/
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.venv/
+
+# IDE
 .idea/
 *.iml
+.vscode/
 
+# Secretos y configuracion local (nunca subir)
 .env
+.env.*
+!.env.example
 application-local.properties
+
+# Logs y datos locales
+*.log
+.codex/
+comprobantes-service/generated/
+whatsapp-service/.wwebjs_auth/
+whatsapp-service/.wwebjs_cache/
 
 .DS_Store
 Thumbs.db

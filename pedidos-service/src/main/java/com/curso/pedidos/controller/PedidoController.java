@@ -4,6 +4,8 @@ import com.curso.pedidos.dto.CrearPedidoRequest;
 import com.curso.pedidos.dto.PagarPedidoRequest;
 import com.curso.pedidos.entity.Pedido;
 import com.curso.pedidos.service.PedidoService;
+import com.curso.pedidos.config.CurrentUser;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +65,12 @@ public class PedidoController {
 
     @PostMapping("/checkout")
     @ResponseStatus(HttpStatus.CREATED)
-    public Pedido checkout(@Valid @RequestBody CrearPedidoRequest request) {
+    public Pedido checkout(@Valid @RequestBody CrearPedidoRequest request, HttpServletRequest http) {
+        CurrentUser usuario = CurrentUser.from(http);
+        if (usuario != null && !usuario.isAdmin()) {
+            // un estudiante solo puede matricularse a si mismo, sin importar el id que envie
+            request.setEstudianteId(usuario.id());
+        }
         return pedidoService.crear(request);
     }
 
@@ -74,7 +81,8 @@ public class PedidoController {
     }
 
     @PutMapping("/{id}/cancelar")
-    public Pedido cancelar(@PathVariable UUID id) {
+    public Pedido cancelar(@PathVariable UUID id, HttpServletRequest http) {
+        pedidoService.verificarAccesoPedido(pedidoService.buscarPorId(id), CurrentUser.from(http));
         return pedidoService.cancelar(id);
     }
 
@@ -84,8 +92,10 @@ public class PedidoController {
     }
 
     @GetMapping("/{id}")
-    public Pedido buscar(@PathVariable UUID id) {
-        return pedidoService.buscarPorId(id);
+    public Pedido buscar(@PathVariable UUID id, HttpServletRequest http) {
+        Pedido pedido = pedidoService.buscarPorId(id);
+        pedidoService.verificarAccesoPedido(pedido, CurrentUser.from(http));
+        return pedido;
     }
 
     @GetMapping("/estudiante/{estudianteId}")
@@ -94,7 +104,8 @@ public class PedidoController {
     }
 
     @GetMapping("/curso/{cursoId}/participantes")
-    public List<Pedido> listarParticipantesPorCurso(@PathVariable UUID cursoId) {
+    public List<Pedido> listarParticipantesPorCurso(@PathVariable UUID cursoId, HttpServletRequest http) {
+        pedidoService.verificarDocenteDelCurso(cursoId, CurrentUser.from(http));
         return pedidoService.listarParticipantesPorCurso(cursoId);
     }
 }

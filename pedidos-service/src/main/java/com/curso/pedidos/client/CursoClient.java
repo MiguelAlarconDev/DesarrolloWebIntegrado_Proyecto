@@ -12,8 +12,9 @@ public class CursoClient {
 
     private final RestClient restClient;
 
-    public CursoClient(@Value("${services.cursos.url:http://localhost:8082}") String cursosUrl) {
-        this.restClient = RestClient.builder()
+    public CursoClient(RestClient.Builder internalRestClientBuilder,
+                      @Value("${services.cursos.url:http://localhost:8082}") String cursosUrl) {
+        this.restClient = internalRestClientBuilder.clone()
                 .baseUrl(cursosUrl)
                 .build();
     }

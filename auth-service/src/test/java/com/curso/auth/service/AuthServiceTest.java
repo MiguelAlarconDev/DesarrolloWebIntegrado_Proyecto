@@ -151,6 +151,53 @@ class AuthServiceTest {
                 .isInstanceOf(AuthenticationException.class);
     }
 
+    @Test
+    void registroPublicoNoPermiteCrearAdmin() {
+        RegistroUsuarioRequest request = registroRequest("hacker@test.com", "password123", RolUsuario.ADMIN, false);
+        assertThatThrownBy(() -> authService.registrar(request, false)).isInstanceOf(SecurityException.class);
+    }
+
+    @Test
+    void adminSiPuedeCrearDocenteCon2faObligatorio() {
+        RegistroUsuarioRequest request = registroRequest("profe@test.com", "password123", RolUsuario.DOCENTE, false);
+        authService.registrar(request, true);
+        assertThat(usuarioRepository.saved.getRol()).isEqualTo(RolUsuario.DOCENTE);
+        assertThat(usuarioRepository.saved.getIs2faEnabled()).isTrue();
+    }
+
+    @Test
+    void cuentaSeBloqueaTrasCincoIntentosFallidos() {
+        Usuario usuario = usuario("alumno@test.com", RolUsuario.ESTUDIANTE, false);
+        usuario.setPasswordHash(passwordEncoder.encode("password123"));
+        usuarioRepository.usuarios.add(usuario);
+
+        for (int i = 0; i < AuthService.MAX_INTENTOS_LOGIN - 1; i++) {
+            assertThatThrownBy(() -> authService.login(loginRequest("alumno@test.com", "mala")))
+                    .isInstanceOf(AuthenticationException.class);
+        }
+        assertThatThrownBy(() -> authService.login(loginRequest("alumno@test.com", "mala")))
+                .isInstanceOf(com.curso.auth.exception.AccountLockedException.class);
+        // incluso con la clave correcta sigue bloqueada
+        assertThatThrownBy(() -> authService.login(loginRequest("alumno@test.com", "password123")))
+                .isInstanceOf(com.curso.auth.exception.AccountLockedException.class);
+    }
+
+    @Test
+    void codigo2faSeInvalidaTrasCincoIntentos() {
+        Usuario usuario = usuario("docente@test.com", RolUsuario.DOCENTE, true);
+        usuario.setCodigo2fa("123456");
+        usuario.setCodigo2faExpiraEn(java.time.LocalDateTime.now().plusMinutes(5));
+        usuarioRepository.usuarios.add(usuario);
+
+        for (int i = 0; i < AuthService.MAX_INTENTOS_2FA; i++) {
+            assertThatThrownBy(() -> authService.verificar2fa(verificarRequest("docente@test.com", "000000")))
+                    .isInstanceOf(AuthenticationException.class);
+        }
+        assertThat(usuario.getCodigo2fa()).isNull();
+        assertThatThrownBy(() -> authService.verificar2fa(verificarRequest("docente@test.com", "123456")))
+                .isInstanceOf(AuthenticationException.class);
+    }
+
     private static RegistroUsuarioRequest registroRequest(String correo, String password, RolUsuario rol, boolean is2faEnabled) {
         RegistroUsuarioRequest request = new RegistroUsuarioRequest();
         request.setDni("12345678");

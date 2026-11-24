@@ -46,6 +46,15 @@ public class Usuario {
     @Column(name = "is_active")
     private Boolean isActive = true;
 
+    @Column(name = "intentos_fallidos")
+    private Integer intentosFallidos = 0;
+
+    @Column(name = "bloqueado_hasta")
+    private LocalDateTime bloqueadoHasta;
+
+    @Column(name = "intentos_2fa")
+    private Integer intentos2fa = 0;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -151,5 +160,29 @@ public class Usuario {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Integer getIntentosFallidos() {
+        return intentosFallidos == null ? 0 : intentosFallidos;
+    }
+
+    public void setIntentosFallidos(Integer intentosFallidos) {
+        this.intentosFallidos = intentosFallidos;
+    }
+
+    public LocalDateTime getBloqueadoHasta() {
+        return bloqueadoHasta;
+    }
+
+    public void setBloqueadoHasta(LocalDateTime bloqueadoHasta) {
+        this.bloqueadoHasta = bloqueadoHasta;
+    }
+
+    public Integer getIntentos2fa() {
+        return intentos2fa == null ? 0 : intentos2fa;
+    }
+
+    public void setIntentos2fa(Integer intentos2fa) {
+        this.intentos2fa = intentos2fa;
     }
 }

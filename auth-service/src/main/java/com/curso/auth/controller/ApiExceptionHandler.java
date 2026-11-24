@@ -1,5 +1,6 @@
 package com.curso.auth.controller;
 
+import com.curso.auth.exception.AccountLockedException;
 import com.curso.auth.exception.AuthenticationException;
 import com.curso.auth.exception.ServiceUnavailableException;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,21 @@ public class ApiExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, Object>> handleAuthentication(AuthenticationException ex) {
         return respuesta(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(AccountLockedException.class)
+    public ResponseEntity<Map<String, Object>> handleLocked(AccountLockedException ex) {
+        return respuesta(HttpStatus.LOCKED, ex.getMessage());
+    }
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<Map<String, Object>> handleForbidden(SecurityException ex) {
+        return respuesta(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleUnreadable(Exception ex) {
+        return respuesta(HttpStatus.BAD_REQUEST, "Cuerpo de la solicitud invalido");
     }
 
     @ExceptionHandler(ServiceUnavailableException.class)
