@@ -136,6 +136,12 @@ export class ApiService {
   }
 
   private resolveDirectUrl(endpoint: string): string | null {
+    // Respaldo directo a los microservicios SOLO en desarrollo local: en produccion los
+    // servicios no son publicos y todo pasa por el gateway.
+    const host = typeof window !== 'undefined' ? window.location.hostname : '';
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      return null;
+    }
     if (endpoint.startsWith('/auth')) {
       return `http://127.0.0.1:8081/api${endpoint}`;
     }

@@ -31,7 +31,7 @@ flowchart LR
 | 4. Roles | gateway (`AccessPolicy`) | Público → Estudiante → Docente → Admin; rutas internas bloqueadas; rutas no listadas rechazadas (fail closed); el usuario solo accede a sus propios datos |
 | 5. Clave interna | cada servicio | Rechaza todo lo que no traiga `X-Internal-Key` (nadie puede saltarse el gateway aunque el servicio tenga URL propia) |
 | 6. Cuenta y 2FA | auth-service | BCrypt, bloqueo de cuenta 15 min tras 5 contraseñas incorrectas, código WhatsApp de 5 min con máximo 5 intentos, docentes y admin con 2FA obligatorio, registro público solo como estudiante |
-| 7. Datos | cursos / pedidos | Docente solo edita sus cursos; estudiante solo ve y cancela sus pedidos; bloqueo de fila contra sobreventa; reservas vencidas se liberan solas |
+| 7. Datos | cursos / pedidos | Docente solo edita sus cursos y solo pone notas y asistencias en ellos; estudiante solo ve sus notas, pedidos, comprobantes y certificados; el pago se confirma consultando a Mercado Pago (nunca por el navegador); certificado solo con pedido PAGADO y nota APROBADO; bloqueo de fila contra sobreventa; reservas vencidas se liberan solas |
 
 Matriz de acceso completa: `gateway-service/src/main/java/com/curso/gateway/security/AccessPolicy.java`.
 
@@ -49,18 +49,21 @@ openssl rand -base64 48   # INTERNAL_API_KEY
 | `SPRING_PROFILES_ACTIVE=prod` | ✓ | ✓ | ✓ | ✓ | | |
 | `JWT_SECRET` | ✓ | ✓ | | | | |
 | `INTERNAL_API_KEY` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `SPRING_DATASOURCE_URL` / `_USERNAME` / `_PASSWORD` | | ✓ | ✓ | ✓ | | |
+| `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` (`DB_POOL_SIZE` opcional) | | ✓ | ✓ | ✓ | | |
 | `AUTH_SERVICE_URL` | ✓ | | | ✓ | | |
 | `CURSOS_SERVICE_URL` | ✓ | | | ✓ | | |
 | `PEDIDOS_SERVICE_URL` | ✓ | | | | | |
 | `WHATSAPP_SERVICE_URL` | ✓ | ✓ | | | | |
 | `CORS_ALLOWED_ORIGINS` | ✓ | | | | | |
 | `SECURITY_TRUSTED_PROXIES` | ✓ | | | | | |
+| `FRONTEND_PROXY_ENABLED=false` (el frontend vive en Netlify) | ✓ | | | | | |
 | `MERCADOPAGO_ACCESS_TOKEN`, `FRONTEND_URL`, `MERCADOPAGO_NOTIFICATION_URL` | | | | ✓ | | |
 | `SMTP_*` | | | | | | ✓ |
 
 Con el perfil `prod` los servicios **no arrancan** si falta un secreto: no hay valores por defecto inseguros.
 Plantilla completa: `.env.example`.
+
+El frontend Angular solo necesita `API_URL` (URL pública del gateway terminada en `/api`). Se escribe en `config.js` al construir en Netlify o al arrancar el contenedor nginx, así que la misma build sirve para cualquier entorno.
 
 `SECURITY_TRUSTED_PROXIES`: rango del balanceador del proveedor, para leer la IP real del cliente.
 Si lo deja vacío detrás de un balanceador, todas las visitas parecerán venir de la misma IP y el rate limit las bloquearía juntas.
@@ -86,7 +89,10 @@ Todo junto en una máquina (demo): `cp .env.example .env && docker compose up --
 Detalle de costos en la matriz comparativa del curso.
 
 1. **PostgreSQL**: Azure Database for PostgreSQL Flexible Server **B1ms** (gratis 12 meses), región Brazil South.
-   Cree la base `cursos_db` y ejecute `database/schema_local.sql`.
+   Cree la base `cursos_db` y ejecute, en este orden:
+   `schema_local.sql`, `migracion_aula_virtual_fase_a.sql`, `migracion_aula_virtual_e2.sql`,
+   `migracion_notas_asistencias.sql`, `migracion_seguridad_cuentas.sql`, `migracion_passwords_bcrypt.sql`.
+   **Si ya usan Supabase**, basta con las dos nuevas: `migracion_notas_asistencias.sql` y `migracion_seguridad_cuentas.sql` (son idempotentes).
 2. **Registro de imágenes**: Azure Container Registry; suba las 6 imágenes.
 3. **Container Apps** (un *Container App* por servicio, mismo *environment*):
    - `gateway-service`: ingress **externo**, puerto 8080.
@@ -96,7 +102,8 @@ Detalle de costos en la matriz comparativa del curso.
 4. **whatsapp-service**: VM Linux **B1s** (gratis 12 meses) con Docker y volumen `/data`.
    Primera vez: `docker logs -f whatsapp-service` y escanee el QR con el WhatsApp del negocio.
    Abra el puerto 8085 solo para la red de Container Apps.
-5. **Frontend**: Netlify (ver `frontend/README.md`) con `VITE_API_URL` = URL del gateway.
+5. **Frontend (Angular)**: Netlify con *Base directory* = `frontend` (el `netlify.toml` ya define build y publicación en `dist/frontend/browser`).
+   Variable de entorno `API_URL=https://<gateway>/api`. Añada la URL de Netlify a `CORS_ALLOWED_ORIGINS` del gateway.
 6. **Mercado Pago**: `MERCADOPAGO_NOTIFICATION_URL=https://<gateway>/api/pedidos/webhook`.
 
 ### Otros proveedores
@@ -110,11 +117,11 @@ Detalle de costos en la matriz comparativa del curso.
 
 ## 5. Lista de verificación antes de la entrega
 
-- [ ] **Rotar credenciales expuestas:** el historial de Git aún contiene la contraseña de la BD y el token de prueba de Mercado Pago que estaban en `application.properties`. Cámbielos en PostgreSQL y en Mercado Pago aunque ya no estén en el código.
+- [ ] **Rotar credenciales expuestas:** el historial de Git contiene la contraseña de la BD, el token de prueba de Mercado Pago y, en `test/fullstack-angular`, un token de **producción** `APP_USR-…`. Revóquelo en el panel de Mercado Pago y cambie la contraseña de PostgreSQL/Supabase aunque ya no estén en el código.
 - [ ] `JWT_SECRET` e `INTERNAL_API_KEY` largos, aleatorios e iguales en todos los servicios.
 - [ ] `CORS_ALLOWED_ORIGINS` con la URL exacta de Netlify (sin `*`).
 - [ ] `SECURITY_TRUSTED_PROXIES` con el rango del balanceador.
 - [ ] Solo el gateway tiene URL pública; `curl https://<auth>/api/cursos` desde fuera debe fallar.
 - [ ] WhatsApp vinculado (panel ADMIN → Seguridad muestra “conectado”).
 - [ ] `OTP_LOG_IF_WHATSAPP_DOWN` **no** definido en producción.
-- [ ] Usuarios semilla: cambie la contraseña `Clave1234` del admin y docente.
+- [ ] Usuarios semilla: la migración del equipo los deja con la contraseña `123456` (en BCrypt). Cámbiela para admin y docentes desde el panel ADMIN → Usuarios antes de publicar.

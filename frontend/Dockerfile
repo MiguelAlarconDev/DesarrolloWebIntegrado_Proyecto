@@ -1,14 +1,15 @@
-# Frontend servido con nginx (alternativa a Netlify, p. ej. en docker-compose)
+# Frontend Angular servido con nginx (alternativa a Netlify, p. ej. en docker-compose)
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-ARG VITE_API_URL=http://localhost:8080
-ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 FROM nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
+# API_URL se inyecta al arrancar el contenedor (config.js), sin recompilar
+ENV API_URL=""
+CMD ["sh", "-c", "printf 'window.__APP_CONFIG__ = {\"apiUrl\": \"%s\"};\\n' \"$API_URL\" > /usr/share/nginx/html/config.js && exec nginx -g 'daemon off;'"]
 EXPOSE 80

@@ -1,17 +1,18 @@
-# Levanta TODO el proyecto en una sola maquina para desarrollo o una demo:
-#   cp .env.example .env   (y edite los valores)
+# Levanta TODO el proyecto en una sola maquina (desarrollo o demo):
+#   cp .env.example .env   (complete al menos JWT_SECRET e INTERNAL_API_KEY)
 #   docker compose up --build
-# Solo el gateway (8080) y el frontend quedan expuestos; los demas servicios
-# viven en la red interna "backend", igual que en la nube.
+# Frontend: http://localhost:8088  ·  API (gateway): http://localhost:8080
+# Solo el gateway y el frontend quedan expuestos; los demas servicios viven en la
+# red interna "backend", igual que en la nube.
 name: plataforma-cursos
 
 x-java-env: &java-env
   SPRING_PROFILES_ACTIVE: prod
   JWT_SECRET: ${JWT_SECRET}
   INTERNAL_API_KEY: ${INTERNAL_API_KEY}
-  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cursos_db
-  SPRING_DATASOURCE_USERNAME: postgres
-  SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  DB_URL: jdbc:postgresql://postgres:5432/cursos_db
+  DB_USERNAME: postgres
+  DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
 
 services:
   postgres:
@@ -21,7 +22,13 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # Se ejecutan en orden alfabetico solo la primera vez (volumen vacio)
       - ./database/schema_local.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/migracion_aula_virtual_fase_a.sql:/docker-entrypoint-initdb.d/02-aula-fase-a.sql:ro
+      - ./database/migracion_aula_virtual_e2.sql:/docker-entrypoint-initdb.d/03-aula-e2.sql:ro
+      - ./database/migracion_notas_asistencias.sql:/docker-entrypoint-initdb.d/04-notas-asistencias.sql:ro
+      - ./database/migracion_seguridad_cuentas.sql:/docker-entrypoint-initdb.d/05-seguridad-cuentas.sql:ro
+      - ./database/migracion_passwords_bcrypt.sql:/docker-entrypoint-initdb.d/06-passwords-bcrypt.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d cursos_db"]
       interval: 5s
@@ -34,12 +41,19 @@ services:
       <<: *java-env
       WHATSAPP_SERVICE_URL: http://whatsapp-service:8085
       OTP_LOG_IF_WHATSAPP_DOWN: ${OTP_LOG_IF_WHATSAPP_DOWN:-false}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
     depends_on: { postgres: { condition: service_healthy } }
     networks: [backend]
 
   cursos-service:
     build: { context: ., dockerfile: cursos-service/Dockerfile }
-    environment: *java-env
+    environment:
+      <<: *java-env
+      PEDIDOS_SERVICE_URL: http://pedidos-service:8083
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
+      SUPABASE_STORAGE_BUCKET: ${SUPABASE_STORAGE_BUCKET:-aula-materiales}
     depends_on: { postgres: { condition: service_healthy } }
     networks: [backend]
 
@@ -49,9 +63,17 @@ services:
       <<: *java-env
       AUTH_SERVICE_URL: http://auth-service:8081
       CURSOS_SERVICE_URL: http://cursos-service:8082
+      COMPROBANTES_SERVICE_URL: http://comprobantes-service:8084
       MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:-}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      MERCADOPAGO_WEBHOOK_SECRET: ${MERCADOPAGO_WEBHOOK_SECRET:-}
+      MERCADOPAGO_BACK_URL: ${MERCADOPAGO_BACK_URL:-http://localhost:8088/checkout}
       MERCADOPAGO_NOTIFICATION_URL: ${MERCADOPAGO_NOTIFICATION_URL:-}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
+      WHATSAPP_CLOUD_ENABLED: ${WHATSAPP_CLOUD_ENABLED:-false}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID:-}
+      WHATSAPP_API_TOKEN: ${WHATSAPP_API_TOKEN:-}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN:-}
     depends_on: { postgres: { condition: service_healthy } }
     networks: [backend]
 
@@ -64,6 +86,8 @@ services:
       SMTP_USERNAME: ${SMTP_USERNAME:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-}
+    volumes:
+      - comprobantes:/app/generated
     networks: [backend]
 
   whatsapp-service:
@@ -83,18 +107,19 @@ services:
       AUTH_SERVICE_URL: http://auth-service:8081
       CURSOS_SERVICE_URL: http://cursos-service:8082
       PEDIDOS_SERVICE_URL: http://pedidos-service:8083
+      COMPROBANTES_SERVICE_URL: http://comprobantes-service:8084
       WHATSAPP_SERVICE_URL: http://whatsapp-service:8085
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:8088}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8088,http://127.0.0.1:8088}
       SECURITY_TRUSTED_PROXIES: ${SECURITY_TRUSTED_PROXIES:-127.0.0.1}
+      FRONTEND_PROXY_ENABLED: "false"
     ports: ["8080:8080"]
     depends_on: [auth-service, cursos-service, pedidos-service]
     networks: [backend]
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+    build: ./frontend
+    environment:
+      API_URL: ${API_URL:-http://localhost:8080/api}
     ports: ["8088:80"]
     depends_on: [gateway-service]
 
@@ -104,3 +129,4 @@ networks:
 volumes:
   pgdata:
   wwebjs:
+  comprobantes:

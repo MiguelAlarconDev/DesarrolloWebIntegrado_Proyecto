@@ -22,9 +22,13 @@ export interface CursoModel {
 }
 
 export const APP_CONFIG = {
-  API_BASE_URL: (typeof window !== 'undefined' && window.location.port === '8080')
-    ? `${window.location.origin}/api`
-    : 'http://127.0.0.1:8080/api',
+  // 1) URL configurada en el despliegue (public/config.js), 2) mismo origen si se sirve desde el gateway,
+  // 3) gateway local para desarrollo.
+  API_BASE_URL: (typeof window !== 'undefined' && (window as any).__APP_CONFIG__?.apiUrl)
+    ? String((window as any).__APP_CONFIG__.apiUrl).replace(/\/$/, '')
+    : (typeof window !== 'undefined' && window.location.port === '8080')
+      ? `${window.location.origin}/api`
+      : 'http://127.0.0.1:8080/api',
   AUTH_SERVICE_URL: 'http://127.0.0.1:8081/api/auth',
   CURSOS_SERVICE_URL: 'http://127.0.0.1:8082/api/cursos',
   PEDIDOS_SERVICE_URL: 'http://127.0.0.1:8083/api/pedidos',
