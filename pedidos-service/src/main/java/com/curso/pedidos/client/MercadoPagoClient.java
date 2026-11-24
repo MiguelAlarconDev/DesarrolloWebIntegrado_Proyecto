@@ -48,8 +48,8 @@ public class MercadoPagoClient {
 
     public PreferenciaResponse crearPreferencia(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         if (accessToken == null || accessToken.isBlank()) {
-            log.warn("[MERCADO PAGO] Access Token no configurado. Se usara un mock.");
-            return new PreferenciaResponse("PREF-MOCK-" + pedido.getId(), "https://sandbox.mercadopago.com.pe/checkout/v1/redirect?pref_id=mock");
+            log.warn("[MERCADO PAGO] Access Token no configurado: la reserva queda registrada sin enlace de pago.");
+            return new PreferenciaResponse("PREF-MOCK-" + pedido.getId(), null);
         }
 
         try {

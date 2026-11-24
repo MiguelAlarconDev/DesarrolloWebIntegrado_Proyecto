@@ -47,6 +47,13 @@ public class PedidoService {
         // 1. Validar existencia del estudiante en auth-service
         UsuarioDto estudiante = authClient.obtenerUsuario(request.getEstudianteId());
 
+        // 1b. Evitar doble reserva/matricula del mismo curso (ocuparia dos vacantes)
+        boolean yaInscrito = pedidoRepository.findByEstudianteId(estudiante.getId()).stream()
+                .anyMatch(p -> p.getCursoId().equals(request.getCursoId()) && p.getEstado() != EstadoPedido.CANCELADO);
+        if (yaInscrito) {
+            throw new IllegalStateException("Ya tienes una reserva o matricula activa en este curso. Revisala en Mis cursos.");
+        }
+
         // 2. Validar curso y reservar vacante vía HTTP en cursos-service
         CursoDto cursoActualizado = cursoClient.descontarAforo(request.getCursoId());
 
