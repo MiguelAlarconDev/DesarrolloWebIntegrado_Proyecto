@@ -1,68 +1,60 @@
-# Sistema de Gestión y Venta de Cursos Virtuales - Arquitectura de Microservicios
+# Sistema de Gestión y Venta de Cursos — Arquitectura de Microservicios
 
-Arquitectura de **Microservicios** desarrollada en **Spring Boot 3**, **Spring Cloud Gateway** y **PostgreSQL** para la plataforma de gestión y venta de cursos virtuales.
+Plataforma para vender cursos presenciales y virtuales: catálogo con control de aforo, reserva de vacante por 15 minutos,
+pago con Mercado Pago, comprobante con IGV y notificaciones por WhatsApp. Backend en **Spring Boot 3** + **Spring Cloud Gateway**,
+**PostgreSQL**, servicios auxiliares en Python y Node, y frontend en **React + Vite**.
 
----
+## Arquitectura
 
-## Arquitectura de microservicios
+| Componente | Tecnología | Puerto | Responsabilidad | Público |
+|---|---|---:|---|:-:|
+| `frontend/` | React + Vite | 5173 | Interfaz para estudiantes, docentes y admin | Sí |
+| `gateway-service` | Spring Cloud Gateway MVC | 8080 | Único punto de entrada; seguridad por capas | Sí |
+| `auth-service` | Spring Boot | 8081 | Usuarios, JWT, 2FA por WhatsApp | No |
+| `cursos-service` | Spring Boot | 8082 | Catálogo, aforos, datos de clase | No |
+| `pedidos-service` | Spring Boot | 8083 | Checkout, Mercado Pago, comprobantes, expiración de reservas | No |
+| `comprobantes-service` | Python + FastAPI | 8084 | PDF y envío por correo | No |
+| `whatsapp-service` | Node + whatsapp-web.js | 8085 | Envío de códigos 2FA y avisos | No |
 
-La POC está compuesta por servicios independientes que se comunican mediante API REST. Cada microservicio se ejecuta en un puerto diferente y posee una responsabilidad específica.
+Seguridad: rate limit y bloqueo de IP, CORS por lista blanca, JWT, permisos por rol (público, estudiante, docente, admin),
+clave interna entre servicios, bloqueo de cuenta y 2FA con límite de intentos. Detalle en [DEPLOY.md](DEPLOY.md#1-seguridad-por-niveles).
 
-| Microservicio | Tecnología | Puerto | Responsabilidad |
-|---|---|---:|---|
-| gateway-service | Java y Spring Boot | 8080 | Punto de entrada de las solicitudes |
-| auth-service | Java y Spring Boot | 8081 | Autenticación y gestión de usuarios |
-| cursos-service | Java y Spring Boot | 8082 | Consulta y administración de cursos |
-| pedidos-service | Java y Spring Boot | 8083 | Pedidos, matrículas y pagos con Mercado Pago |
-| comprobantes-service | Python y FastAPI | 8084 | Generación de PDF y envío por correo |
+## Inicio rápido (todo con Docker)
 
-## Requisitos
+```bash
+cp .env.example .env            # complete JWT_SECRET e INTERNAL_API_KEY
+docker compose up --build
+```
 
-Para ejecutar la POC se necesita:
+- Frontend: http://localhost:8088 · API: http://localhost:8080
+- Usuarios de prueba (contraseña `Clave1234`): `estudiante@cursos.com`, `docente@cursos.com` y `admin@cursos.com` (estos dos piden código 2FA).
+- Sin WhatsApp vinculado, agregue `OTP_LOG_IF_WHATSAPP_DOWN=true` al `.env` para ver el código en `docker compose logs auth-service` (solo desarrollo).
 
-- Java 17 o superior.
-- Maven 3.9 o superior.
-- Python 3.11 o superior.
-- PostgreSQL o una instancia de Supabase.
-- Postman para las pruebas de los endpoints.
-- Una cuenta de Mercado Pago con credenciales de prueba.
-- Una cuenta SMTP para el envío de correos.
+## Desarrollo sin Docker
 
-## Base de datos
+Requisitos: Java 17+, Maven 3.9+, Node 20+, Python 3.11+, PostgreSQL 16 (o Supabase).
 
-Los microservicios Java utilizan PostgreSQL. Para las pruebas colaborativas se puede emplear una instancia compartida en Supabase.
+```bash
+# Base de datos local
+psql -U postgres -c "create database cursos_db" && psql -U postgres -d cursos_db -f database/schema_local.sql
 
-Las credenciales deben configurarse mediante variables de entorno:
+# Cada servicio en su terminal (las variables por defecto apuntan a localhost)
+cd auth-service    && mvn spring-boot:run
+cd cursos-service  && mvn spring-boot:run
+cd pedidos-service && mvn spring-boot:run
+cd gateway-service && mvn spring-boot:run
+cd frontend        && npm install && npm run dev
+```
 
-```env
-SPRING_DATASOURCE_URL=jdbc:postgresql://servidor:5432/postgres?sslmode=require
-SPRING_DATASOURCE_USERNAME=usuario
-SPRING_DATASOURCE_PASSWORD=contraseña
+Variables útiles en desarrollo: `SPRING_DATASOURCE_PASSWORD`, `MERCADOPAGO_ACCESS_TOKEN` (token `TEST-...`),
+`OTP_LOG_IF_WHATSAPP_DOWN=true`. **Nunca** escriba credenciales en `application.properties`: todo va por variables de entorno.
 
-Las credenciales reales no deben almacenarse en el repositorio.
+Pruebas: `mvn verify` (gateway: capas de seguridad; auth: login, 2FA, bloqueos).
 
-## Ejecución de los servicios Java
+## Despliegue en servidores separados
 
-Cada microservicio debe iniciarse en una terminal independiente:
-
-powershell
-cd auth-service
-mvn spring-boot:run
-
-
-powershell
-cd cursos-service
-mvn spring-boot:run
-
-
-powershell
-cd pedidos-service
-mvn spring-boot:run
-
-
-powershell
-cd gateway-service
-mvn spring-boot:run
+Cada servicio tiene su `Dockerfile` y se configura solo por variables de entorno. Paso a paso, variables por servicio
+y opciones por proveedor (Azure, Google Cloud, Render, Railway, AWS) en **[DEPLOY.md](DEPLOY.md)**.
 
 ---
 
