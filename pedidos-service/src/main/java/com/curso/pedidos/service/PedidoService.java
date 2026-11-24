@@ -259,6 +259,53 @@ public class PedidoService {
         return true;
     }
 
+    public byte[] descargarComprobante(UUID pedidoId) {
+        return comprobanteClient.descargarComprobante(pedidoId);
+    }
+
+    /** Estado de pago de un pedido (el frontend lo consulta tras volver de Mercado Pago). */
+    public Map<String, Object> verificarEstadoMercadoPago(UUID pedidoId) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado con ID: " + pedidoId));
+        boolean pagado = pedido.getEstado() == EstadoPedido.PAGADO || pedido.getEstado() == EstadoPedido.CONFIRMADO;
+        return Map.of("pedidoId", pedido.getId(), "estado", pedido.getEstado().name(), "pagado", pagado);
+    }
+
+    /**
+     * Certificado de aprobacion: solo para pedidos pagados cuyo alumno tiene condicion APROBADO
+     * en el libro de notas del curso. Todos los datos salen de los registros, no del cliente.
+     */
+    public byte[] generarCertificado(UUID pedidoId) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado con ID: " + pedidoId));
+        if (pedido.getEstado() != EstadoPedido.PAGADO && pedido.getEstado() != EstadoPedido.CONFIRMADO) {
+            throw new IllegalStateException("El certificado se emite solo para matriculas pagadas");
+        }
+        Map<String, Object> nota = cursoClient.obtenerCalificacion(pedido.getCursoId(), pedido.getEstudianteId());
+        if (nota == null || !"APROBADO".equals(String.valueOf(nota.get("condicion")))) {
+            throw new IllegalStateException("El certificado estara disponible cuando el docente registre tu nota aprobatoria");
+        }
+        UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+        CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
+        String docente = "Docente del curso";
+        try {
+            UsuarioDto d = authClient.obtenerUsuario(curso.getDocenteId());
+            docente = (d.getNombres() + " " + (d.getApellidos() == null ? "" : d.getApellidos())).trim();
+        } catch (Exception ignored) {
+        }
+        Map<String, Object> datos = new java.util.HashMap<>();
+        datos.put("pedidoId", pedido.getId().toString());
+        datos.put("codigoCertificado", "CERT-" + pedido.getCodigoOrden().replaceAll("[^A-Za-z0-9]", "").toUpperCase());
+        datos.put("estudiante", (estudiante.getNombres() + " " + (estudiante.getApellidos() == null ? "" : estudiante.getApellidos())).trim());
+        datos.put("dni", estudiante.getDni());
+        datos.put("curso", curso.getTitulo());
+        datos.put("modalidad", curso.getModalidad());
+        datos.put("docente", docente);
+        datos.put("promedio", nota.get("promedioFinal"));
+        datos.put("fecha", java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        return comprobanteClient.generarCertificado(datos);
+    }
+
     /**
      * RF-08: libera automaticamente las vacantes de reservas no pagadas a los 15 minutos
      * (transaccion compensatoria). Corre cada minuto.

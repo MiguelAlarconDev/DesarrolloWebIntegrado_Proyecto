@@ -241,3 +241,70 @@ def descargar_comprobante(pedido_id: UUID):
     if not pdf_path.exists():
         raise HTTPException(status_code=404, detail="Comprobante no encontrado")
     return FileResponse(pdf_path, media_type="application/pdf", filename=pdf_path.name)
+
+
+class CertificadoRequest(BaseModel):
+    """Datos verificados por pedidos-service (pedido pagado + curso aprobado)."""
+    pedidoId: UUID
+    codigoCertificado: str = Field(min_length=6, max_length=40, pattern=r"^[A-Z0-9-]+$")
+    estudiante: str = Field(min_length=2, max_length=200)
+    dni: str = Field(min_length=8, max_length=15, pattern=r"^[0-9A-Za-z]+$")
+    curso: str = Field(min_length=2, max_length=250)
+    modalidad: str = Field(min_length=3, max_length=20)
+    docente: str = Field(min_length=2, max_length=200)
+    promedio: Decimal = Field(ge=0, le=20, decimal_places=2)
+    fecha: str = Field(min_length=8, max_length=20)
+
+
+def generar_certificado_pdf(datos: CertificadoRequest) -> bytes:
+    from xml.sax.saxutils import escape
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20 * mm, leftMargin=20 * mm,
+                            topMargin=20 * mm, bottomMargin=20 * mm)
+    styles = getSampleStyleSheet()
+    contenido = [
+        Paragraph("GESTIÓN DE CURSOS", styles["Title"]),
+        Paragraph("CERTIFICADO DE APROBACIÓN", styles["Heading2"]),
+        Spacer(1, 8 * mm),
+        # escape(): los nombres no pueden inyectar etiquetas de formato en el PDF
+        Paragraph(
+            f"Se otorga el presente certificado a <b>{escape(datos.estudiante)}</b> "
+            f"(DNI <b>{escape(datos.dni)}</b>) por haber aprobado el curso:",
+            styles["Normal"],
+        ),
+        Spacer(1, 6 * mm),
+    ]
+    filas = [
+        ["Código de certificado", datos.codigoCertificado],
+        ["Curso", datos.curso],
+        ["Modalidad", datos.modalidad],
+        ["Docente", datos.docente],
+        ["Promedio final", f"{datos.promedio:.2f} / 20"],
+        ["Fecha de emisión", datos.fecha],
+    ]
+    tabla = Table(filas, colWidths=[50 * mm, 110 * mm])
+    tabla.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#EEEEEE")),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#BBBBBB")),
+        ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("PADDING", (0, 0), (-1, -1), 8),
+    ]))
+    contenido.extend([
+        tabla,
+        Spacer(1, 10 * mm),
+        Paragraph("Emitido por la plataforma a partir del registro de matrícula y notas del curso.", styles["Italic"]),
+    ])
+    doc.build(contenido)
+    return buffer.getvalue()
+
+
+@app.post("/api/comprobantes/certificado", dependencies=[Depends(require_internal_key)])
+def crear_certificado(datos: CertificadoRequest):
+    """Solo interno: pedidos-service verifica pago y aprobación antes de llamar."""
+    from fastapi.responses import Response
+
+    pdf = generar_certificado_pdf(datos)
+    return Response(content=pdf, media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="Certificado_{datos.codigoCertificado}.pdf"'})

@@ -59,6 +59,7 @@ public final class AccessPolicy {
             publico("GET", "/actuator/health"),
             publico("POST", "/api/auth/login"),
             publico("POST", "/api/auth/verificar-2fa"),
+            publico("POST", "/api/auth/reenviar-2fa"),
             new Regla("POST", compile("/api/auth/registro"), "/api/auth/registro", Tipo.OPCIONAL, AUTENTICADO, null),
             publico("POST", "/api/pedidos/webhook"),            // Mercado Pago (pedidos verifica la firma)
             publico("*", "/api/pedidos/whatsapp/webhook"),      // Meta WhatsApp Cloud (verificacion del webhook)
@@ -71,7 +72,12 @@ public final class AccessPolicy {
             interno("PUT", "/api/cursos/{id}/descontar-aforo"),
             interno("PUT", "/api/cursos/{id}/liberar-aforo"),
             interno("*", "/api/pedidos/interno/**"),
-            interno("POST", "/api/comprobantes/enviar"),
+            interno("*", "/api/comprobantes/**"),   // PDFs se descargan via /api/pedidos/{id}/comprobante|certificado
+            // ---- Notas (0-20) y asistencias: docente del curso o admin; el alumno ve las suyas
+            roles("GET", "/api/cursos/calificaciones/curso/{cursoId}/estudiante/{estudianteId}", AUTENTICADO, null),
+            roles("GET", "/api/cursos/asistencias/curso/{cursoId}/estudiante/{estudianteId}", AUTENTICADO, null),
+            roles("*", "/api/cursos/calificaciones/**", STAFF, null),
+            roles("*", "/api/cursos/asistencias/**", STAFF, null),
             // ---- Aula virtual: sesion obligatoria; cursos-service valida rol, matricula y propiedad
             roles("*", "/api/cursos/{cursoId}/aula/**", AUTENTICADO, null),
             // ---- Nivel 1: estudiante
@@ -79,7 +85,6 @@ public final class AccessPolicy {
             roles("POST", "/api/pedidos/checkout", ESTUDIANTE, null),
             roles("GET", "/api/pedidos/estudiante/{estudianteId}", ESTUDIANTE, "estudianteId"),
             roles("PUT", "/api/pedidos/{id}/cancelar", ESTUDIANTE, null),
-            roles("GET", "/api/comprobantes/**", AUTENTICADO, null),
             // ---- Nivel 2: docente
             roles("POST", "/api/cursos", DOCENTE, null),
             roles("PUT", "/api/cursos/{id}/enlace", DOCENTE, null),
@@ -90,7 +95,11 @@ public final class AccessPolicy {
             // ---- Nivel 3: admin
             roles("GET", "/api/auth/usuarios/{id}", AUTENTICADO, "id"),
             roles("GET", "/api/auth/usuarios", ADMIN, null),
-            roles("PUT", "/api/pedidos/{id}/pagar", ADMIN, null),
+            roles("PUT", "/api/auth/usuarios/{id}", AUTENTICADO, "id"),
+            roles("DELETE", "/api/auth/usuarios/{id}", ADMIN, null),
+            roles("PUT", "/api/cursos/{id}", ADMIN, null),
+            roles("DELETE", "/api/cursos/{id}", ADMIN, null),
+            roles("PUT", "/api/pedidos/{id}/pagar", ESTUDIANTE, null),   // pedidos verifica el pago en Mercado Pago
             roles("*", "/api/pedidos/{id}/whatsapp/reenviar", ADMIN, null),
             roles("*", "/api/pedidos/whatsapp/**", ADMIN, null),
             roles("*", "/api/pedidos/email/**", ADMIN, null),

@@ -120,6 +120,21 @@ public class CursoClient {
         return result;
     }
 
+    /** Nota del alumno en el curso (o null si aun no tiene). Llamada con token de servicio. */
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> obtenerCalificacion(UUID cursoId, UUID estudianteId) {
+        try {
+            return restClient.get()
+                    .uri("/api/cursos/calificaciones/curso/{c}/estudiante/{e}", cursoId, estudianteId)
+                    .retrieve()
+                    .body(Map.class);
+        } catch (org.springframework.web.client.HttpClientErrorException.NotFound ex) {
+            return null;
+        } catch (Exception ex) {
+            throw new IllegalStateException("No se pudo consultar la nota del curso. Intente nuevamente.");
+        }
+    }
+
     public CursoDto descontarAforo(UUID cursoId) {
         try {
             CursoDto dto = restClient.put()

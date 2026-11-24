@@ -13,30 +13,30 @@ import { CartService } from '../../services/cart.service';
   template: `
 	<!-- START NAVBAR -->  
 	<div id="navigation" class="fixed-top navbar-light bg-faded site-navigation">
-		<div class="container">
-			<div class="row align-items-center">
-				<div class="col-lg-3 col-md-4 col-sm-6">
-					<div class="site-logo">
+		<div class="container-fluid px-xl-5 px-lg-4 px-3">
+			<div class="row align-items-center justify-content-between flex-nowrap g-2">
+				<div class="col-auto d-flex align-items-center">
+					<div class="site-logo me-3">
 						<a href="/" class="brand-logo-link">
 							<span class="brand-icon"><i class="fa fa-graduation-cap"></i></span>
 							<span class="brand-text">Gestión de Cursos</span>
 						</a>          			        				
 					</div>
 				</div>
-				<div class="col-lg-6 col-md-6 col-sm-6">
+				<div class="col d-flex align-items-center justify-content-center">
 					<div class="header_right">
-						<nav id="main-menu" class="ms-auto">
+						<nav id="main-menu">
 							<ul>
 								<li><a class="nav-link active" href="/"><i class="fa fa-home me-1"></i> Inicio</a></li>
 								<li><a class="nav-link" href="/cursos"><i class="fa fa-book me-1"></i> Cursos</a></li>
+								<li><a class="nav-link" href="/beneficios"><i class="fa fa-star me-1"></i> Beneficios</a></li>
 								<li><a class="nav-link" href="/contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
-								<li><a class="nav-link" href="/carrito"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
 							</ul>
 						</nav>
 						<div id="mobile_menu"></div>
 					</div>
 				</div>
-				<div class="col-lg-3 col-md-3 col-sm-12">
+				<div class="col-auto d-flex align-items-center justify-content-end gap-2">
 					<div class="home_lc">
 						<a href="/carrito" class="hlc" title="Ver Carrito de Matrícula" aria-label="Ver Carrito de Matrícula">
 							<i class="fa fa-shopping-cart"></i>

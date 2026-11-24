@@ -93,6 +93,41 @@ public class CursoService {
     }
 
     @Transactional
+    public Curso actualizar(UUID id, CrearCursoRequest request) {
+        Curso curso = buscarPorId(id);
+        validarDatosClase(request.getModalidad(), request.getEnlaceClase(), request.getDireccionClase());
+
+        curso.setTitulo(request.getTitulo());
+        curso.setDescripcion(request.getDescripcion());
+        curso.setDocenteId(request.getDocenteId());
+        curso.setFechaInicio(request.getFechaInicio());
+        curso.setFechaFin(request.getFechaFin());
+        curso.setHorario(request.getHorario());
+        curso.setPrecio(request.getPrecio());
+
+        if (!curso.getAforoMaximo().equals(request.getAforoMaximo())) {
+            int diferencia = request.getAforoMaximo() - curso.getAforoMaximo();
+            curso.setAforoMaximo(request.getAforoMaximo());
+            curso.setAforoDisponible(Math.max(0, curso.getAforoDisponible() + diferencia));
+        }
+
+        aplicarDatosClase(curso, request.getModalidad(), request.getEnlaceClase(), request.getDireccionClase(), request.getAula());
+        return cursoRepository.save(curso);
+    }
+
+    @Transactional
+    public void eliminar(UUID id) {
+        Curso curso = buscarPorId(id);
+        try {
+            cursoRepository.delete(curso);
+            cursoRepository.flush();
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            throw new IllegalStateException("El curso tiene matriculas, materiales o notas registradas. "
+                    + "Marcalo como FINALIZADO en lugar de eliminarlo.");
+        }
+    }
+
+    @Transactional
     public Curso cambiarEstado(UUID id, EstadoCurso nuevoEstado) {
         Curso curso = buscarPorId(id);
         curso.setEstado(nuevoEstado);

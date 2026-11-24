@@ -24,7 +24,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     static final Set<String> PUBLIC_POST = Set.of(
             "/api/auth/login",
             "/api/auth/registro",
-            "/api/auth/verificar-2fa"
+            "/api/auth/verificar-2fa",
+            "/api/auth/reenviar-2fa"
     );
 
     private final JwtService jwtService;
@@ -76,6 +77,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     static boolean allowed(String method, String path, AccessPrincipal p) {
+        if ("PUT".equalsIgnoreCase(method) && path.startsWith("/api/auth/usuarios/")) {
+            return !p.isService(); // el controlador valida propietario o ADMIN
+        }
+        if ("DELETE".equalsIgnoreCase(method) && path.startsWith("/api/auth/usuarios/")) {
+            return p.isAdmin();
+        }
         if (!"GET".equalsIgnoreCase(method)) {
             return false;
         }

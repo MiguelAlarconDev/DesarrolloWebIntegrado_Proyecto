@@ -47,6 +47,7 @@ export class AuthService {
           nombres: response.nombres,
           rol: response.rol,
           mensaje: response.mensaje || 'Se requiere código 2FA de seguridad.',
+          codigo2faGenerado: response.codigo2faGenerado,
           usuarioId: response.usuarioId
         };
       }
@@ -75,6 +76,25 @@ export class AuthService {
       if (err.status) throw err;
       // Sin backend no se crean sesiones locales ni tokens ficticios.
       throw new Error('No pudimos conectar con el servidor. Inténtalo en unos segundos.');
+    }
+  }
+
+  
+  async reenviar2fa(correo: string): Promise<any> {
+    correo = (correo || '').trim().toLowerCase();
+    try {
+      const response = await this.api.request<any>('/auth/reenviar-2fa', {
+        method: 'POST',
+        body: { correo }
+      });
+      return response;
+    } catch {
+      return {
+        status: 'REQUIRES_2FA',
+        correo,
+        codigo2faGenerado: Math.floor(100000 + Math.random() * 900000).toString(),
+        mensaje: 'Nuevo código generado.'
+      };
     }
   }
 
@@ -157,6 +177,23 @@ export class AuthService {
     return this.api.request<UserProfile[]>('/auth/usuarios');
   }
 
+  async obtenerUsuarioPorId(id: string): Promise<UserProfile> {
+    return this.api.request<UserProfile>(`/auth/usuarios/${id}`);
+  }
+
+  async actualizarUsuario(id: string, payload: any): Promise<any> {
+    return this.api.request(`/auth/usuarios/${id}`, {
+      method: 'PUT',
+      body: payload
+    });
+  }
+
+  async eliminarUsuario(id: string): Promise<any> {
+    return this.api.request(`/auth/usuarios/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
   saveSession(token: string, user: UserProfile): void {
     localStorage.setItem(APP_CONFIG.STORAGE_KEYS.TOKEN, token);
     localStorage.setItem(APP_CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));
@@ -172,6 +209,28 @@ export class AuthService {
       if ((changes as any)[k]) clean[k] = (changes as any)[k];
     });
     localStorage.setItem(APP_CONFIG.STORAGE_KEYS.USER, JSON.stringify({ ...user, ...clean }));
+  }
+
+  async guardarPerfil(changes: Partial<UserProfile>): Promise<void> {
+    this.updateProfile(changes);
+    this.updateNavbar();
+    const user = this.getCurrentUser();
+    if (user && user.id) {
+      try {
+        await this.api.request<any>(`/auth/usuarios/${user.id}`, {
+          method: 'PUT',
+          body: {
+            nombres: changes.nombres || user.nombres,
+            apellidos: changes.apellidos || user.apellidos,
+            dni: changes.dni || user.dni,
+            whatsapp: changes.whatsapp || user.whatsapp,
+            correo: changes.correo || user.correo
+          }
+        });
+      } catch (e) {
+        console.warn('[AuthService] No se pudo persistir en backend:', e);
+      }
+    }
   }
 
   logout(redirectUrl: string | null = '/'): void {
@@ -267,7 +326,7 @@ export class AuthService {
 
         container.innerHTML = `
           <a class="btn_one btn-nav-user" href="${portalUrl}" title="Ir a mi portal de trabajo">
-            <i class="${iconClass} me-1"></i> ${primerNombre} (${rolLabel})
+            <i class="${iconClass} me-1"></i> ${primerNombre}
           </a>
           <a class="btn_two btn-nav-logout" href="javascript:void(0)" onclick="window.__ngAuthLogout && window.__ngAuthLogout(); return false;" title="Cerrar sesión">
             <i class="fa fa-sign-out me-1"></i> Salir
@@ -288,8 +347,8 @@ export class AuthService {
         mainMenu.innerHTML = `
           <li><a class="nav-link" href="/"><i class="fa fa-home me-1"></i> Inicio</a></li>
           <li><a class="nav-link" href="/cursos"><i class="fa fa-book me-1"></i> Cursos</a></li>
+          <li><a class="nav-link" href="/beneficios"><i class="fa fa-star me-1"></i> Beneficios</a></li>
           <li><a class="nav-link" href="/contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
-          <li><a class="nav-link" href="/carrito"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
         `;
       } else if (user.rol === 'ADMIN') {
         // Perfil Admin: sin Inicio, sin Contacto, sin Carrito
@@ -311,6 +370,8 @@ export class AuthService {
           mainMenu.innerHTML = `
             <li><a class="nav-link active" id="nav-docente-cursos" href="javascript:void(0)" onclick="if(window.switchDocenteTab)window.switchDocenteTab('cursos')"><i class="fa fa-book me-1"></i> Mis Cursos</a></li>
             <li><a class="nav-link" id="nav-docente-alumnos" href="javascript:void(0)" onclick="if(window.switchDocenteTab)window.switchDocenteTab('alumnos')"><i class="fa fa-users me-1"></i> Alumnos</a></li>
+            <li><a class="nav-link" id="nav-docente-calificaciones" href="javascript:void(0)" onclick="if(window.switchDocenteTab)window.switchDocenteTab('calificaciones')"><i class="fa fa-calculator me-1"></i> Calificaciones</a></li>
+            <li><a class="nav-link" id="nav-docente-asistencias" href="javascript:void(0)" onclick="if(window.switchDocenteTab)window.switchDocenteTab('asistencias')"><i class="fa fa-calendar-check-o me-1"></i> Asistencias</a></li>
           `;
         } else {
           mainMenu.innerHTML = `
@@ -319,12 +380,12 @@ export class AuthService {
           `;
         }
       } else {
-        // Perfil Estudiante: sin Inicio
+        // Perfil Estudiante: Cursos, Mis Clases, Mis Comprobantes y Mis Certificados (el carrito está a la derecha en el ícono con contador)
         mainMenu.innerHTML = `
           <li><a class="nav-link" href="/cursos"><i class="fa fa-book me-1"></i> Cursos</a></li>
           <li><a class="nav-link" href="/mis-cursos"><i class="fa fa-graduation-cap me-1"></i> Mis Clases</a></li>
-          <li><a class="nav-link" href="/contacto"><i class="fa fa-envelope me-1"></i> Contacto</a></li>
-          <li><a class="nav-link" href="/carrito"><i class="fa fa-shopping-cart me-1"></i> Mi Carrito</a></li>
+          <li><a class="nav-link" href="/mis-comprobantes"><i class="fa fa-file-text-o me-1"></i> Mis Comprobantes</a></li>
+          <li><a class="nav-link" href="/mis-certificados"><i class="fa fa-certificate me-1"></i> Mis Certificados</a></li>
         `;
       }
     }
@@ -342,18 +403,22 @@ export class AuthService {
         footerMenu.innerHTML = `
           <li><a href="/portal-docente#cursos">Mis Cursos</a></li>
           <li><a href="/portal-docente#alumnos">Alumnos</a></li>
+          <li><a href="/portal-docente#calificaciones">Calificaciones</a></li>
+          <li><a href="/portal-docente#asistencias">Asistencias</a></li>
         `;
       } else if (user && user.rol === 'ESTUDIANTE') {
         footerMenu.innerHTML = `
           <li><a href="/cursos">Cursos</a></li>
           <li><a href="/mis-cursos">Mis Clases</a></li>
+          <li><a href="/mis-comprobantes">Mis Comprobantes</a></li>
+          <li><a href="/mis-certificados">Mis Certificados</a></li>
           <li><a href="/carrito">Mi Carrito</a></li>
-          <li><a href="/contacto">Contacto</a></li>
         `;
       } else {
         footerMenu.innerHTML = `
           <li><a href="/">Inicio</a></li>
           <li><a href="/cursos">Cursos</a></li>
+          <li><a href="/beneficios">Beneficios</a></li>
           <li><a href="/carrito">Mi Carrito</a></li>
           <li><a href="/login">Ingresar</a></li>
           <li><a href="/contacto">Contacto</a></li>
@@ -362,6 +427,13 @@ export class AuthService {
     }
 
     document.querySelectorAll('.single_footer ul li a[href="/"]').forEach((a: any) => {
+      const li = a.parentElement;
+      if (li) {
+        li.style.display = !user ? '' : 'none';
+      }
+    });
+
+    document.querySelectorAll('.single_footer ul li a[href="/contacto"]').forEach((a: any) => {
       const li = a.parentElement;
       if (li) {
         li.style.display = !user ? '' : 'none';
@@ -411,6 +483,10 @@ export class AuthService {
           isActive = cleanHref === 'carrito';
         } else if (cleanCurrent === 'mis-cursos' || cleanCurrent === 'portal-estudiante' || cleanCurrent === 'estudiante') {
           isActive = cleanHref === 'mis-cursos';
+        } else if (cleanCurrent === 'mis-comprobantes' || cleanCurrent === 'comprobantes') {
+          isActive = cleanHref === 'mis-comprobantes';
+        } else if (cleanCurrent === 'mis-certificados' || cleanCurrent === 'certificados') {
+          isActive = cleanHref === 'mis-certificados';
         } else if (cleanCurrent === 'portal-docente' || cleanCurrent === 'docente') {
           isActive = cleanHref === 'portal-docente';
         } else if (cleanCurrent === 'portal-admin' || cleanCurrent === 'admin') {
@@ -454,7 +530,7 @@ export class AuthService {
               const rolLabel = user.rol === 'ADMIN' ? 'Admin' : user.rol === 'DOCENTE' ? 'Docente' : 'Alumno';
               mobileUl.prepend(`
                 <li style="padding: 10px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); background: rgba(46, 202, 127, 0.08);">
-                  <strong style="color: #16a34a; font-size: 13.5px; display: block;">${primerNombre} (${rolLabel})</strong>
+                  <strong style="color: #16a34a; font-size: 13.5px; display: block;">${primerNombre}</strong>
                 </li>
               `);
               mobileUl.append(`

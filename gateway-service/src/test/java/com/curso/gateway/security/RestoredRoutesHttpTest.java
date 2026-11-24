@@ -130,13 +130,13 @@ class RestoredRoutesHttpTest {
         assertThat(received.get()).isNull();
     }
 
-    @Test void preservesDownloadNotFoundInsteadOfServingFrontend() throws Exception {
+    @Test void directReceiptDownloadIsInternalAndNeverServesFrontend() throws Exception {
         var response = http.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
                 + "/api/comprobantes/missing/descargar")).timeout(Duration.ofSeconds(10))
                 .header("Authorization", "Bearer " + ESTUDIANTE).GET().build(),
                 HttpResponse.BodyHandlers.ofString());
-        assertThat(response.statusCode()).isEqualTo(404);
-        assertThat(response.body()).contains("Comprobante no encontrado");
-        assertThat(received.get()).startsWith("GET /api/comprobantes/missing/descargar");
+        // La descarga directa es interna: se hace via /api/pedidos/{id}/comprobante (con control de propietario)
+        assertThat(response.statusCode()).isEqualTo(403);
+        assertThat(response.body()).doesNotContain("<html");
     }
 }

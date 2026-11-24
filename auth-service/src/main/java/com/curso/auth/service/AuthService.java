@@ -107,15 +107,15 @@ public class AuthService {
             notificacionEmailAuthService.enviarBienvenidaRegistro(guardado);
         }
 
-        return new AuthResponse(
+        return completarPerfil(new AuthResponse(
                 "Usuario registrado exitosamente",
                 "SUCCESS",
                 guardado.getId(),
-                guardado.getNombres() + " " + guardado.getApellidos(),
+                guardado.getNombres(),
                 guardado.getCorreo(),
                 guardado.getRol(),
                 jwtService.generateToken(guardado)
-        );
+        ), guardado);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -169,22 +169,23 @@ public class AuthService {
             response.setMensaje("Se requiere verificacion 2FA. Revise el codigo enviado por WhatsApp (vigencia: 5 minutos).");
             response.setStatus("REQUIRES_2FA");
             response.setUsuarioId(usuario.getId());
-            response.setNombres(usuario.getNombres() + " " + usuario.getApellidos());
+            response.setNombres(usuario.getNombres());
+            completarPerfil(response, usuario);
             response.setCorreo(usuario.getCorreo());
             response.setRol(usuario.getRol());
             return response;
         }
 
         usuarioRepository.save(usuario);
-        return new AuthResponse(
+        return completarPerfil(new AuthResponse(
                 "Inicio de sesion exitoso",
                 "SUCCESS",
                 usuario.getId(),
-                usuario.getNombres() + " " + usuario.getApellidos(),
+                usuario.getNombres(),
                 usuario.getCorreo(),
                 usuario.getRol(),
                 jwtService.generateToken(usuario)
-        );
+        ), usuario);
     }
 
     public AuthResponse verificar2fa(Verificar2faRequest request) {
@@ -222,15 +223,15 @@ public class AuthService {
         usuario.setIntentos2fa(0);
         usuarioRepository.save(usuario);
 
-        return new AuthResponse(
+        return completarPerfil(new AuthResponse(
                 "Autenticacion 2FA exitosa. Acceso concedido.",
                 "SUCCESS",
                 usuario.getId(),
-                usuario.getNombres() + " " + usuario.getApellidos(),
+                usuario.getNombres(),
                 usuario.getCorreo(),
                 usuario.getRol(),
                 jwtService.generateToken(usuario)
-        );
+        ), usuario);
     }
 
     public List<UsuarioResponse> listarUsuarios() {
@@ -243,6 +244,140 @@ public class AuthService {
         return usuarioRepository.findById(id)
                 .map(UsuarioResponse::from)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + id));
+    }
+
+    /** Agrega apellidos, DNI y WhatsApp a la respuesta (el frontend arma el perfil con ellos). */
+    private static AuthResponse completarPerfil(AuthResponse response, Usuario usuario) {
+        response.setApellidos(usuario.getApellidos());
+        response.setDni(usuario.getDni());
+        response.setWhatsapp(usuario.getWhatsapp());
+        return response;
+    }
+
+    /**
+     * Reenvia un codigo 2FA solo si hay un inicio de sesion pendiente (el usuario ya paso la
+     * contrasenia). Respuesta identica exista o no la cuenta, para no revelar correos registrados.
+     */
+    public AuthResponse reenviar2fa(String correo) {
+        AuthResponse response = new AuthResponse();
+        response.setStatus("REQUIRES_2FA");
+        response.setMensaje("Si hay un inicio de sesion pendiente, enviamos un nuevo codigo a tu WhatsApp (vigencia: 5 minutos).");
+        if (correo == null || correo.isBlank()) {
+            return response;
+        }
+        usuarioRepository.findByCorreo(correo.trim().toLowerCase()).ifPresent(usuario -> {
+            boolean pendiente = Boolean.TRUE.equals(usuario.getIs2faEnabled()) && usuario.getCodigo2fa() != null;
+            boolean bloqueada = usuario.getBloqueadoHasta() != null && usuario.getBloqueadoHasta().isAfter(LocalDateTime.now());
+            if (!pendiente || bloqueada) {
+                return;
+            }
+            String codigoOtp = generarOtp();
+            usuario.setCodigo2fa(codigoOtp);
+            usuario.setCodigo2faExpiraEn(LocalDateTime.now().plusMinutes(5));
+            usuario.setIntentos2fa(0);
+            usuarioRepository.save(usuario);
+            whatsappOtpClient.sendOtp(usuario.getWhatsapp(), codigoOtp);
+        });
+        return response;
+    }
+
+    /**
+     * Edicion de perfil. El propio usuario puede cambiar sus datos personales y su contrasenia;
+     * solo un ADMIN puede cambiar rol, estado, 2FA o datos de otra cuenta.
+     */
+    public UsuarioResponse actualizarPerfil(UUID id, com.curso.auth.dto.ActualizarPerfilRequest request, boolean esAdmin) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + id));
+        if (notBlank(request.getNombres())) {
+            usuario.setNombres(limitar(request.getNombres(), 100));
+        }
+        if (notBlank(request.getApellidos())) {
+            usuario.setApellidos(limitar(request.getApellidos(), 100));
+        }
+        if (notBlank(request.getDni())) {
+            String nuevoDni = request.getDni().trim();
+            if (!nuevoDni.matches("^[0-9A-Za-z]{8,15}$")) {
+                throw new IllegalArgumentException("El DNI debe tener entre 8 y 15 letras o numeros");
+            }
+            if (!nuevoDni.equalsIgnoreCase(usuario.getDni()) && usuarioRepository.existsByDni(nuevoDni)) {
+                throw new IllegalStateException("Ya existe otro usuario registrado con el DNI: " + nuevoDni);
+            }
+            usuario.setDni(nuevoDni);
+        }
+        if (notBlank(request.getWhatsapp())) {
+            String nuevoWa = request.getWhatsapp().replaceAll("\\s", "");
+            if (!nuevoWa.matches("^\\+?[0-9]{9,15}$")) {
+                throw new IllegalArgumentException("WhatsApp debe tener entre 9 y 15 digitos, con codigo de pais");
+            }
+            if (!nuevoWa.equals(usuario.getWhatsapp()) && usuarioRepository.existsByWhatsapp(nuevoWa)) {
+                throw new IllegalStateException("Ya existe otro usuario registrado con el WhatsApp: " + nuevoWa);
+            }
+            usuario.setWhatsapp(nuevoWa);
+        }
+        if (notBlank(request.getCorreo())) {
+            String nuevoCorreo = request.getCorreo().trim().toLowerCase();
+            if (!nuevoCorreo.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+                throw new IllegalArgumentException("Formato de correo invalido");
+            }
+            if (!nuevoCorreo.equalsIgnoreCase(usuario.getCorreo()) && usuarioRepository.existsByCorreo(nuevoCorreo)) {
+                throw new IllegalStateException("Ya existe otro usuario registrado con el correo: " + nuevoCorreo);
+            }
+            usuario.setCorreo(nuevoCorreo);
+        }
+        if (notBlank(request.getPassword())) {
+            String clave = request.getPassword();
+            if (clave.length() < 8 || clave.length() > 72 || !clave.matches(".*[A-Za-z].*") || !clave.matches(".*[0-9].*")) {
+                throw new IllegalArgumentException("La contrasenia debe tener entre 8 y 72 caracteres y combinar letras y numeros");
+            }
+            usuario.setPasswordHash(passwordEncoder.encode(clave));
+        }
+        boolean cambiaPrivilegios = notBlank(request.getRol()) || request.getIsActive() != null || request.getIs2faEnabled() != null;
+        if (cambiaPrivilegios && !esAdmin) {
+            throw new com.curso.auth.exception.ForbiddenException("Solo un administrador puede cambiar rol, estado o doble factor");
+        }
+        if (notBlank(request.getRol())) {
+            try {
+                usuario.setRol(RolUsuario.valueOf(request.getRol().trim().toUpperCase()));
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException("Rol invalido: " + request.getRol());
+            }
+        }
+        if (request.getIsActive() != null) {
+            usuario.setIsActive(request.getIsActive());
+        }
+        if (request.getIs2faEnabled() != null) {
+            usuario.setIs2faEnabled(request.getIs2faEnabled());
+        }
+        // Docentes y administradores siempre con doble factor
+        if (usuario.getRol() == RolUsuario.ADMIN || usuario.getRol() == RolUsuario.DOCENTE) {
+            usuario.setIs2faEnabled(true);
+        }
+        return UsuarioResponse.from(usuarioRepository.save(usuario));
+    }
+
+    /**
+     * Baja de usuario: se desactiva la cuenta (no se borran pedidos, pagos ni comprobantes,
+     * que son registros contables). No se permite dar de baja la propia cuenta.
+     */
+    public void desactivarUsuario(UUID id, UUID solicitante) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + id));
+        if (id.equals(solicitante)) {
+            throw new IllegalStateException("No puedes desactivar tu propia cuenta");
+        }
+        usuario.setIsActive(false);
+        usuario.setCodigo2fa(null);
+        usuario.setCodigo2faExpiraEn(null);
+        usuarioRepository.save(usuario);
+    }
+
+    private static boolean notBlank(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private static String limitar(String value, int max) {
+        String t = value.trim();
+        return t.length() > max ? t.substring(0, max) : t;
     }
 
     private static boolean codigosIguales(String esperado, String recibido) {

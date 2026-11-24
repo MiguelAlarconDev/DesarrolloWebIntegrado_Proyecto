@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class IpBlockFilter extends OncePerRequestFilter {
 
     private static final Set<String> AUTH_PATHS = Set.of(
-            "/api/auth/login", "/api/auth/verificar-2fa", "/api/auth/registro");
+            "/api/auth/login", "/api/auth/verificar-2fa", "/api/auth/registro", "/api/auth/reenviar-2fa");
 
     private final ClientIpResolver clientIpResolver;
     private final Set<String> blockedIps;

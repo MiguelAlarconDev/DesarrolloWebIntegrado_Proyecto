@@ -8,6 +8,8 @@ import { ConfirmacionComponent } from './pages/confirmacion/confirmacion.compone
 import { LoginComponent } from './pages/login/login.component';
 import { RegistroComponent } from './pages/registro/registro.component';
 import { EstudiantePanelComponent } from './pages/estudiante-panel/estudiante-panel.component';
+import { MisComprobantesComponent } from './pages/mis-comprobantes/mis-comprobantes.component';
+import { MisCertificadosComponent } from './pages/mis-certificados/mis-certificados.component';
 import { DocentePanelComponent } from './pages/docente-panel/docente-panel.component';
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel.component';
 import { ContactoComponent } from './pages/contacto/contacto.component';
@@ -40,6 +42,17 @@ export const routes: Routes = [
   { path: 'mis-cursos', component: EstudiantePanelComponent },
   { path: 'mis-cursos/aula/:cursoId', component: AulaEstudianteComponent },
   { path: 'mis-cursos.html', redirectTo: 'mis-cursos', pathMatch: 'full' },
+  // El aula virtual real vive en /mis-cursos/aula/:cursoId (alumno) y /portal-docente/aula/:cursoId
+  { path: 'aula-virtual', redirectTo: 'mis-cursos', pathMatch: 'full' },
+  { path: 'aula-virtual.html', redirectTo: 'mis-cursos', pathMatch: 'full' },
+  { path: 'aula-virtual/:cursoId', redirectTo: 'mis-cursos/aula/:cursoId' },
+  { path: 'mi-perfil', component: EstudiantePanelComponent },
+  { path: 'mi-perfil.html', redirectTo: 'mi-perfil', pathMatch: 'full' },
+  { path: 'perfil', redirectTo: 'mi-perfil', pathMatch: 'full' },
+  { path: 'mis-comprobantes', component: MisComprobantesComponent },
+  { path: 'mis-comprobantes.html', redirectTo: 'mis-comprobantes', pathMatch: 'full' },
+  { path: 'mis-certificados', component: MisCertificadosComponent },
+  { path: 'mis-certificados.html', redirectTo: 'mis-certificados', pathMatch: 'full' },
   { path: 'portal-estudiante', component: EstudiantePanelComponent },
   { path: 'portal-estudiante.html', redirectTo: 'portal-estudiante', pathMatch: 'full' },
   { path: 'portal-docente', component: DocentePanelComponent },
@@ -47,5 +60,9 @@ export const routes: Routes = [
   { path: 'portal-docente.html', redirectTo: 'portal-docente', pathMatch: 'full' },
   { path: 'portal-admin', component: AdminPanelComponent },
   { path: 'portal-admin.html', redirectTo: 'portal-admin', pathMatch: 'full' },
+  { path: 'admin', redirectTo: 'portal-admin', pathMatch: 'full' },
+  { path: 'admin.html', redirectTo: 'portal-admin', pathMatch: 'full' },
+  { path: 'usuarios', component: AdminPanelComponent },
+  { path: 'usuarios.html', redirectTo: 'usuarios', pathMatch: 'full' },
   { path: '**', redirectTo: '' }
 ];

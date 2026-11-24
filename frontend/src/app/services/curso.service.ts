@@ -77,35 +77,8 @@ export class CursoService {
     return cursos.filter(c => c.modalidad && c.modalidad.toUpperCase() === modalidad.toUpperCase());
   }
 
-  async descontarAforo(cursoId: string): Promise<any> {
-    this.clearCache();
-    try {
-      return await this.api.request(`/cursos/${cursoId}/descontar-aforo`, { method: 'PUT' });
-    } catch (_) {
-      const cached: CursoModel[] = JSON.parse(localStorage.getItem('app_cursos_cache') || 'null') || [...APP_CONFIG.INITIAL_COURSES];
-      const idx = cached.findIndex(c => c.id === cursoId);
-      if (idx !== -1 && cached[idx].aforoDisponible > 0) {
-        cached[idx].aforoDisponible -= 1;
-        localStorage.setItem('app_cursos_cache', JSON.stringify(cached));
-      }
-      return cached[idx];
-    }
-  }
 
-  async liberarAforo(cursoId: string): Promise<any> {
-    this.clearCache();
-    try {
-      return await this.api.request(`/cursos/${cursoId}/liberar-aforo`, { method: 'PUT' });
-    } catch (_) {
-      const cached: CursoModel[] = JSON.parse(localStorage.getItem('app_cursos_cache') || 'null') || [...APP_CONFIG.INITIAL_COURSES];
-      const idx = cached.findIndex(c => c.id === cursoId);
-      if (idx !== -1 && cached[idx].aforoDisponible < cached[idx].aforoMaximo) {
-        cached[idx].aforoDisponible += 1;
-        localStorage.setItem('app_cursos_cache', JSON.stringify(cached));
-      }
-      return cached[idx];
-    }
-  }
+  // El aforo lo descuenta/libera solo pedidos-service (operacion interna, bloqueada en el gateway).
 
   async obtenerTodosAdmin(): Promise<CursoModel[]> {
     try {
@@ -156,6 +129,87 @@ export class CursoService {
     this.clearCache();
     return this.api.request(`/cursos/${cursoId}/estado?estado=${nuevoEstado}`, {
       method: 'PUT'
+    });
+  }
+
+  // ==========================================
+  // LIBRO DE CALIFICACIONES (GRADEBOOK 0-20)
+  // ==========================================
+  async obtenerCalificaciones(cursoId: string): Promise<any[]> {
+    try {
+      const data = await this.api.request<any[]>(`/cursos/calificaciones/curso/${cursoId}`);
+      return Array.isArray(data) ? data : [];
+    } catch (err: any) {
+      console.warn(`[CursoService] No se pudieron cargar calificaciones de BD para curso ${cursoId}:`, err?.message);
+      return [];
+    }
+  }
+
+  async obtenerCalificacionEstudiante(cursoId: string, estudianteId: string): Promise<any | null> {
+    try {
+      return await this.api.request<any>(`/cursos/calificaciones/curso/${cursoId}/estudiante/${estudianteId}`);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async guardarCalificacion(payload: {
+    cursoId: string;
+    estudianteId: string;
+    ec1?: number | null;
+    ec2?: number | null;
+    proyectoFinal?: number | null;
+    feedback?: string | null;
+    docenteId?: string;
+    actualizadoPor?: string;
+  }): Promise<any> {
+    return this.api.request('/cursos/calificaciones', {
+      method: 'POST',
+      body: payload
+    });
+  }
+
+  // ==========================================
+  // CONTROL DE ASISTENCIAS POR SESIÓN
+  // ==========================================
+  async obtenerAsistencias(cursoId: string, sesion?: number): Promise<any[]> {
+    try {
+      const path = sesion
+        ? `/cursos/asistencias/curso/${cursoId}/sesion/${sesion}`
+        : `/cursos/asistencias/curso/${cursoId}`;
+      const data = await this.api.request<any[]>(path);
+      return Array.isArray(data) ? data : [];
+    } catch (err: any) {
+      console.warn(`[CursoService] No se pudieron cargar asistencias de BD para curso ${cursoId}:`, err?.message);
+      return [];
+    }
+  }
+
+  async obtenerResumenAsistencias(cursoId: string): Promise<any[]> {
+    try {
+      const data = await this.api.request<any[]>(`/cursos/asistencias/curso/${cursoId}/resumen`);
+      return Array.isArray(data) ? data : [];
+    } catch (err: any) {
+      console.warn(`[CursoService] No se pudo obtener resumen de asistencias para curso ${cursoId}:`, err?.message);
+      return [];
+    }
+  }
+
+  async guardarAsistenciasLote(payload: {
+    cursoId: string;
+    numeroSesion: number;
+    fechaSesion: string;
+    temaSesion?: string;
+    registradoPor?: string;
+    registros: Array<{
+      estudianteId: string;
+      estado: string; // 'P' | 'T' | 'FJ' | 'F'
+      observaciones?: string;
+    }>;
+  }): Promise<any> {
+    return this.api.request('/cursos/asistencias/lote', {
+      method: 'POST',
+      body: payload
     });
   }
 

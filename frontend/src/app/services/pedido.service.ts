@@ -55,8 +55,11 @@ export class PedidoService {
         }
       });
       if (response && response.id) {
+        const resolvedUrl = response.initPoint || response.mpInitPoint || response.init_point || response.sandbox_init_point;
         return {
           ...response,
+          initPoint: resolvedUrl,
+          mpInitPoint: resolvedUrl,
           curso: curso
         };
       }
@@ -64,6 +67,20 @@ export class PedidoService {
     } catch (err: any) {
       // Sin backend no se crea una orden local: evitaria matriculas/aforos ficticios.
       throw new Error('No se pudo registrar el pedido en el servidor: ' + (err?.message || 'error desconocido'));
+    }
+  }
+
+  async verificarEstadoMercadoPago(pedidoId: string): Promise<{ approved: boolean; paymentId: string }> {
+    try {
+      const res = await this.api.request<any>(`/pedidos/${pedidoId}/estado-mp`, {
+        method: 'GET'
+      });
+      return {
+        approved: !!(res && res.approved),
+        paymentId: (res && res.paymentId) ? String(res.paymentId) : ''
+      };
+    } catch (_) {
+      return { approved: false, paymentId: '' };
     }
   }
 
@@ -80,14 +97,18 @@ export class PedidoService {
       backendPedido = await this.api.request<any>(`/pedidos/${pedido.id}/pagar`, {
         method: 'PUT',
         body: {
-          mpPaymentId,
+          mpPaymentId: (datosPago.mpPaymentId || mpPaymentId),
           metodoPago: datosPago.metodoPago || 'TARJETA',
           tipoComprobante,
           rucCliente: datosPago.ruc || null,
           razonSocial: datosPago.razonSocial || null,
           whatsapp: datosPago.whatsapp || null,
           correo: datosPago.correo || null,
-          clienteNombres: datosPago.clienteNombres || null
+          clienteNombres: datosPago.clienteNombres || null,
+          numeroTarjeta: datosPago.numeroTarjeta || null,
+          fechaExpiracion: datosPago.fechaExpiracion || null,
+          cvv: datosPago.cvv || null,
+          titular: datosPago.titular || null
         }
       });
     } catch (err: any) {
@@ -205,6 +226,10 @@ export class PedidoService {
         const remote = await this.api.request<any[]>(`/pedidos/estudiante/${targetId}`);
         if (Array.isArray(remote)) {
           this.saveCachedPaidCourseIds(remote);
+          if (remote.length === 0) {
+            localStorage.removeItem('app_order_history');
+            localStorage.removeItem(APP_CONFIG.STORAGE_KEYS.LAST_ORDER);
+          }
           return remote;
         }
       } catch (err: any) {
@@ -253,6 +278,43 @@ export class PedidoService {
       history.unshift(order);
     }
     localStorage.setItem('app_order_history', JSON.stringify(history));
+  }
+
+  /** Nota oficial del alumno en el curso (libro de calificaciones del backend). */
+  async obtenerNotaOficial(cursoId: string, estudianteId: string): Promise<{ condicion: string; promedioFinal: number } | null> {
+    try {
+      return await this.api.request<any>(`/cursos/calificaciones/curso/${cursoId}/estudiante/${estudianteId}`, { noCache: true });
+    } catch {
+      return null;
+    }
+  }
+
+  getEvaluacionAcademica(cursoId: string, estudianteId: string): { aprobado: boolean; nota?: number; fechaAprobacion?: string } | null {
+    try {
+      const raw = localStorage.getItem('app_academic_evaluations');
+      if (!raw) return null;
+      const map = JSON.parse(raw);
+      return map[`${cursoId}_${estudianteId}`] || map[cursoId] || null;
+    } catch {
+      return null;
+    }
+  }
+
+  guardarEvaluacionAcademica(cursoId: string, estudianteId: string, aprobado: boolean, nota: number = 18): void {
+    try {
+      const raw = localStorage.getItem('app_academic_evaluations');
+      const map = raw ? JSON.parse(raw) : {};
+      if (aprobado) {
+        map[`${cursoId}_${estudianteId}`] = {
+          aprobado: true,
+          nota: nota,
+          fechaAprobacion: new Date().toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        };
+      } else {
+        delete map[`${cursoId}_${estudianteId}`];
+      }
+      localStorage.setItem('app_academic_evaluations', JSON.stringify(map));
+    } catch (_) {}
   }
 
   private generateUUID(): string {

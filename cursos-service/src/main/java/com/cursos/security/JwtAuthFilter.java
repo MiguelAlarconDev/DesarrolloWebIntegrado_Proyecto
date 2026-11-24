@@ -28,8 +28,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String method = request.getMethod();
-        return "OPTIONS".equalsIgnoreCase(method) || ("GET".equalsIgnoreCase(method) && !isAula(request.getRequestURI()))
-                || !request.getRequestURI().startsWith("/api/cursos");
+        String uri = request.getRequestURI();
+        return "OPTIONS".equalsIgnoreCase(method)
+                || ("GET".equalsIgnoreCase(method) && !isAula(uri) && !isAcademico(uri))
+                || !uri.startsWith("/api/cursos");
     }
 
     @Override
@@ -63,10 +65,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (isAula(path)) {
             return "DOCENTE".equals(p.rol()) || "ESTUDIANTE".equals(p.rol());
         }
+        if (isAcademico(path)) {
+            // Notas y asistencias: personal (el controlador exige ser el docente del curso) o el
+            // propio alumno consultando lo suyo (/curso/{id}/estudiante/{suId}, validado en el controlador).
+            return p.isStaff() || ((p.isService() || "ESTUDIANTE".equals(p.rol())) && path.matches("^/api/cursos/(calificaciones|asistencias)/curso/[^/]+/estudiante/[^/]+$"));
+        }
         if (path.endsWith("/descontar-aforo") || path.endsWith("/liberar-aforo")) {
             return p.isService() || p.isAdmin();
         }
         return p.isStaff();
+    }
+
+    private static boolean isAcademico(String path) {
+        return path.startsWith("/api/cursos/calificaciones") || path.startsWith("/api/cursos/asistencias");
     }
 
     private static boolean isAula(String path) {

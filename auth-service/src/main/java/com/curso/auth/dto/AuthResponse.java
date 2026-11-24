@@ -12,6 +12,9 @@ public class AuthResponse {
     private String correo;
     private RolUsuario rol;
     private String token;
+    private String apellidos;
+    private String dni;
+    private String whatsapp;
 
     public AuthResponse() {
     }
@@ -82,4 +85,28 @@ public class AuthResponse {
         this.token = token;
     }
 
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
+    }
 }

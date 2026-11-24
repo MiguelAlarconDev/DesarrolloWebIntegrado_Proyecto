@@ -44,6 +44,32 @@ public class ComprobanteClient {
         this.restClient = client;
     }
 
+    /** PDF del comprobante ya emitido (o null si todavia no existe). */
+    public byte[] descargarComprobante(java.util.UUID pedidoId) {
+        try {
+            return restClient.get().uri("/api/comprobantes/{id}/descargar", pedidoId)
+                    .retrieve()
+                    .body(byte[].class);
+        } catch (org.springframework.web.client.HttpClientErrorException.NotFound ex) {
+            return null;
+        } catch (Exception ex) {
+            throw new IllegalStateException("No se pudo obtener el comprobante en este momento.");
+        }
+    }
+
+    /** Pide a comprobantes-service el PDF del certificado (endpoint interno). */
+    public byte[] generarCertificado(Map<String, Object> datos) {
+        try {
+            return restClient.post().uri("/api/comprobantes/certificado")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(datos)
+                    .retrieve()
+                    .body(byte[].class);
+        } catch (Exception ex) {
+            throw new IllegalStateException("No se pudo generar el certificado en este momento.");
+        }
+    }
+
     public void emitirYEnviarComprobante(Pedido pedido,
                                           UsuarioDto estudiante,
                                           CursoDto curso,

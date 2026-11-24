@@ -62,6 +62,36 @@ public class AuthController {
         return authService.buscarPorId(UUID.fromString(principal.subject()));
     }
 
+    /** Reenvio del codigo 2FA (publico; limitado por el gateway como el login). */
+    @PostMapping("/reenviar-2fa")
+    public AuthResponse reenviar2fa(@RequestBody(required = false) java.util.Map<String, String> body) {
+        return authService.reenviar2fa(body == null ? null : body.get("correo"));
+    }
+
+    /** Edicion de perfil: el propio usuario o un ADMIN (solo ADMIN cambia rol/estado/2FA). */
+    @PutMapping("/usuarios/{id}")
+    public UsuarioResponse actualizarUsuario(@PathVariable UUID id,
+                                             @RequestBody com.curso.auth.dto.ActualizarPerfilRequest request,
+                                             HttpServletRequest http) {
+        AccessPrincipal principal = AccessPrincipal.fromOrNull(http);
+        boolean esAdmin = principal != null && principal.isAdmin();
+        if (principal == null || (!esAdmin && !principal.isUser(id))) {
+            throw new ForbiddenException("Solo puedes editar tu propio perfil");
+        }
+        return authService.actualizarPerfil(id, request, esAdmin);
+    }
+
+    /** Baja logica (solo ADMIN): la cuenta queda inactiva y se conservan sus registros. */
+    @DeleteMapping("/usuarios/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminarUsuario(@PathVariable UUID id, HttpServletRequest http) {
+        AccessPrincipal principal = AccessPrincipal.fromOrNull(http);
+        if (principal == null || !principal.isAdmin()) {
+            throw new ForbiddenException("Solo un administrador puede dar de baja usuarios");
+        }
+        authService.desactivarUsuario(id, UUID.fromString(principal.subject()));
+    }
+
     @GetMapping("/usuarios")
     public List<UsuarioResponse> listarUsuarios() {
         return authService.listarUsuarios();

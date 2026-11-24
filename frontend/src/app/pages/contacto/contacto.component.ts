@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { NotificationService } from '../../services/notification.service';
@@ -59,7 +60,7 @@ import { NotificationService } from '../../services/notification.service';
 								</div>
 								<div class="contact-item-content">
 									<h4 class="contact-item-title">Llámanos o WhatsApp :</h4>
-									<a href="tel:+51999555666" class="contact-item-link">+51 999 555 666</a>, <a href="tel:+5113118888" class="contact-item-link">+51 (01) 311 8888</a>
+									<a href="tel:+51935300159" class="contact-item-link">+51 935 300 159</a>, <a href="tel:+5113118888" class="contact-item-link">+51 (01) 311 8888</a>
 								</div>
 							</div>
 
@@ -112,10 +113,24 @@ import { NotificationService } from '../../services/notification.service';
 	<!-- END CONTACT SECTION -->
   `
 })
-export class ContactoComponent implements AfterViewInit {
+export class ContactoComponent implements OnInit, AfterViewInit {
+  private router = inject(Router);
   private authService = inject(AuthService);
   private cartService = inject(CartService);
   private notifications = inject(NotificationService);
+
+  ngOnInit(): void {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      if (user.rol === 'ESTUDIANTE') {
+        this.router.navigateByUrl('/mis-cursos');
+      } else if (user.rol === 'DOCENTE') {
+        this.router.navigateByUrl('/portal-docente');
+      } else if (user.rol === 'ADMIN') {
+        this.router.navigateByUrl('/portal-admin');
+      }
+    }
+  }
 
   ngAfterViewInit(): void {
     this.authService.updateNavbar();

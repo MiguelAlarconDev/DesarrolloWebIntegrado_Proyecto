@@ -120,6 +120,39 @@ public class PedidoController {
         return pedidoService.listar();
     }
 
+    @GetMapping("/{id}/estado-mp")
+    public Map<String, Object> verificarEstadoMercadoPago(@PathVariable UUID id, HttpServletRequest http) {
+        AuthPrincipal.from(http).requireOwnerOrStaff(pedidoService.buscarPorId(id).getEstudianteId());
+        return pedidoService.verificarEstadoMercadoPago(id);
+    }
+
+    /** Comprobante PDF (boleta/factura): el alumno duenio del pedido o el personal. */
+    @GetMapping("/{id}/comprobante")
+    public org.springframework.http.ResponseEntity<byte[]> comprobante(@PathVariable UUID id, HttpServletRequest http) {
+        AuthPrincipal.from(http).requireOwnerOrStaff(pedidoService.buscarPorId(id).getEstudianteId());
+        byte[] pdf = pedidoService.descargarComprobante(id);
+        if (pdf == null) {
+            throw new IllegalArgumentException("El comprobante de este pedido aun no ha sido emitido");
+        }
+        return org.springframework.http.ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .header("Content-Disposition", "attachment; filename=\"comprobante.pdf\"")
+                .header("Cache-Control", "no-store")
+                .body(pdf);
+    }
+
+    /** Certificado PDF: el alumno duenio del pedido o un ADMIN. */
+    @GetMapping("/{id}/certificado")
+    public org.springframework.http.ResponseEntity<byte[]> certificado(@PathVariable UUID id, HttpServletRequest http) {
+        AuthPrincipal.from(http).requireOwnerOrAdmin(pedidoService.buscarPorId(id).getEstudianteId());
+        byte[] pdf = pedidoService.generarCertificado(id);
+        return org.springframework.http.ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .header("Content-Disposition", "attachment; filename=\"certificado.pdf\"")
+                .header("Cache-Control", "no-store")
+                .body(pdf);
+    }
+
     @GetMapping("/{id}")
     public Pedido buscar(@PathVariable UUID id, HttpServletRequest http) {
         Pedido pedido = pedidoService.buscarPorId(id);

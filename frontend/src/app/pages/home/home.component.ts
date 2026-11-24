@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APP_CONFIG, CursoModel } from '../../services/config.data';
@@ -54,8 +54,8 @@ import { NotificationService } from '../../services/notification.service';
 
 	<!-- START TOP PROMO FEATURES  -->
 	<section class="tp_feature">
-	   <div class="container-fluid">			
-			<div class="row">					
+	   <div class="container">			
+			<div class="row tp_promo_box">					
 				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
 					<div class="single_tp">
 						<h3>Cero Sobreventa de Vacantes</h3>
@@ -149,7 +149,7 @@ import { NotificationService } from '../../services/notification.service';
 	<!-- END COURSE SECTION -->
   `
 })
-export class HomeComponent implements AfterViewInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
@@ -163,7 +163,40 @@ export class HomeComponent implements AfterViewInit {
   searchKeywordHome = '';
   paidCourseIdsHome = new Set<string>();
 
+  ngOnInit(): void {
+    if (this.redirigirSiRolEspecial()) return;
+  }
+
+  private redirigirSiRolEspecial(): boolean {
+    const user = this.authService.getCurrentUser();
+    const rawHash = (typeof window !== 'undefined' ? (window.location.hash || '').replace('#', '').toLowerCase() : '');
+    const fragment = rawHash || (this.route.snapshot.fragment || '').toLowerCase();
+
+    if (user) {
+      if (user.rol === 'ADMIN') {
+        const targetHash = (fragment === 'usuarios' || fragment === 'pedidos' || fragment === 'cursos' || fragment === 'resumen')
+          ? `#${fragment}`
+          : '';
+        this.router.navigateByUrl('/portal-admin' + targetHash);
+        return true;
+      }
+      if (user.rol === 'DOCENTE') {
+        this.router.navigateByUrl('/portal-docente');
+        return true;
+      }
+    } else {
+      // Si un usuario no autenticado intenta ingresar a las secciones de administración:
+      if (fragment === 'usuarios' || fragment === 'pedidos') {
+        this.router.navigateByUrl('/login?redirect=' + encodeURIComponent('portal-admin#' + fragment));
+        return true;
+      }
+    }
+    return false;
+  }
+
   ngAfterViewInit(): void {
+    if (this.redirigirSiRolEspecial()) return;
+
     if (typeof window !== 'undefined') {
       (window as any).reservar = (id: string) => this.reservar(id);
       (window as any).filtrarCursos = (mod: string) => this.filtrarCursos(mod);
@@ -173,12 +206,12 @@ export class HomeComponent implements AfterViewInit {
     this.initHome();
 
     this.route.fragment.subscribe(fragment => {
-      if (fragment) {
-        setTimeout(() => {
-          const el = document.getElementById(fragment);
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }
+      if (!fragment) return;
+      if (this.redirigirSiRolEspecial()) return;
+      setTimeout(() => {
+        const el = document.getElementById(fragment);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     });
   }
 
@@ -332,8 +365,8 @@ export class HomeComponent implements AfterViewInit {
                 <img src="${imgUrl}" alt="${c.titulo}" style="width: 100%; height: 210px; object-fit: cover;">
               </a>
               ${enrolledTag}
-              <div class="course-date">
-                <span class="month" style="font-weight: 700; font-size: 16px;">S/ ${Number(c.precio).toFixed(2)}</span>
+              <div class="course-date course-price-wrap">
+                <span class="course-price-badge"><span class="price-currency">S/</span><span class="price-amount">${Number(c.precio).toFixed(2)}</span></span>
               </div>
             </div>
             <div class="course-content" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 25px;">
