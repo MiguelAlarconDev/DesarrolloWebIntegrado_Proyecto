@@ -34,6 +34,9 @@ public class GatewayJwtService {
     }
 
     GatewayJwtService(ObjectMapper objectMapper, Clock clock, String secret) {
+        if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("JWT_SECRET debe tener al menos 32 caracteres");
+        }
         this.objectMapper = objectMapper;
         this.clock = clock;
         this.secret = secret;
@@ -45,6 +48,11 @@ public class GatewayJwtService {
             throw new IllegalArgumentException("Token JWT invalido");
         }
 
+        Map<String, Object> header = decodePayload(parts[0]);
+        if (!"HS256".equals(header.get("alg"))) {
+            throw new IllegalArgumentException("Algoritmo JWT no permitido");
+        }
+
         String unsignedToken = parts[0] + "." + parts[1];
         String expectedSignature = sign(unsignedToken);
         if (!MessageDigest.isEqual(expectedSignature.getBytes(StandardCharsets.UTF_8), parts[2].getBytes(StandardCharsets.UTF_8))) {
@@ -53,6 +61,9 @@ public class GatewayJwtService {
 
         Map<String, Object> claims = decodePayload(parts[1]);
         Object exp = claims.get("exp");
+        if (exp == null || claims.get("sub") == null || claims.get("rol") == null) {
+            throw new IllegalArgumentException("Claims JWT incompletos");
+        }
         long expiresAt = exp instanceof Number number ? number.longValue() : Long.parseLong(String.valueOf(exp));
         if (!Instant.ofEpochSecond(expiresAt).isAfter(Instant.now(clock))) {
             throw new IllegalArgumentException("Token JWT expirado");

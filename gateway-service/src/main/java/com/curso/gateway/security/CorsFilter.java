@@ -16,10 +16,11 @@ import java.util.stream.Collectors;
 
 @Component
 @Order(2)
+/** Capa 2: CORS con lista blanca exacta de origenes (CORS_ALLOWED_ORIGINS). */
 public class CorsFilter extends OncePerRequestFilter {
 
     private static final String METHODS = "GET,POST,PUT,PATCH,DELETE,OPTIONS";
-    private static final String HEADERS = "Authorization,Content-Type,Accept";
+    private static final String HEADERS = "Authorization,Content-Type,Accept,X-Requested-With,X-Request-Id";
 
     private final Set<String> allowedOrigins;
     private final boolean allowCredentials;
@@ -31,6 +32,9 @@ public class CorsFilter extends OncePerRequestFilter {
                 .map(String::trim)
                 .filter(item -> !item.isBlank())
                 .collect(Collectors.toSet());
+        if (allowCredentials && this.allowedOrigins.contains("*")) {
+            throw new IllegalStateException("CORS: no se puede usar '*' junto con credenciales. Liste los origenes exactos.");
+        }
         this.allowCredentials = allowCredentials;
     }
 
@@ -44,12 +48,17 @@ public class CorsFilter extends OncePerRequestFilter {
             response.setHeader("Access-Control-Allow-Methods", METHODS);
             response.setHeader("Access-Control-Allow-Headers", HEADERS);
             response.setHeader("Access-Control-Max-Age", "3600");
+            response.setHeader("Access-Control-Expose-Headers", "X-Request-Id,Retry-After");
             if (allowCredentials) {
                 response.setHeader("Access-Control-Allow-Credentials", "true");
             }
         }
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            if (origin != null && !allowedOrigins.contains(origin)) {
+                JsonErrors.write(response, HttpServletResponse.SC_FORBIDDEN, "Forbidden", "Origen no permitido por CORS");
+                return;
+            }
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
