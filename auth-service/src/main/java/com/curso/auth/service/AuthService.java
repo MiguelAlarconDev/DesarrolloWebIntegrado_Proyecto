@@ -12,6 +12,7 @@ import com.curso.auth.exception.AccountLockedException;
 import com.curso.auth.exception.AuthenticationException;
 import com.curso.auth.repository.UsuarioRepository;
 import com.curso.auth.security.JwtService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,16 +38,28 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final WhatsappOtpClient whatsappOtpClient;
+    private final NotificacionEmailAuthService notificacionEmailAuthService;
 
     public AuthService(
             UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             WhatsappOtpClient whatsappOtpClient) {
+        this(usuarioRepository, passwordEncoder, jwtService, whatsappOtpClient, null);
+    }
+
+    @Autowired
+    public AuthService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            WhatsappOtpClient whatsappOtpClient,
+            @Autowired(required = false) NotificacionEmailAuthService notificacionEmailAuthService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.whatsappOtpClient = whatsappOtpClient;
+        this.notificacionEmailAuthService = notificacionEmailAuthService;
     }
 
     public AuthResponse registrar(RegistroUsuarioRequest request) {
@@ -55,11 +68,11 @@ public class AuthService {
 
     /**
      * Registro de usuarios. Solo un ADMIN autenticado puede crear DOCENTE o ADMIN;
-     * el registro publico siempre crea ESTUDIANTE (evita la escalada de privilegios).
+     * el registro publico siempre crea ESTUDIANTE (defensa en profundidad, ademas del controlador).
      */
     public AuthResponse registrar(RegistroUsuarioRequest request, boolean solicitadoPorAdmin) {
         if (!solicitadoPorAdmin && request.getRol() != null && request.getRol() != RolUsuario.ESTUDIANTE) {
-            throw new SecurityException("Solo un administrador puede registrar usuarios con rol " + request.getRol());
+            throw new com.curso.auth.exception.ForbiddenException("Solo un administrador puede crear cuentas " + request.getRol());
         }
         request.setCorreo(request.getCorreo().trim().toLowerCase());
         if (usuarioRepository.existsByCorreo(request.getCorreo())) {
@@ -89,6 +102,11 @@ public class AuthService {
 
         Usuario guardado = usuarioRepository.save(usuario);
 
+        // Envío automático de correo de bienvenida si SMTP está configurado
+        if (notificacionEmailAuthService != null) {
+            notificacionEmailAuthService.enviarBienvenidaRegistro(guardado);
+        }
+
         return new AuthResponse(
                 "Usuario registrado exitosamente",
                 "SUCCESS",
@@ -110,7 +128,8 @@ public class AuthService {
                     + usuario.getBloqueadoHasta().toLocalTime().withNano(0) + ".");
         }
 
-        if (!passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash())) {
+        boolean passwordMatches = passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash());
+        if (!passwordMatches) {
             int intentos = usuario.getIntentosFallidos() + 1;
             if (intentos >= MAX_INTENTOS_LOGIN) {
                 usuario.setIntentosFallidos(0);
@@ -137,7 +156,14 @@ public class AuthService {
             usuario.setCodigo2faExpiraEn(LocalDateTime.now().plusMinutes(5));
             usuario.setIntentos2fa(0);
             usuarioRepository.save(usuario);
-            whatsappOtpClient.sendOtp(usuario.getWhatsapp(), codigoOtp);
+            try {
+                whatsappOtpClient.sendOtp(usuario.getWhatsapp(), codigoOtp);
+            } catch (com.curso.auth.exception.ServiceUnavailableException ex) {
+                usuario.setCodigo2fa(null);
+                usuario.setCodigo2faExpiraEn(null);
+                usuarioRepository.save(usuario);
+                throw ex;
+            }
 
             AuthResponse response = new AuthResponse();
             response.setMensaje("Se requiere verificacion 2FA. Revise el codigo enviado por WhatsApp (vigencia: 5 minutos).");

@@ -2,6 +2,7 @@
 target/
 node_modules/
 dist/
+.angular/
 __pycache__/
 *.pyc
 .venv/
@@ -23,6 +24,10 @@ application-local.properties
 comprobantes-service/generated/
 whatsapp-service/.wwebjs_auth/
 whatsapp-service/.wwebjs_cache/
+
+# Prototipos y documentos pesados
+prototipo-frontend/
+*.pdf
 
 .DS_Store
 Thumbs.db

@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
  * INTERNO              solo servicio a servicio (nunca desde Internet)
  * </pre>
  *
- * Cualquier ruta /api/** que no este en la tabla se rechaza (fail closed).
+ * Una ruta /api/** que no este en la tabla exige sesion valida (cualquier rol) y el
+ * microservicio decide el permiso fino: cada servicio valida el JWT por su cuenta.
  * Las reglas "owner" exigen que el id de la URL sea el del usuario del token, salvo ADMIN.
  */
 public final class AccessPolicy {
@@ -50,6 +51,7 @@ public final class AccessPolicy {
     private static final Set<Rol> ADMIN = EnumSet.of(Rol.ADMIN);
     private static final Set<Rol> DOCENTE = EnumSet.of(Rol.DOCENTE, Rol.ADMIN);
     private static final Set<Rol> ESTUDIANTE = EnumSet.of(Rol.ESTUDIANTE, Rol.ADMIN);
+    private static final Set<Rol> STAFF = EnumSet.of(Rol.DOCENTE, Rol.ADMIN);
     private static final Set<Rol> AUTENTICADO = EnumSet.allOf(Rol.class);
 
     private static final List<Regla> REGLAS = List.of(
@@ -58,34 +60,44 @@ public final class AccessPolicy {
             publico("POST", "/api/auth/login"),
             publico("POST", "/api/auth/verificar-2fa"),
             new Regla("POST", compile("/api/auth/registro"), "/api/auth/registro", Tipo.OPCIONAL, AUTENTICADO, null),
-            publico("POST", "/api/pedidos/webhook"),
+            publico("POST", "/api/pedidos/webhook"),            // Mercado Pago (pedidos verifica la firma)
+            publico("*", "/api/pedidos/whatsapp/webhook"),      // Meta WhatsApp Cloud (verificacion del webhook)
             // rutas especificas de cursos antes que /api/cursos/{id}
-            roles("GET", "/api/cursos/todos", ADMIN, null),
+            roles("GET", "/api/cursos/todos", STAFF, null),
             roles("GET", "/api/cursos/docente/{docenteId}", DOCENTE, "docenteId"),
             publico("GET", "/api/cursos"),
             publico("GET", "/api/cursos/{id}"),
-            // ---- Interno: nunca desde Internet
+            // ---- Interno: solo servicio a servicio, nunca desde Internet
             interno("PUT", "/api/cursos/{id}/descontar-aforo"),
             interno("PUT", "/api/cursos/{id}/liberar-aforo"),
+            interno("*", "/api/pedidos/interno/**"),
+            interno("POST", "/api/comprobantes/enviar"),
+            // ---- Aula virtual: sesion obligatoria; cursos-service valida rol, matricula y propiedad
+            roles("*", "/api/cursos/{cursoId}/aula/**", AUTENTICADO, null),
             // ---- Nivel 1: estudiante
             roles("GET", "/api/auth/perfil", AUTENTICADO, null),
             roles("POST", "/api/pedidos/checkout", ESTUDIANTE, null),
             roles("GET", "/api/pedidos/estudiante/{estudianteId}", ESTUDIANTE, "estudianteId"),
             roles("PUT", "/api/pedidos/{id}/cancelar", ESTUDIANTE, null),
+            roles("GET", "/api/comprobantes/**", AUTENTICADO, null),
             // ---- Nivel 2: docente
+            roles("POST", "/api/cursos", DOCENTE, null),
             roles("PUT", "/api/cursos/{id}/enlace", DOCENTE, null),
             roles("PUT", "/api/cursos/{id}/datos-clase", DOCENTE, null),
+            roles("PUT", "/api/cursos/{id}/estado", DOCENTE, null),
             roles("GET", "/api/pedidos/curso/{cursoId}/participantes", DOCENTE, null),
+            roles("GET", "/api/pedidos", STAFF, null),
             // ---- Nivel 3: admin
-            roles("GET", "/api/auth/usuarios/{id}", ADMIN, null),
+            roles("GET", "/api/auth/usuarios/{id}", AUTENTICADO, "id"),
             roles("GET", "/api/auth/usuarios", ADMIN, null),
-            roles("POST", "/api/cursos", ADMIN, null),
-            roles("PUT", "/api/cursos/{id}/estado", ADMIN, null),
             roles("PUT", "/api/pedidos/{id}/pagar", ADMIN, null),
-            roles("GET", "/api/pedidos", ADMIN, null),
+            roles("*", "/api/pedidos/{id}/whatsapp/reenviar", ADMIN, null),
+            roles("*", "/api/pedidos/whatsapp/**", ADMIN, null),
+            roles("*", "/api/pedidos/email/**", ADMIN, null),
+            roles("*", "/api/pagos/**", ADMIN, null),
             roles("*", "/api/whatsapp/**", ADMIN, null),
             roles("*", "/api/seguridad/**", ADMIN, null),
-            // el detalle de un pedido lo ve su duenio (validado en pedidos-service) o ADMIN
+            // el detalle de un pedido lo ve su duenio o el personal (validado en pedidos-service)
             roles("GET", "/api/pedidos/{id}", AUTENTICADO, null)
     );
 

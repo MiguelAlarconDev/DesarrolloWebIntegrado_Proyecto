@@ -40,13 +40,26 @@ public class AccessControlFilter extends OncePerRequestFilter {
             H_USER_EMAIL.toLowerCase(Locale.ROOT), H_INTERNAL_KEY.toLowerCase(Locale.ROOT),
             SecurityHeadersFilter.REQUEST_ID.toLowerCase(Locale.ROOT));
 
+    private static final AccessPolicy.Regla API_AUTENTICADA = new AccessPolicy.Regla("*",
+            java.util.regex.Pattern.compile("/api/.*"), "/api/**", AccessPolicy.Tipo.ROLES,
+            java.util.EnumSet.allOf(AccessPolicy.Rol.class), null);
+
     private final GatewayJwtService jwtService;
     private final String internalKey;
+    private final boolean frontendProxy;
 
     public AccessControlFilter(GatewayJwtService jwtService,
                                @Value("${security.internal-key:${INTERNAL_API_KEY:}}") String internalKey) {
+        this(jwtService, internalKey, true);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public AccessControlFilter(GatewayJwtService jwtService,
+                               @Value("${security.internal-key:${INTERNAL_API_KEY:}}") String internalKey,
+                               @Value("${security.frontend-proxy.enabled:true}") boolean frontendProxy) {
         this.jwtService = jwtService;
         this.internalKey = internalKey;
+        this.frontendProxy = frontendProxy;
     }
 
     @Override
@@ -60,8 +73,17 @@ public class AccessControlFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         Optional<AccessPolicy.Resultado> resultado = AccessPolicy.evaluar(request.getMethod(), path);
         if (resultado.isEmpty()) {
-            JsonErrors.write(response, HttpServletResponse.SC_NOT_FOUND, "Not Found", "Ruta no disponible");
-            return;
+            if (path.startsWith("/api/")) {
+                // Ruta de API no listada: sesion obligatoria; el microservicio decide el permiso fino.
+                resultado = Optional.of(new AccessPolicy.Resultado(API_AUTENTICADA, java.util.Map.of()));
+            } else if (frontendProxy && !path.startsWith("/actuator")) {
+                // Desarrollo local: el gateway sirve el frontend Angular (ng serve).
+                filterChain.doFilter(stripTrustedHeaders(request), response);
+                return;
+            } else {
+                JsonErrors.write(response, HttpServletResponse.SC_NOT_FOUND, "Not Found", "Ruta no disponible");
+                return;
+            }
         }
         AccessPolicy.Regla regla = resultado.get().regla();
 
@@ -124,6 +146,10 @@ public class AccessControlFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(new TrustedHeadersRequest(request, forwarded), response);
+    }
+
+    private static HttpServletRequest stripTrustedHeaders(HttpServletRequest request) {
+        return new TrustedHeadersRequest(request, java.util.Map.of());
     }
 
     private static AccessPolicy.Rol parseRol(Object value) {

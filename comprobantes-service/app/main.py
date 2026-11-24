@@ -1,4 +1,6 @@
 import io
+import hashlib
+import json
 import os
 import smtplib
 from datetime import datetime
@@ -29,6 +31,12 @@ class ComprobanteRequest(BaseModel):
     tipoComprobante: str = "BOLETA"
     rucCliente: str | None = None
     razonSocial: str | None = None
+    # Optional enrollment data preserves the former Java confirmation email.
+    horario: str | None = None
+    modalidad: str | None = None
+    enlaceClase: str | None = None
+    direccionClase: str | None = None
+    aula: str | None = None
 
     @model_validator(mode="after")
     def validar_factura(self):
@@ -68,7 +76,6 @@ def require_internal_key(x_internal_key: str | None = Header(default=None)) -> N
         return
     if not x_internal_key or not hmac.compare_digest(x_internal_key, INTERNAL_API_KEY):
         raise HTTPException(status_code=401, detail="Acceso solo a traves del gateway")
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def generar_pdf(datos: ComprobanteRequest, destino: Path) -> None:
@@ -150,7 +157,11 @@ def enviar_correo(datos: ComprobanteRequest, pdf_path: Path) -> None:
         f"Hola {datos.estudiante},\n\n"
         f"Adjuntamos la constancia demostrativa de tu matricula en {datos.curso}.\n"
         f"Orden: {datos.codigoOrden}\nTotal: S/ {datos.monto:.2f}\n\n"
-        "Este documento se genero como parte de una POC academica."
+        f"Horario: {datos.horario or 'Por confirmar'}\n"
+        f"Modalidad: {datos.modalidad or 'Por confirmar'}\n"
+        + (f"Sede: {datos.direccionClase or 'Por confirmar'} - Aula: {datos.aula or 'Por confirmar'}\n"
+           if datos.modalidad == "PRESENCIAL" else f"Enlace de clase: {datos.enlaceClase or 'Por confirmar'}\n")
+        + "Este documento se genero como parte de una POC academica; no esta validado por SUNAT."
     )
     mensaje.add_attachment(
         pdf_path.read_bytes(),
@@ -174,15 +185,38 @@ def health():
 
 @app.post("/api/comprobantes/enviar", response_model=ComprobanteResponse, dependencies=[Depends(require_internal_key)])
 def crear_y_enviar_comprobante(datos: ComprobanteRequest):
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     nombre_archivo = f"comprobante-{datos.pedidoId}.pdf"
     pdf_path = OUTPUT_DIR / nombre_archivo
+    # Durable at-most-once dispatch. Never resend after an ambiguous SMTP outcome.
+    # Exclusive creation also serializes concurrent requests across workers.
+    state_path = OUTPUT_DIR / f"comprobante-{datos.pedidoId}.json"
+    fingerprint = hashlib.sha256(datos.model_dump_json().encode()).hexdigest()
     try:
+        with state_path.open("x", encoding="utf-8") as state:
+            json.dump({"fingerprint": fingerprint, "estado": "EN_PROCESO"}, state)
+            state.flush()
+            os.fsync(state.fileno())
+    except FileExistsError:
+        try:
+            previous = json.loads(state_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            raise HTTPException(status_code=409, detail="Operacion en proceso o pendiente de conciliacion")
+        if previous.get("fingerprint") != fingerprint:
+            raise HTTPException(status_code=409, detail="El pedido ya tiene un comprobante con otros datos")
+        if previous.get("estado") == "ENVIADO":
+            return ComprobanteResponse(**previous["response"])
+        raise HTTPException(status_code=409, detail="Envio pendiente de conciliacion; no se reenviara automaticamente")
+    try:
+        if pdf_path.exists():
+            raise HTTPException(status_code=409, detail="PDF anterior sin estado de envio; requiere conciliacion")
         generar_pdf(datos, pdf_path)
         enviar_correo(datos, pdf_path)
-    except (OSError, RuntimeError, smtplib.SMTPException) as exc:
-        raise HTTPException(status_code=502, detail=f"No se pudo enviar el comprobante: {exc}") from exc
+    except (OSError, RuntimeError, ValueError, smtplib.SMTPException):
+        # Preserve EN_PROCESO: SMTP may have accepted the message before a timeout.
+        raise HTTPException(status_code=502, detail="No se pudo confirmar el envio del comprobante; requiere conciliacion") from None
 
-    return ComprobanteResponse(
+    response = ComprobanteResponse(
         success=True,
         pedidoId=datos.pedidoId,
         estado="ENVIADO",
@@ -190,9 +224,18 @@ def crear_y_enviar_comprobante(datos: ComprobanteRequest):
         destinatario=datos.correo,
         mensaje="PDF generado y correo enviado correctamente",
     )
+    completed = state_path.with_suffix(".tmp")
+    with completed.open("w", encoding="utf-8") as state:
+        json.dump({"fingerprint": fingerprint, "estado": "ENVIADO",
+                   "response": response.model_dump(mode="json")}, state)
+        state.flush()
+        os.fsync(state.fileno())
+    completed.replace(state_path)
+    return response
 
 
 @app.get("/api/comprobantes/{pedido_id}/descargar", dependencies=[Depends(require_internal_key)])
+@app.get("/api/comprobantes/descargar/{pedido_id}", include_in_schema=False, dependencies=[Depends(require_internal_key)])
 def descargar_comprobante(pedido_id: UUID):
     pdf_path = OUTPUT_DIR / f"comprobante-{pedido_id}.pdf"
     if not pdf_path.exists():

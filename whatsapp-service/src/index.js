@@ -65,7 +65,8 @@ client.on('authenticated', () => {
 });
 
 client.on('auth_failure', (msg) => {
-    console.error('❌ Error de autenticación en WhatsApp:', msg);
+    isReady = false;
+    console.error('Error de autenticacion en WhatsApp.');
 });
 
 client.on('disconnected', (reason) => {
@@ -73,7 +74,19 @@ client.on('disconnected', (reason) => {
     console.log('⚠️ WhatsApp se desconectó:', reason);
 });
 
-client.initialize();
+// Una sesion invalida (LOGOUT) o un fallo de Chromium no debe tumbar la API HTTP:
+// el servicio sigue respondiendo /health con OFFLINE hasta que se escanee un QR nuevo.
+if (typeof process.on === 'function') {
+    process.on('unhandledRejection', () => {
+        isReady = false;
+        console.error('Cliente de WhatsApp no disponible; se requiere nueva vinculacion por QR.');
+    });
+}
+
+Promise.resolve(client.initialize()).catch(() => {
+    isReady = false;
+    console.error('No se pudo inicializar el cliente de WhatsApp.');
+});
 
 // Endpoint de verificación de salud (Health check)
 app.get('/health', (req, res) => {
@@ -100,7 +113,7 @@ app.post('/api/whatsapp/send', requireInternalKey, async (req, res) => {
 
     const { phone, message } = req.body || {};
 
-    if (typeof phone !== 'string' || typeof message !== 'string' || !phone || !message || message.length > 1000) {
+    if (typeof phone !== 'string' || typeof message !== 'string' || !phone.trim() || !message.trim() || message.length > 1000) {
         return res.status(400).json({
             success: false,
             message: 'Se requieren los campos "phone" y "message".'
@@ -110,6 +123,9 @@ app.post('/api/whatsapp/send', requireInternalKey, async (req, res) => {
     try {
         // Formatear el número (Ejemplo Perú: 51912345678@c.us)
         let formattedPhone = phone.replace(/[^0-9]/g, '');
+        if (formattedPhone.length < 10 || formattedPhone.length > 15) {
+            return res.status(400).json({ success: false, message: 'Telefono internacional no valido.' });
+        }
         if (!formattedPhone.endsWith('@c.us')) {
             formattedPhone = `${formattedPhone}@c.us`;
         }
@@ -122,7 +138,8 @@ app.post('/api/whatsapp/send', requireInternalKey, async (req, res) => {
             to: phone
         });
     } catch (error) {
-        console.error('Error al enviar mensaje:', error);
+        // Provider exceptions may include message bodies (including OTP).
+        console.error('No se pudo confirmar el envio de WhatsApp.');
         return res.status(500).json({
             success: false,
             message: 'Error al enviar el mensaje de WhatsApp.'

@@ -1,0 +1,46 @@
+package com.cursos.dto;
+
+import com.cursos.entity.ModalidadCurso;
+
+public class ActualizarDatosClaseRequest {
+
+    private ModalidadCurso modalidad;
+
+    private String enlaceClase;
+
+    private String direccionClase;
+
+    private String aula;
+
+    public ModalidadCurso getModalidad() {
+        return modalidad;
+    }
+
+    public void setModalidad(ModalidadCurso modalidad) {
+        this.modalidad = modalidad;
+    }
+
+    public String getEnlaceClase() {
+        return enlaceClase;
+    }
+
+    public void setEnlaceClase(String enlaceClase) {
+        this.enlaceClase = enlaceClase;
+    }
+
+    public String getDireccionClase() {
+        return direccionClase;
+    }
+
+    public void setDireccionClase(String direccionClase) {
+        this.direccionClase = direccionClase;
+    }
+
+    public String getAula() {
+        return aula;
+    }
+
+    public void setAula(String aula) {
+        this.aula = aula;
+    }
+}

@@ -29,7 +29,7 @@ public class GatewayJwtService {
     @Autowired
     public GatewayJwtService(
             ObjectMapper objectMapper,
-            @Value("${security.jwt.secret:${JWT_SECRET:dev-secret-change-me-please-32-chars}}") String secret) {
+            @Value("${security.jwt.secret}") String secret) {
         this(objectMapper, Clock.systemUTC(), secret);
     }
 

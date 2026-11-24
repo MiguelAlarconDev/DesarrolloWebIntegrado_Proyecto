@@ -1,0 +1,55 @@
+/* Estilos compartidos por el aula del docente y del estudiante (alcance del componente). */
+.aula-page { padding: 120px 0 70px; background: #f8fafc; min-height: 70vh; }
+.aula-back { display: inline-block; margin-bottom: 16px; font-size: 13px; font-weight: 600; color: #475569; text-decoration: none; }
+.aula-back:hover { color: #2eca7f; }
+.aula-header { margin-bottom: 24px; }
+.aula-kicker { display: inline-block; font-size: 12px; font-weight: 700; color: #16a34a; background: #ecfdf5;
+  border: 1px solid #bbf7d0; border-radius: 999px; padding: 4px 12px; margin-bottom: 10px; }
+.aula-header h1 { font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 6px; overflow-wrap: anywhere; }
+.aula-header p { color: #64748b; margin: 0; font-size: 14px; }
+
+.aula-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 18px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .04); }
+.aula-card h2 { font-size: 17px; font-weight: 800; color: #0f172a; margin: 0; overflow-wrap: anywhere; }
+.aula-nuevo h2 { margin-bottom: 12px; }
+.aula-nuevo .form-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px; }
+
+.aula-modulo-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.aula-orden { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; border-radius: 8px;
+  background: #2eca7f; color: #fff; font-size: 13px; margin-right: 6px; }
+
+.aula-subida { display: grid; grid-template-columns: 2fr 2fr auto; gap: 8px; margin-bottom: 14px;
+  padding: 12px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px; }
+
+.aula-tabla { font-size: 13px; margin-bottom: 0; }
+.aula-tabla th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; color: #64748b; font-weight: 700; }
+.aula-tabla td { overflow-wrap: anywhere; }
+
+.aula-tipo { display: inline-block; min-width: 46px; text-align: center; font-size: 11px; font-weight: 800; border-radius: 6px;
+  padding: 3px 6px; color: #334155; background: #e2e8f0; }
+.aula-tipo[data-tipo="PDF"] { background: #fee2e2; color: #b91c1c; }
+.aula-tipo[data-tipo="DOCX"] { background: #dbeafe; color: #1d4ed8; }
+.aula-tipo[data-tipo="PPTX"] { background: #ffedd5; color: #c2410c; }
+.aula-tipo[data-tipo="ZIP"] { background: #ede9fe; color: #6d28d9; }
+
+.aula-lista { list-style: none; padding: 0; margin: 0; }
+.aula-lista li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid #f1f5f9; }
+.aula-lista li:first-child { border-top: 0; }
+.aula-lista-info { flex: 1; min-width: 0; }
+.aula-lista-info strong { display: block; color: #0f172a; font-size: 14px; overflow-wrap: anywhere; }
+.aula-lista-info small { color: #64748b; font-size: 12px; overflow-wrap: anywhere; }
+
+.aula-vacio { color: #94a3b8; font-size: 13px; margin: 0; font-style: italic; }
+.aula-estado { text-align: center; padding: 48px 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; color: #475569; }
+.aula-estado i { font-size: 36px; color: #94a3b8; display: block; margin-bottom: 10px; }
+.aula-estado h3 { font-size: 18px; font-weight: 800; color: #0f172a; }
+.aula-estado p { margin: 10px 0; }
+.aula-estado-error i { color: #f59e0b; }
+
+@media (max-width: 767px) {
+  .aula-page { padding-top: 96px; }
+  .aula-header h1 { font-size: 22px; }
+  .aula-subida { grid-template-columns: 1fr; }
+  .aula-lista li { flex-wrap: wrap; }
+  .aula-lista li .btn { width: 100%; }
+}

@@ -94,6 +94,28 @@ class AuthServiceTest {
         assertThat(usuario.getCodigo2fa()).matches("\\d{6}");
         assertThat(whatsappOtpClient.phone).isEqualTo("51999999999");
         assertThat(whatsappOtpClient.otp).isEqualTo(usuario.getCodigo2fa());
+        assertThat(response.getMensaje()).doesNotContain(usuario.getCodigo2fa());
+    }
+
+    @Test
+    void loginRechazaPasswordAlmacenadoEnTextoPlano() {
+        Usuario usuario = usuario("legacy@test.com", RolUsuario.ESTUDIANTE, false);
+        usuario.setPasswordHash("password123");
+        usuarioRepository.usuarios.add(usuario);
+        assertThatThrownBy(() -> authService.login(loginRequest("legacy@test.com", "password123")))
+                .isInstanceOf(AuthenticationException.class);
+    }
+
+    @Test
+    void falloWhatsAppInvalidaOtpYPropagaError() {
+        Usuario usuario = usuario("docente@test.com", RolUsuario.DOCENTE, true);
+        usuario.setPasswordHash(passwordEncoder.encode("password123"));
+        usuarioRepository.usuarios.add(usuario);
+        whatsappOtpClient.fail = true;
+        assertThatThrownBy(() -> authService.login(loginRequest("docente@test.com", "password123")))
+                .isInstanceOf(com.curso.auth.exception.ServiceUnavailableException.class);
+        assertThat(usuario.getCodigo2fa()).isNull();
+        assertThat(usuario.getCodigo2faExpiraEn()).isNull();
     }
 
     @Test
@@ -154,7 +176,7 @@ class AuthServiceTest {
     @Test
     void registroPublicoNoPermiteCrearAdmin() {
         RegistroUsuarioRequest request = registroRequest("hacker@test.com", "password123", RolUsuario.ADMIN, false);
-        assertThatThrownBy(() -> authService.registrar(request, false)).isInstanceOf(SecurityException.class);
+        assertThatThrownBy(() -> authService.registrar(request, false)).isInstanceOf(com.curso.auth.exception.ForbiddenException.class);
     }
 
     @Test
@@ -242,6 +264,7 @@ class AuthServiceTest {
     private static class FakeWhatsappOtpClient extends WhatsappOtpClient {
         private String phone;
         private String otp;
+        private boolean fail;
 
         FakeWhatsappOtpClient() {
             super(RestClient.builder(), "http://localhost:8085");
@@ -249,6 +272,7 @@ class AuthServiceTest {
 
         @Override
         public void sendOtp(String phone, String otp) {
+            if (fail) throw new com.curso.auth.exception.ServiceUnavailableException("Unavailable", null);
             this.phone = phone;
             this.otp = otp;
         }

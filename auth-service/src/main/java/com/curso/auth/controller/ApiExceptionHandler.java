@@ -31,14 +31,14 @@ public class ApiExceptionHandler {
         return respuesta(HttpStatus.LOCKED, ex.getMessage());
     }
 
-    @ExceptionHandler(SecurityException.class)
-    public ResponseEntity<Map<String, Object>> handleForbidden(SecurityException ex) {
-        return respuesta(HttpStatus.FORBIDDEN, ex.getMessage());
-    }
-
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleUnreadable(Exception ex) {
         return respuesta(HttpStatus.BAD_REQUEST, "Cuerpo de la solicitud invalido");
+    }
+
+    @ExceptionHandler(com.curso.auth.exception.ForbiddenException.class)
+    public ResponseEntity<Map<String, Object>> handleForbidden(com.curso.auth.exception.ForbiddenException ex) {
+        return respuesta(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     @ExceptionHandler(ServiceUnavailableException.class)

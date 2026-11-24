@@ -1,13 +1,15 @@
 package com.curso.auth.controller;
 
-import com.curso.auth.config.CurrentUser;
 import com.curso.auth.dto.AuthResponse;
+import com.curso.auth.entity.RolUsuario;
+import com.curso.auth.exception.ForbiddenException;
+import com.curso.auth.security.AccessPrincipal;
+import jakarta.servlet.http.HttpServletRequest;
 import com.curso.auth.dto.LoginRequest;
 import com.curso.auth.dto.RegistroUsuarioRequest;
 import com.curso.auth.dto.UsuarioResponse;
 import com.curso.auth.dto.Verificar2faRequest;
 import com.curso.auth.service.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
+
 public class AuthController {
 
     private final AuthService authService;
@@ -28,18 +31,15 @@ public class AuthController {
     @PostMapping("/registro")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse registrar(@Valid @RequestBody RegistroUsuarioRequest request, HttpServletRequest http) {
-        CurrentUser caller = CurrentUser.from(http);
-        return authService.registrar(request, caller != null && caller.isAdmin());
-    }
-
-    /** Datos del usuario autenticado (id tomado del token validado por el gateway). */
-    @GetMapping("/perfil")
-    public UsuarioResponse perfil(HttpServletRequest http) {
-        CurrentUser caller = CurrentUser.from(http);
-        if (caller == null) {
-            throw new com.curso.auth.exception.AuthenticationException("Sesion no valida");
+        // El registro publico solo crea ESTUDIANTES; ADMIN/DOCENTE requiere un token ADMIN.
+        if (request.getRol() != null && request.getRol() != RolUsuario.ESTUDIANTE) {
+            AccessPrincipal principal = AccessPrincipal.fromOrNull(http);
+            if (principal == null || !principal.isAdmin()) {
+                throw new ForbiddenException("Solo un administrador puede crear cuentas " + request.getRol());
+            }
         }
-        return authService.buscarPorId(caller.id());
+        AccessPrincipal caller = AccessPrincipal.fromOrNull(http);
+        return authService.registrar(request, caller != null && caller.isAdmin());
     }
 
     @PostMapping("/login")
@@ -50,6 +50,16 @@ public class AuthController {
     @PostMapping("/verificar-2fa")
     public AuthResponse verificar2fa(@Valid @RequestBody Verificar2faRequest request) {
         return authService.verificar2fa(request);
+    }
+
+    /** Datos del usuario autenticado (id tomado del JWT validado por JwtAuthFilter). */
+    @GetMapping("/perfil")
+    public UsuarioResponse perfil(HttpServletRequest http) {
+        AccessPrincipal principal = AccessPrincipal.fromOrNull(http);
+        if (principal == null || principal.isService()) {
+            throw new com.curso.auth.exception.AuthenticationException("Sesion no valida");
+        }
+        return authService.buscarPorId(UUID.fromString(principal.subject()));
     }
 
     @GetMapping("/usuarios")

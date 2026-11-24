@@ -172,8 +172,8 @@ class GatewaySecurityFilterTest {
     }
 
     @Test
-    void rutaDesconocidaSeRechaza() throws Exception {
-        assertThat(call("DELETE", "/api/cursos/abc", null, new MockFilterChain()).getStatus()).isEqualTo(404);
+    void rutaDeApiNoListadaExigeSesion() throws Exception {
+        assertThat(call("DELETE", "/api/cursos/abc", null, new MockFilterChain()).getStatus()).isEqualTo(401);
     }
 
     @Test

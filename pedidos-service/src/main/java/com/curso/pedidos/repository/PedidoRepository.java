@@ -3,6 +3,10 @@ package com.curso.pedidos.repository;
 import com.curso.pedidos.entity.EstadoPedido;
 import com.curso.pedidos.entity.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,6 +16,8 @@ import java.util.UUID;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, UUID> {
 
+    boolean existsByCursoIdAndEstudianteIdAndEstado(UUID cursoId, UUID estudianteId, EstadoPedido estado);
+
     Optional<Pedido> findByCodigoOrden(String codigoOrden);
 
     List<Pedido> findByEstudianteId(UUID estudianteId);
@@ -20,5 +26,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, UUID> {
 
     List<Pedido> findByCursoId(UUID cursoId);
 
+    /** Bloquea la fila (SELECT ... FOR UPDATE) para confirmar pagos sin carreras. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select p from Pedido p where p.id = :id")
+    Optional<Pedido> findByIdForUpdate(@Param("id") UUID id);
+
+    Optional<Pedido> findFirstByMpPaymentId(String mpPaymentId);
+
+    /** Reservas vencidas sin pagar (para liberar su vacante). */
     List<Pedido> findByEstadoInAndReservaExpiraEnBefore(List<EstadoPedido> estados, java.time.LocalDateTime limite);
 }

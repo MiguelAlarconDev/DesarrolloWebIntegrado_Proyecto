@@ -1,9 +1,11 @@
 package com.curso.pedidos.service;
 
 import com.curso.pedidos.client.AuthClient;
+import com.curso.pedidos.client.ComprobanteClient;
 import com.curso.pedidos.client.CursoClient;
 import com.curso.pedidos.client.MercadoPagoClient;
 import com.curso.pedidos.dto.*;
+import com.curso.pedidos.exception.PagoRechazadoException;
 import com.curso.pedidos.entity.*;
 import com.curso.pedidos.repository.ComprobanteRepository;
 import com.curso.pedidos.repository.NotificacionRepository;
@@ -16,7 +18,12 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -27,19 +34,29 @@ public class PedidoService {
     private final AuthClient authClient;
     private final CursoClient cursoClient;
     private final MercadoPagoClient mercadoPagoClient;
+    private final ComprobanteClient comprobanteClient;
+    private final WhatsAppCloudService whatsAppCloudService;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ComprobanteRepository comprobanteRepository,
                          NotificacionRepository notificacionRepository,
                          AuthClient authClient,
                          CursoClient cursoClient,
-                         MercadoPagoClient mercadoPagoClient) {
+                         MercadoPagoClient mercadoPagoClient,
+                         ComprobanteClient comprobanteClient,
+                         WhatsAppCloudService whatsAppCloudService) {
         this.pedidoRepository = pedidoRepository;
         this.comprobanteRepository = comprobanteRepository;
         this.notificacionRepository = notificacionRepository;
         this.authClient = authClient;
         this.cursoClient = cursoClient;
         this.mercadoPagoClient = mercadoPagoClient;
+        this.comprobanteClient = comprobanteClient;
+        this.whatsAppCloudService = whatsAppCloudService;
+    }
+
+    public WhatsAppCloudService getWhatsAppCloudService() {
+        return whatsAppCloudService;
     }
 
     @Transactional
@@ -75,13 +92,7 @@ public class PedidoService {
         guardado.setInitPoint(pref.getInitPoint());
 
         // Enriquecer datos para la respuesta
-        guardado.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
-        guardado.setCursoTitulo(cursoActualizado.getTitulo());
-        guardado.setHorario(cursoActualizado.getHorario());
-        guardado.setModalidad(cursoActualizado.getModalidad());
-        guardado.setEnlaceClase(cursoActualizado.getEnlaceClase());
-        guardado.setDireccionClase(cursoActualizado.getDireccionClase());
-        guardado.setAula(cursoActualizado.getAula());
+        enriquecerPedido(guardado, estudiante, cursoActualizado);
 
         System.out.printf("[PEDIDOS-SERVICE] Pedido %s creado para el estudiante %s. Vacante reservada. MP Preference: %s%n",
                 guardado.getCodigoOrden(), estudiante.getNombres(), guardado.getMpPreferenceId());
@@ -89,87 +100,163 @@ public class PedidoService {
         return guardado;
     }
 
+    static final String MONEDA_ESPERADA = "PEN";
+
+    /**
+     * Webhook: el pago se consulta SIEMPRE al proveedor y debe referenciar un pedido existente.
+     * Devuelve null si el pago aun no esta aprobado.
+     */
     @Transactional
     public Pedido procesarPagoMercadoPago(String paymentId) {
         Map<String, Object> pago = mercadoPagoClient.consultarPago(paymentId);
-        if (pago == null) {
-            throw new IllegalArgumentException("No se pudo obtener informacion del pago " + paymentId + " desde Mercado Pago");
-        }
-
-        String status = (String) pago.get("status");
-        if (!"approved".equalsIgnoreCase(status)) {
-            System.out.printf("[MERCADO PAGO WEBHOOK] Pago %s recibido con estado '%s'. No es aprobado.%n", paymentId, status);
+        if (!"approved".equalsIgnoreCase(String.valueOf(pago.get("status")))) {
             return null;
         }
-
-        String externalRef = (String) pago.get("external_reference");
-        if (externalRef == null || externalRef.isBlank()) {
-            throw new IllegalArgumentException("El pago " + paymentId + " no contiene external_reference");
+        Object externalRef = pago.get("external_reference");
+        UUID pedidoId;
+        try {
+            pedidoId = UUID.fromString(String.valueOf(externalRef));
+        } catch (IllegalArgumentException ex) {
+            throw new PagoRechazadoException("El pago no referencia un pedido valido");
         }
-
-        UUID pedidoId = UUID.fromString(externalRef);
         PagarPedidoRequest pagarRequest = new PagarPedidoRequest();
         pagarRequest.setMpPaymentId(paymentId);
         pagarRequest.setTipoComprobante(TipoComprobante.BOLETA);
-
-        System.out.printf("[MERCADO PAGO WEBHOOK] Pago %s APROBADO para el pedido %s. Confirmando matricula...%n", paymentId, pedidoId);
-        return pagar(pedidoId, pagarRequest);
+        return confirmarConPagoConsultado(pedidoId, paymentId, pago, pagarRequest);
     }
 
+    /**
+     * Confirmacion desde el frontend tras el retorno de Mercado Pago. Los parametros del
+     * navegador NO son prueba: el pago se consulta al proveedor y se valida contra el pedido.
+     */
     @Transactional
-    public Pedido pagar(UUID pedidoId, PagarPedidoRequest request) {
-        Pedido pedido = buscarPorId(pedidoId);
-
-        if (pedido.getEstado() == EstadoPedido.PAGADO || pedido.getEstado() == EstadoPedido.CONFIRMADO) {
-            throw new IllegalStateException("Este pedido ya fue pagado anteriormente");
+    public Pedido confirmarPagoVerificado(UUID pedidoId, PagarPedidoRequest request) {
+        String paymentId = request != null ? request.getMpPaymentId() : null;
+        if (paymentId == null || paymentId.isBlank()) {
+            throw new PagoRechazadoException("Se requiere el identificador de pago de Mercado Pago");
         }
+        String id = paymentId.trim();
+        // Fila bloqueada antes de consultar: evita doble confirmacion concurrente (webhook + frontend).
+        Pedido pedido = pedidoRepository.findByIdForUpdate(pedidoId)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado con ID: " + pedidoId));
+        Pedido yaConfirmado = resolverIdempotencia(pedido, id);
+        if (yaConfirmado != null) {
+            return yaConfirmado;
+        }
+        Map<String, Object> pago = mercadoPagoClient.consultarPago(id);
+        return validarYAplicar(pedido, id, pago, request);
+    }
 
+    private Pedido confirmarConPagoConsultado(UUID pedidoId, String paymentId, Map<String, Object> pago,
+                                              PagarPedidoRequest request) {
+        Pedido pedido = pedidoRepository.findByIdForUpdate(pedidoId)
+                .orElseThrow(() -> new PagoRechazadoException("El pago referencia un pedido inexistente"));
+        Pedido yaConfirmado = resolverIdempotencia(pedido, paymentId);
+        if (yaConfirmado != null) {
+            return yaConfirmado;
+        }
+        return validarYAplicar(pedido, paymentId, pago, request);
+    }
+
+    private Pedido validarYAplicar(Pedido pedido, String paymentId, Map<String, Object> pago,
+                                   PagarPedidoRequest request) {
+        UUID pedidoId = pedido.getId();
+        pedidoRepository.findFirstByMpPaymentId(paymentId)
+                .filter(otro -> !otro.getId().equals(pedidoId))
+                .ifPresent(otro -> {
+                    throw new IllegalStateException("Este pago ya fue aplicado a otro pedido");
+                });
+        validarPagoContraPedido(pago, pedido, paymentId);
+        return aplicarPago(pedido, paymentId, request);
+    }
+
+    /** Devuelve el pedido si ya esta pagado con el mismo pago (sin efectos repetidos); falla si no aplica. */
+    private Pedido resolverIdempotencia(Pedido pedido, String paymentId) {
+        if (pedido.getEstado() == EstadoPedido.PAGADO || pedido.getEstado() == EstadoPedido.CONFIRMADO) {
+            if (paymentId.equals(pedido.getMpPaymentId())) {
+                enriquecerSilenciosamente(pedido);
+                return pedido;
+            }
+            throw new IllegalStateException("Este pedido ya fue pagado con otra operacion");
+        }
         if (pedido.getEstado() == EstadoPedido.CANCELADO) {
             throw new IllegalStateException("No se puede pagar un pedido que fue cancelado");
         }
+        return null;
+    }
 
+    static void validarPagoContraPedido(Map<String, Object> pago, Pedido pedido, String paymentId) {
+        if (!paymentId.equals(String.valueOf(pago.get("id")))) {
+            throw new PagoRechazadoException("La respuesta del proveedor no corresponde al pago solicitado");
+        }
+        if (!"approved".equalsIgnoreCase(String.valueOf(pago.get("status")))) {
+            throw new PagoRechazadoException("El pago no esta aprobado (estado: " + pago.get("status") + ")");
+        }
+        if (!pedido.getId().toString().equalsIgnoreCase(String.valueOf(pago.get("external_reference")))) {
+            throw new PagoRechazadoException("El pago no corresponde a este pedido");
+        }
+        if (!MONEDA_ESPERADA.equalsIgnoreCase(String.valueOf(pago.get("currency_id")))) {
+            throw new PagoRechazadoException("Moneda del pago no valida");
+        }
+        BigDecimal monto;
+        try {
+            monto = new BigDecimal(String.valueOf(pago.get("transaction_amount")));
+        } catch (NumberFormatException ex) {
+            throw new PagoRechazadoException("Monto del pago no valido");
+        }
+        if (pedido.getMonto() == null || monto.compareTo(pedido.getMonto()) != 0) {
+            throw new PagoRechazadoException("El monto pagado no coincide con el pedido");
+        }
+    }
+
+    private Pedido aplicarPago(Pedido pedido, String paymentId, PagarPedidoRequest request) {
         pedido.setEstado(EstadoPedido.PAGADO);
-        pedido.setMpPaymentId(request != null && request.getMpPaymentId() != null
-                ? request.getMpPaymentId()
-                : "PAY-" + System.currentTimeMillis());
+        pedido.setMpPaymentId(paymentId);
+        pedido.setFechaActualizacion(LocalDateTime.now());
 
         Pedido pedidoActualizado = pedidoRepository.save(pedido);
 
         // Obtener datos del estudiante y curso para comprobante y notificación
         UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+        if (request != null) {
+            if (request.getWhatsapp() != null && !request.getWhatsapp().isBlank()) {
+                estudiante.setWhatsapp(request.getWhatsapp().trim());
+            }
+            if (request.getCorreo() != null && !request.getCorreo().isBlank()) {
+                estudiante.setCorreo(request.getCorreo().trim());
+            }
+            if (request.getClienteNombres() != null && !request.getClienteNombres().isBlank()) {
+                estudiante.setNombres(request.getClienteNombres().trim());
+                estudiante.setApellidos("");
+            }
+        }
         CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
 
-        // Generar comprobante electrónico
-        generarComprobante(pedidoActualizado, estudiante, request);
+        // Generar comprobante electrónico y disparar envío por correo en segundo plano
+        generarComprobante(pedidoActualizado, estudiante, curso, request);
 
-        // Despachar notificación de WhatsApp
+        // Despachar / preparar notificación de WhatsApp mediante Meta Cloud API en segundo plano
         enviarNotificacionWhatsApp(pedidoActualizado, estudiante, curso);
 
         enriquecerPedido(pedidoActualizado, estudiante, curso);
+        comprobanteRepository.findByPedidoId(pedidoActualizado.getId()).ifPresent(pedidoActualizado::setComprobante);
         return pedidoActualizado;
     }
 
-    /**
-     * Control de propiedad: un ESTUDIANTE solo accede a sus pedidos y un DOCENTE solo a los
-     * participantes de sus cursos. ADMIN y las llamadas internas (sin usuario) no se restringen.
-     */
-    public void verificarAccesoPedido(Pedido pedido, com.curso.pedidos.config.CurrentUser usuario) {
-        if (usuario == null || usuario.isAdmin()) {
-            return;
+    @Transactional
+    public boolean reenviarWhatsApp(UUID pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
+        List<Notificacion> previas = notificacionRepository.findByPedidoId(pedidoId);
+        if (!previas.isEmpty()) {
+            String ultimoDestinatario = previas.get(previas.size() - 1).getDestinatario();
+            if (ultimoDestinatario != null && !ultimoDestinatario.isBlank()) {
+                estudiante.setWhatsapp(ultimoDestinatario);
+            }
         }
-        if (!usuario.id().equals(pedido.getEstudianteId())) {
-            throw new SecurityException("No tiene acceso a este pedido");
-        }
-    }
-
-    public void verificarDocenteDelCurso(UUID cursoId, com.curso.pedidos.config.CurrentUser usuario) {
-        if (usuario == null || usuario.isAdmin()) {
-            return;
-        }
-        CursoDto curso = cursoClient.obtenerCurso(cursoId);
-        if (!usuario.isDocente() || !usuario.id().equals(curso.getDocenteId())) {
-            throw new SecurityException("Solo el docente del curso puede ver sus participantes");
-        }
+        CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
+        enviarNotificacionWhatsApp(pedido, estudiante, curso);
+        return true;
     }
 
     /**
@@ -215,7 +302,7 @@ public class PedidoService {
 
     public List<Pedido> listar() {
         List<Pedido> pedidos = pedidoRepository.findAll();
-        pedidos.forEach(this::enriquecerSilenciosamente);
+        enriquecerListaPedidos(pedidos);
         return pedidos;
     }
 
@@ -228,14 +315,48 @@ public class PedidoService {
 
     public List<Pedido> listarPorEstudiante(UUID estudianteId) {
         List<Pedido> pedidos = pedidoRepository.findByEstudianteId(estudianteId);
-        pedidos.forEach(this::enriquecerSilenciosamente);
+        enriquecerListaPedidos(pedidos);
         return pedidos;
     }
 
     public List<Pedido> listarParticipantesPorCurso(UUID cursoId) {
         List<Pedido> pedidos = pedidoRepository.findByCursoIdAndEstado(cursoId, EstadoPedido.PAGADO);
-        pedidos.forEach(this::enriquecerSilenciosamente);
+        enriquecerListaPedidos(pedidos);
         return pedidos;
+    }
+
+    /**
+     * Enriquecimiento en lote (Batch): evita el problema N+1 de consultas HTTP y SQL.
+     */
+    private void enriquecerListaPedidos(List<Pedido> pedidos) {
+        if (pedidos == null || pedidos.isEmpty()) {
+            return;
+        }
+
+        try {
+            Set<UUID> pedidoIds = pedidos.stream().map(Pedido::getId).filter(Objects::nonNull).collect(Collectors.toSet());
+            Set<UUID> estudianteIds = pedidos.stream().map(Pedido::getEstudianteId).filter(Objects::nonNull).collect(Collectors.toSet());
+            Set<UUID> cursoIds = pedidos.stream().map(Pedido::getCursoId).filter(Objects::nonNull).collect(Collectors.toSet());
+
+            Map<UUID, Comprobante> comprobantesMap = comprobanteRepository.findByPedidoIdIn(pedidoIds)
+                    .stream()
+                    .collect(Collectors.toMap(Comprobante::getPedidoId, Function.identity(), (a, b) -> a));
+
+            Map<UUID, UsuarioDto> usuariosMap = authClient.obtenerUsuariosPorIds(estudianteIds);
+            Map<UUID, CursoDto> cursosMap = cursoClient.obtenerCursosPorIds(cursoIds);
+
+            for (Pedido pedido : pedidos) {
+                UsuarioDto estudiante = usuariosMap.get(pedido.getEstudianteId());
+                CursoDto curso = cursosMap.get(pedido.getCursoId());
+                enriquecerPedido(pedido, estudiante, curso);
+                Comprobante comp = comprobantesMap.get(pedido.getId());
+                if (comp != null) {
+                    pedido.setComprobante(comp);
+                }
+            }
+        } catch (Exception ex) {
+            pedidos.forEach(this::enriquecerSilenciosamente);
+        }
     }
 
     private void enriquecerSilenciosamente(Pedido pedido) {
@@ -243,13 +364,15 @@ public class PedidoService {
             UsuarioDto estudiante = authClient.obtenerUsuario(pedido.getEstudianteId());
             CursoDto curso = cursoClient.obtenerCurso(pedido.getCursoId());
             enriquecerPedido(pedido, estudiante, curso);
+            comprobanteRepository.findByPedidoId(pedido.getId()).ifPresent(pedido::setComprobante);
         } catch (Exception ignored) {
         }
     }
 
     private void enriquecerPedido(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         if (estudiante != null) {
-            pedido.setEstudianteNombre(estudiante.getNombres() + " " + estudiante.getApellidos());
+            pedido.setEstudiante(estudiante);
+            pedido.setEstudianteNombre((estudiante.getNombres() + " " + (estudiante.getApellidos() != null ? estudiante.getApellidos() : "")).trim());
         }
         if (curso != null) {
             pedido.setCursoTitulo(curso.getTitulo());
@@ -261,7 +384,7 @@ public class PedidoService {
         }
     }
 
-    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, PagarPedidoRequest request) {
+    private void generarComprobante(Pedido pedido, UsuarioDto estudiante, CursoDto curso, PagarPedidoRequest request) {
         if (comprobanteRepository.findByPedidoId(pedido.getId()).isPresent()) {
             return;
         }
@@ -282,25 +405,33 @@ public class PedidoService {
         comprobante.setMontoSubtotal(montoSubtotal);
         comprobante.setMontoIgv(montoIgv);
         comprobante.setMontoTotal(montoTotal);
-        comprobante.setPdfUrl("/api/comprobantes/descargar/" + pedido.getId());
-        comprobante.setEstadoEmail("ENVIADO");
+        comprobante.setPdfUrl("/api/comprobantes/" + pedido.getId() + "/descargar");
+        comprobante.setEstadoEmail("PENDIENTE");
 
         if (tipo == TipoComprobante.FACTURA && request != null) {
             comprobante.setRucCliente(request.getRucCliente());
             comprobante.setRazonSocial(request.getRazonSocial());
         }
 
-        comprobanteRepository.save(comprobante);
+        Comprobante guardado = comprobanteRepository.save(comprobante);
+        pedido.setComprobante(guardado);
 
-        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. RUC: %s. Enviado al correo %s%n",
-                tipo, comprobante.getSerie(), comprobante.getNumeroCorrelativo(), pedido.getCodigoOrden(),
-                montoTotal, comprobante.getRucCliente() != null ? comprobante.getRucCliente() : "N/A", estudiante.getCorreo());
+        // FastAPI owns PDF generation and its single email dispatch.
+        // The remote service deduplicates by pedidoId, including retries after rollback.
+        comprobanteClient.emitirYEnviarComprobante(pedido, estudiante, curso, tipo,
+                comprobante.getRucCliente(), comprobante.getRazonSocial());
+        guardado.setEstadoEmail("ENVIADO");
+        comprobanteRepository.save(guardado);
+
+        System.out.printf("[FACTURACION] Comprobante %s (%s-%06d) generado para la orden %s. Total: S/ %.2f. Correo: %s%n",
+                tipo, guardado.getSerie(), guardado.getNumeroCorrelativo(), pedido.getCodigoOrden(),
+                montoTotal, estudiante.getCorreo());
     }
 
     private void enviarNotificacionWhatsApp(Pedido pedido, UsuarioDto estudiante, CursoDto curso) {
         String datosClase = obtenerDatosClase(curso);
-        String mensaje = String.format("Hola %s! Tu matricula en el curso '%s' ha sido confirmada con exito. Horario: %s. %s",
-                estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), datosClase);
+        String mensaje = String.format("🎉 Hola %s! Tu matrícula en el curso '%s' ha sido confirmada con éxito.\n\n📅 Horario: %s\n%s\n🔖 Código: %s\n🏛️ Acceso aula: http://localhost:4200/mis-cursos.html",
+                estudiante.getNombres(), curso.getTitulo(), curso.getHorario(), datosClase, pedido.getCodigoOrden());
 
         Notificacion notificacion = new Notificacion();
         notificacion.setPedidoId(pedido.getId());
@@ -308,13 +439,22 @@ public class PedidoService {
         notificacion.setDestinatario(estudiante.getWhatsapp());
         notificacion.setTipo("BIENVENIDA");
         notificacion.setMensaje(mensaje);
-        notificacion.setEstado("ENVIADO");
+        notificacion.setEstado("PENDIENTE");
         notificacion.setIntentos(1);
 
-        notificacionRepository.save(notificacion);
+        Notificacion guardada = notificacionRepository.save(notificacion);
 
-        System.out.printf("[WHATSAPP NOTIFICACION] Mensaje enviado a %s (%s): %s%n",
-                estudiante.getNombres(), estudiante.getWhatsapp(), mensaje);
+        // Despacho asíncrono mediante Meta WhatsApp Cloud API para no bloquear la transacción
+        CompletableFuture.runAsync(() -> {
+            try {
+                boolean enviado = whatsAppCloudService.enviarNotificacionBienvenida(pedido, estudiante, curso, guardada);
+                if (enviado) {
+                    guardada.setEstado("ENVIADO");
+                }
+                notificacionRepository.save(guardada);
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     private String obtenerDatosClase(CursoDto curso) {
